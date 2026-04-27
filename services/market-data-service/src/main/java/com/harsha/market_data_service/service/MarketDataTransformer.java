@@ -1,0 +1,32 @@
+package com.harsha.market_data_service.service;
+
+import com.harsha.events.market.StockTickEvent;
+import com.harsha.market_data_service.filter.StockFilter;
+import com.harsha.market_data_service.model.TradeSummaryResponse;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class MarketDataTransformer {
+    private final StockFilter stockFilter;
+
+    public MarketDataTransformer(StockFilter stockFilter) {
+        this.stockFilter = stockFilter;
+    }
+
+    public List<StockTickEvent> toEvents(TradeSummaryResponse response) {
+
+        return response.reqTradeSummery()
+                .stream()
+                .filter(s -> stockFilter.isWatched(s.symbol()))
+                .map(s -> new StockTickEvent(
+                        s.symbol(),
+                        s.price(),
+                        s.change(),
+                        s.shareVolume(),
+                        s.lastTradedTime()
+                ))
+                .toList();
+    }
+}
