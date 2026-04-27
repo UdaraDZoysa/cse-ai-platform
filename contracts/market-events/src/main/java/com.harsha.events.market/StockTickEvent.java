@@ -1,3 +1,5 @@
+package com.harsha.events.market;
+
 public record StockTickEvent(
         String symbol,
         double price,
