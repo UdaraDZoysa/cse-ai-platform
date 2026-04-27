@@ -1,5 +1,9 @@
+package com.harsha.events.core;
+
+import java.util.UUID;
+
 public record EventEnvelope<T>(
-        String eventId,
+        UUID eventId,
         String aggregateId,
         String eventType,
         String source,
