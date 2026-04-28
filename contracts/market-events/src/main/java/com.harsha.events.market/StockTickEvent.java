@@ -5,5 +5,7 @@ public record StockTickEvent(
         double price,
         double change,
         long volume,
+        double high,
+        double low,
         long timestamp
 ) {}
