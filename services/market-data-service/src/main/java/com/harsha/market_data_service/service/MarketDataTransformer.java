@@ -17,6 +17,10 @@ public class MarketDataTransformer {
 
     public List<StockTickEvent> toEvents(TradeSummaryResponse response) {
 
+        if (response == null || response.reqTradeSummery() == null) {
+            return List.of();
+        }
+
         return response.reqTradeSummery()
                 .stream()
                 .filter(s -> stockFilter.isWatched(s.symbol()))
@@ -25,6 +29,8 @@ public class MarketDataTransformer {
                         s.price(),
                         s.change(),
                         s.shareVolume(),
+                        s.high(),
+                        s.low(),
                         s.lastTradedTime()
                 ))
                 .toList();

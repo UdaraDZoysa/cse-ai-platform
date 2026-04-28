@@ -9,6 +9,7 @@ public class MarketDataParser {
     private final ObjectMapper mapper;
 
     public MarketDataParser(ObjectMapper mapper) {
+
         this.mapper = mapper;
     }
 
@@ -16,7 +17,7 @@ public class MarketDataParser {
         try {
             return mapper.readValue(rawJson, TradeSummaryResponse.class);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing failed", e);
+            throw new RuntimeException("Failed to parse CSE trade summary response", e);
         }
     }
 }
