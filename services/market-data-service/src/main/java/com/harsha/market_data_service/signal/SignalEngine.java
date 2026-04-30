@@ -1,7 +1,7 @@
 package com.harsha.market_data_service.signal;
 
-import com.harsha.market_data_service.model.Signal;
-import com.harsha.market_data_service.model.StockFeatures;
+import com.harsha.events.market.Signal;
+import com.harsha.events.market.StockFeatures;
 import org.springframework.stereotype.Component;
 
 @Component

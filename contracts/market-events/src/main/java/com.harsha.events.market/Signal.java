@@ -1,4 +1,4 @@
-package com.harsha.market_data_service.model;
+package com.harsha.events.market;
 
 public record Signal(
         String symbol,

@@ -1,7 +1,7 @@
 package com.harsha.market_data_service.feature;
 
 import com.harsha.events.market.StockTickEvent;
-import com.harsha.market_data_service.model.StockFeatures;
+import com.harsha.events.market.StockFeatures;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -80,7 +80,10 @@ public class FeatureExtractor {
                 changePercent,
                 volatility,
                 volumeSpike,
-                current.price()
+                current.price(),
+                current.high(),
+                current.low(),
+                current.change()
         );
     }
 }

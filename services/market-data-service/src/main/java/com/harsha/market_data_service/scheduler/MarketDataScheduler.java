@@ -61,6 +61,7 @@ public class MarketDataScheduler {
 
                 var features = featureExtractor.extract(event);
                 if (features == null) {
+                    log.info("First Observation → {}", event);
                     continue; // skip first observation
                 }
 
