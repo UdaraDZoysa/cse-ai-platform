@@ -10,5 +10,6 @@ public record StockFeatures(
         double price,
         double high,
         double low,
-        double change
+        double change,
+        long lastTradedTime
 ) {}
