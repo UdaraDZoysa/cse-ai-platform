@@ -4,8 +4,8 @@ public record StockTickEvent(
         String symbol,
         double price,
         double change,
-        long volume,
+        long sharevolume,
         double high,
         double low,
-        long timestamp
+        long lastTradedTime
 ) {}
