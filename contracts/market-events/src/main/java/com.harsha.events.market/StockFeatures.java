@@ -1,4 +1,4 @@
-package com.harsha.market_data_service.model;
+package com.harsha.events.market;
 
 public record StockFeatures(
         String symbol,
@@ -7,5 +7,8 @@ public record StockFeatures(
         double priceChangePercent,
         double volatility,
         boolean volumeSpike,
-        double price
+        double price,
+        double high,
+        double low,
+        double change
 ) {}
