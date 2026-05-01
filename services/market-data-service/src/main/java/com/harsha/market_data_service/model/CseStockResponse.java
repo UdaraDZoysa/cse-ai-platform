@@ -2,7 +2,7 @@ package com.harsha.market_data_service.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record StockData(
+public record CseStockResponse(
         String symbol,
         double price,
         double change,
