@@ -83,7 +83,8 @@ public class FeatureExtractor {
                 current.price(),
                 current.high(),
                 current.low(),
-                current.change()
+                current.change(),
+                current.lastTradedTime()
         );
     }
 }

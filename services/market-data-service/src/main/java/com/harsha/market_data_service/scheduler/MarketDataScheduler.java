@@ -5,6 +5,7 @@ import com.harsha.market_data_service.collector.MarketDataCollector;
 import com.harsha.market_data_service.diff.MarketDataDiffEngine;
 import com.harsha.market_data_service.feature.FeatureExtractor;
 import com.harsha.market_data_service.parser.MarketDataParser;
+import com.harsha.market_data_service.publisher.KafkaPublisher;
 import com.harsha.market_data_service.service.MarketDataTransformer;
 import com.harsha.market_data_service.signal.SignalEngine;
 import org.slf4j.Logger;
@@ -20,8 +21,9 @@ public class MarketDataScheduler {
     private final MarketDataParser parser;
     private final MarketDataTransformer transformer;
     private final MarketDataDiffEngine diffEngine;
-    private final FeatureExtractor featureExtractor;
-    private final SignalEngine signalEngine;
+    //private final FeatureExtractor featureExtractor;
+    //private final SignalEngine signalEngine;
+    private final KafkaPublisher publisher;
     private static final Logger log = LoggerFactory.getLogger(MarketDataScheduler.class);
 
     public MarketDataScheduler(
@@ -29,15 +31,17 @@ public class MarketDataScheduler {
             MarketDataParser parser,
             MarketDataTransformer transformer,
             MarketDataDiffEngine diffEngine,
-            FeatureExtractor featureExtractor,
-            SignalEngine signalEngine
+            //FeatureExtractor featureExtractor,
+            //SignalEngine signalEngine
+            KafkaPublisher publisher
     ) {
         this.collector = collector;
         this.parser = parser;
         this.transformer = transformer;
         this.diffEngine = diffEngine;
-        this.featureExtractor = featureExtractor;
-        this.signalEngine = signalEngine;
+        //this.featureExtractor = featureExtractor;
+        //this.signalEngine = signalEngine;
+        this.publisher = publisher;
     }
 
     @Scheduled(fixedRate = 8000)
@@ -55,20 +59,21 @@ public class MarketDataScheduler {
             }
 
             for (StockTickEvent event : events) {
-                if (!diffEngine.hasChanged(event)) {
-                    continue;
+                if (diffEngine.hasChanged(event)) {
+                    publisher.publish(event);
+                    log.info("PUBLISH EVENT → {}", event);
                 }
 
-                var features = featureExtractor.extract(event);
-                if (features == null) {
-                    log.info("First Observation → {}", event);
-                    continue; // skip first observation
-                }
-
-                var signal = signalEngine.evaluates(features);
-                if (signal != null) {
-                    log.info("SIGNAL → {}", signal);
-                }
+//                var features = featureExtractor.extract(event);
+//                if (features == null) {
+//                    log.info("First Observation → {}", event);
+//                    continue; // skip first observation
+//                }
+//
+//                var signal = signalEngine.evaluates(features);
+//                if (signal != null) {
+//                    log.info("SIGNAL → {}", signal);
+//                }
             }
         } catch (Exception e) {
             log.error("Market data pipeline failed", e);
