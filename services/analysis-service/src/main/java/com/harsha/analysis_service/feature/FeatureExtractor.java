@@ -1,4 +1,4 @@
-package com.harsha.market_data_service.feature;
+package com.harsha.analysis_service.feature;
 
 import com.harsha.events.market.StockTickEvent;
 import com.harsha.events.market.StockFeatures;
