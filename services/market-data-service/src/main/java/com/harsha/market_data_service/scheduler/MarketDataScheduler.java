@@ -7,7 +7,6 @@ import com.harsha.market_data_service.feature.FeatureExtractor;
 import com.harsha.market_data_service.parser.MarketDataParser;
 import com.harsha.market_data_service.publisher.KafkaPublisher;
 import com.harsha.market_data_service.service.MarketDataTransformer;
-import com.harsha.market_data_service.signal.SignalEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -31,16 +30,12 @@ public class MarketDataScheduler {
             MarketDataParser parser,
             MarketDataTransformer transformer,
             MarketDataDiffEngine diffEngine,
-            //FeatureExtractor featureExtractor,
-            //SignalEngine signalEngine
             KafkaPublisher publisher
     ) {
         this.collector = collector;
         this.parser = parser;
         this.transformer = transformer;
         this.diffEngine = diffEngine;
-        //this.featureExtractor = featureExtractor;
-        //this.signalEngine = signalEngine;
         this.publisher = publisher;
     }
 
