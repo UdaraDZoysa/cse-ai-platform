@@ -24,13 +24,16 @@ public class InboxEvent {
     @Column(columnDefinition = "jsonb")
     private String payload;
 
-    private boolean processed;
-
     private int retryCount;
 
     private Instant createdAt;
 
     private Instant lastAttemptAt;
+
+    @Enumerated(EnumType.STRING)
+    private InboxStatus status;
+
+    private Instant processingStartedAt;
 
     protected InboxEvent() {}
 
@@ -39,9 +42,9 @@ public class InboxEvent {
         this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
-        this.processed = false;
         this.retryCount = 0;
         this.createdAt = Instant.now();
+        this.status = InboxStatus.PENDING;
     }
 
     public String getId() {
@@ -60,10 +63,6 @@ public class InboxEvent {
         return payload;
     }
 
-    public boolean isProcessed() {
-        return processed;
-    }
-
     public int getRetryCount() {
         return retryCount;
     }
@@ -77,7 +76,20 @@ public class InboxEvent {
     }
 
     public void markProcessed() {
-        this.processed = true;
+        this.status = InboxStatus.PROCESSED;
+    }
+
+    public void markFailed() {
+        this.status = InboxStatus.FAILED;
+    }
+
+    public void markPending() {
+        this.status = InboxStatus.PENDING;
+    }
+
+    public void markProcessing() {
+        this.status = InboxStatus.PROCESSING;
+        this.processingStartedAt = Instant.now();
     }
 
     public void markAttempt() {
@@ -88,5 +100,9 @@ public class InboxEvent {
     public boolean shouldRetry() {
         return retryCount < 50 &&
                 createdAt.plusSeconds(3600).isAfter(Instant.now());
+    }
+
+    public Object getProcessingStartedAt() {
+        return processingStartedAt;
     }
 }

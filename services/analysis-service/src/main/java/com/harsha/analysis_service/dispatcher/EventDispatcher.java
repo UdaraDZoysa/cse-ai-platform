@@ -1,6 +1,7 @@
 package com.harsha.analysis_service.dispatcher;
 
 import com.harsha.analysis_service.handler.EventHandler;
+import com.harsha.analysis_service.inbox.InboxEvent;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,13 +22,13 @@ public class EventDispatcher {
         }
     }
 
-    public void dispatch(String eventType, String payload) {
-        EventHandler<?> handler = handlers.get(eventType);
+    public void dispatch(InboxEvent inboxEvent) {
+        EventHandler<?> handler = handlers.get(inboxEvent.getEventType());
 
         if (handler == null) {
-            throw new RuntimeException("No handler for event type: " + eventType);
+            throw new RuntimeException("No handler for event type: " + inboxEvent.getEventType());
         }
 
-        handler.handle(payload, objectMapper);
+        handler.handle(inboxEvent, objectMapper);
     }
 }

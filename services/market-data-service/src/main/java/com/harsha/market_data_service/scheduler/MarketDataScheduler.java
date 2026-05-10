@@ -3,7 +3,6 @@ package com.harsha.market_data_service.scheduler;
 import com.harsha.events.market.StockTickEvent;
 import com.harsha.market_data_service.collector.MarketDataCollector;
 import com.harsha.market_data_service.diff.MarketDataDiffEngine;
-import com.harsha.market_data_service.feature.FeatureExtractor;
 import com.harsha.market_data_service.parser.MarketDataParser;
 import com.harsha.market_data_service.publisher.KafkaPublisher;
 import com.harsha.market_data_service.service.MarketDataTransformer;
