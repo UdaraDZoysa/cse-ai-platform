@@ -33,7 +33,7 @@ public class InboxProcessor {
                 log.error("Unexpected failure for event → id={}, reason={}",
                         event.getId(),
                         e.getMessage());
-                event.markProcessed();
+                event.markFailed();
             }
         }
     }

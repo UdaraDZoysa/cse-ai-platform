@@ -19,6 +19,7 @@ import java.time.Instant;
 public class InboxEventService {
     private final EventDispatcher eventDispatcher;
     private final KafkaTemplate<String, DltEventEnvelope> kafkaTemplate;
+    private final InboxRepository inboxRepository;
     private static final Logger log = LoggerFactory.getLogger(InboxEventService.class);
 
     @Value("${topic.market.ticks.dlt}")
@@ -26,20 +27,22 @@ public class InboxEventService {
 
     public InboxEventService(
             EventDispatcher eventDispatcher,
+            InboxRepository inboxRepository,
             KafkaTemplate<String, DltEventEnvelope> kafkaTemplate) {
         this.eventDispatcher = eventDispatcher;
+        this.inboxRepository = inboxRepository;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Transactional
     public void processSingleEvent(InboxEvent event) {
         try {
-            eventDispatcher.dispatch(event.getEventType(), event.getPayload());
+            event.markProcessing();
+            inboxRepository.save(event);
+            eventDispatcher.dispatch(event);
             event.markProcessed();
-
         } catch (InvalidEventException ex) {
             sendToDlt(event, DltErrorType.INVALID_EVENT, ex);
-            event.markProcessed();
 
         } catch (RetryableProcessingException ex) {
             handleRetry(event, ex, DltErrorType.RETRY_EXHAUSTED);
@@ -87,7 +90,8 @@ public class InboxEventService {
                     );
                 }
             });
-            event.markProcessed();
+            event.markFailed();
+            inboxRepository.save(event);
         } catch (Exception sendEx) {
             log.error("Failed to publish inbox event to DLT → id={}, reason={}",
                     event.getId(),
@@ -108,6 +112,9 @@ public class InboxEventService {
 
         if (!event.shouldRetry()){
             sendToDlt(event, finalErrorType, ex);
+        } else {
+            event.markPending();
+            inboxRepository.save(event);
         }
     }
 }

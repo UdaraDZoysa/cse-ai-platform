@@ -5,18 +5,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.analysis_service.exception.InvalidEventException;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.exception.RetryableProcessingException;
+import com.harsha.analysis_service.inbox.InboxEvent;
 
 public interface EventHandler<T> {
     String eventType();
 
     Class<T> eventClass();
 
-    void handle(T event);
+    void handle(
+            String eventId,
+            T event
+    );
 
-    default void handle(String payload, ObjectMapper objectMapper) {
+    default void handle(InboxEvent inboxEvent, ObjectMapper objectMapper) {
         try {
-            T event = objectMapper.readValue(payload, eventClass());
-            handle(event);
+            T event = objectMapper.readValue(inboxEvent.getPayload(), eventClass());
+            handle(inboxEvent.getId(), event);
         } catch (JsonProcessingException e) {
             throw new InvalidEventException(e);
         } catch (RuntimeException e) {
