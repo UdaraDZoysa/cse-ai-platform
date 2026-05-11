@@ -41,6 +41,7 @@ public class InboxEventService {
             inboxRepository.save(event);
             eventDispatcher.dispatch(event);
             event.markProcessed();
+            inboxRepository.save(event);
         } catch (InvalidEventException ex) {
             sendToDlt(event, DltErrorType.INVALID_EVENT, ex);
 

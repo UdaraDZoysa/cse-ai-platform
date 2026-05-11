@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.handler;
 
+import com.harsha.analysis_service.service.AnalysisService;
 import com.harsha.analysis_service.service.idempotency.IdempotencyService;
 import com.harsha.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
@@ -7,11 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class StockTickEventHandler implements EventHandler<StockTickEvent> {
     private final IdempotencyService idempotencyService;
+    private final AnalysisService analysisService;
 
     public StockTickEventHandler(
-            IdempotencyService idempotencyService
+            IdempotencyService idempotencyService,
+            AnalysisService analysisService
     ) {
         this.idempotencyService = idempotencyService;
+        this.analysisService = analysisService;
     }
 
     @Override
@@ -26,14 +30,11 @@ public class StockTickEventHandler implements EventHandler<StockTickEvent> {
 
     @Override
     public void handle(String eventId, StockTickEvent event) {
-        //For now
         if (idempotencyService.alreadyProcessed(eventId)) {
             return;
         }
 
-        System.out.println(
-                "Processing stock tick: " + event.symbol()
-        );
+        analysisService.analyseEvent(event);
 
         idempotencyService.markProcessed(eventId);
     }
