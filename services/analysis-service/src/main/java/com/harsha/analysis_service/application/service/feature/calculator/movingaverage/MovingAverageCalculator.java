@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.feature.calculator.movingaverage;
+package com.harsha.analysis_service.application.service.feature.calculator.movingaverage;
 
 import com.harsha.events.market.MovingAverageFeatures;
 import com.harsha.events.market.StockTickEvent;

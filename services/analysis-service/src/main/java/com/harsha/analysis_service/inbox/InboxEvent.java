@@ -75,6 +75,10 @@ public class InboxEvent {
         return lastAttemptAt;
     }
 
+    public Instant getProcessingStartedAt() {
+        return processingStartedAt;
+    }
+
     public void markProcessed() {
         this.status = InboxStatus.PROCESSED;
     }
@@ -102,7 +106,5 @@ public class InboxEvent {
                 createdAt.plusSeconds(3600).isAfter(Instant.now());
     }
 
-    public Object getProcessingStartedAt() {
-        return processingStartedAt;
-    }
+
 }

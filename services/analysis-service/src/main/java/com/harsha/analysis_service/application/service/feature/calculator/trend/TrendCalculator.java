@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.feature.calculator.trend;
+package com.harsha.analysis_service.application.service.feature.calculator.trend;
 
 import com.harsha.events.market.StockTickEvent;
 import com.harsha.events.market.TrendFeatures;

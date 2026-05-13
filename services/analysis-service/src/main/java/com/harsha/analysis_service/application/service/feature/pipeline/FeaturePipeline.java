@@ -1,15 +1,11 @@
-package com.harsha.analysis_service.service.feature.pipeline;
+package com.harsha.analysis_service.application.service.feature.pipeline;
 
-import com.harsha.analysis_service.service.feature.calculator.momentum.MomentumCalculator;
-import com.harsha.analysis_service.service.feature.calculator.movingaverage.MovingAverageCalculator;
-import com.harsha.analysis_service.service.feature.calculator.trend.TrendCalculator;
-import com.harsha.analysis_service.service.feature.calculator.volatility.VolatilityCalculator;
-import com.harsha.analysis_service.service.feature.model.StockFeatureSnapshot;
+import com.harsha.analysis_service.application.service.feature.calculator.momentum.MomentumCalculator;
+import com.harsha.analysis_service.application.service.feature.calculator.movingaverage.MovingAverageCalculator;
+import com.harsha.analysis_service.application.service.feature.calculator.trend.TrendCalculator;
+import com.harsha.analysis_service.application.service.feature.calculator.volatility.VolatilityCalculator;
+import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
 import com.harsha.events.market.StockTickEvent;
-import com.harsha.events.market.TrendFeatures;
-import com.harsha.events.market.MomentumFeatures;
-import com.harsha.events.market.VolatilityFeatures;
-import com.harsha.events.market.MovingAverageFeatures;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;

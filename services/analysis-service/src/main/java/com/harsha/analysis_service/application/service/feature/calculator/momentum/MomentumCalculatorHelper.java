@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.feature.calculator.momentum;
+package com.harsha.analysis_service.application.service.feature.calculator.momentum;
 
 import com.harsha.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;

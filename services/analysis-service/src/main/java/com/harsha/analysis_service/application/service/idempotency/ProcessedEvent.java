@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.idempotency;
+package com.harsha.analysis_service.application.service.idempotency;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

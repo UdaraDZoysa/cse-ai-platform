@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.feature.calculator.volatility;
+package com.harsha.analysis_service.application.service.feature.calculator.volatility;
 
 import com.harsha.events.market.StockTickEvent;
 import com.harsha.events.market.VolatilityFeatures;

@@ -1,8 +1,8 @@
-package com.harsha.analysis_service.service.feature;
+package com.harsha.analysis_service.application.service.feature;
 
-import com.harsha.analysis_service.service.feature.model.StockFeatureSnapshot;
-import com.harsha.analysis_service.service.feature.pipeline.FeaturePipeline;
-import com.harsha.analysis_service.service.feature.store.RollingWindowStore;
+import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
+import com.harsha.analysis_service.application.service.feature.pipeline.FeaturePipeline;
+import com.harsha.analysis_service.application.service.feature.store.RollingWindowStore;
 import com.harsha.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +31,12 @@ public class FeatureExtractor {
                 tick.lastTradedTime(),
                 window
         );
+    }
+
+    public Deque<StockTickEvent> currentWindow(
+            String symbol
+    ) {
+        return rollingWindowStore.currentWindow(symbol);
     }
 
 }

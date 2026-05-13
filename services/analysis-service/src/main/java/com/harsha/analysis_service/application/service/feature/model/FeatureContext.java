@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.feature.model;
+package com.harsha.analysis_service.application.service.feature.model;
 
 import com.harsha.events.market.StockTickEvent;
 

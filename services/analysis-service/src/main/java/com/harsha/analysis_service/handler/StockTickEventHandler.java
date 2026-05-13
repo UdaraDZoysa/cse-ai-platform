@@ -1,7 +1,7 @@
 package com.harsha.analysis_service.handler;
 
-import com.harsha.analysis_service.service.AnalysisService;
-import com.harsha.analysis_service.service.idempotency.IdempotencyService;
+import com.harsha.analysis_service.application.service.AnalysisService;
+import com.harsha.analysis_service.application.service.idempotency.IdempotencyService;
 import com.harsha.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class StockTickEventHandler implements EventHandler<StockTickEvent> {
             return;
         }
 
-        analysisService.analyseEvent(event);
+        analysisService.analyseEvent(eventId, event);
 
         idempotencyService.markProcessed(eventId);
     }

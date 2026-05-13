@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.feature.store;
+package com.harsha.analysis_service.application.service.feature.store;
 
 import com.harsha.events.market.StockTickEvent;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,5 +41,17 @@ public class RollingWindowStore {
 
             return new ArrayDeque<>(window);
         }
+    }
+
+    public Deque<StockTickEvent> currentWindow(
+            String symbol
+    ) {
+        Deque<StockTickEvent> window = windows.get(symbol);
+
+        if (window == null) {
+            return new ArrayDeque<>();
+        }
+
+        return new ArrayDeque<>(window);
     }
 }
