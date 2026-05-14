@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.service.idempotency;
+package com.harsha.analysis_service.application.service.idempotency;
 
 import org.springframework.stereotype.Service;
 

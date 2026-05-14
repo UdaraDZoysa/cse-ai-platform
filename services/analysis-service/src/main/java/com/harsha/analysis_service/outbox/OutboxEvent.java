@@ -1,22 +1,27 @@
-package com.harsha.analysis_service.inbox;
+package com.harsha.analysis_service.outbox;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(
-        name = "inbox_events",
+        name = "outbox_events",
         indexes = {
-                @Index(name = "idx_inbox_processed_created", columnList = "processed, created_at")
+                @Index(
+                        name = "idx_outbox_status_created_at",
+                        columnList = "status, createdAt"
+                )
         }
 )
 @Getter
-public class InboxEvent {
+public class OutboxEvent {
     @Id
-    private String id;
+    private UUID id;
 
     private String aggregateId;
 
@@ -26,43 +31,52 @@ public class InboxEvent {
     @Column(columnDefinition = "jsonb")
     private String payload;
 
-    private int retryCount;
-
     private Instant createdAt;
+
+    private int retryCount;
 
     private Instant lastAttemptAt;
 
     @Enumerated(EnumType.STRING)
-    private InboxStatus status;
+    private OutboxStatus status;
 
     private Instant processingStartedAt;
 
-    protected InboxEvent() {}
+    private Instant processingFinishedAt;
 
-    public InboxEvent(String id, String aggregateId, String eventType, String payload) {
+    protected OutboxEvent() {}
+
+    public OutboxEvent(
+            UUID id,
+            String aggregateId,
+            String eventType,
+            String payload
+    ) {
         this.id = id;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
-        this.retryCount = 0;
         this.createdAt = Instant.now();
-        this.status = InboxStatus.PENDING;
+        this.retryCount = 0;
+        this.status = OutboxStatus.PENDING;
     }
 
     public void markProcessed() {
-        this.status = InboxStatus.PROCESSED;
+        this.status = OutboxStatus.PROCESSED;
+        this.processingFinishedAt = Instant.now();
     }
 
     public void markFailed() {
-        this.status = InboxStatus.FAILED;
+        this.status = OutboxStatus.FAILED;
+        this.processingFinishedAt = Instant.now();
     }
 
     public void markPending() {
-        this.status = InboxStatus.PENDING;
+        this.status = OutboxStatus.PENDING;
     }
 
     public void markProcessing() {
-        this.status = InboxStatus.PROCESSING;
+        this.status = OutboxStatus.PROCESSING;
         this.processingStartedAt = Instant.now();
     }
 
@@ -75,6 +89,5 @@ public class InboxEvent {
         return retryCount < 20 &&
                 createdAt.plusSeconds(3600).isAfter(Instant.now());
     }
-
 
 }

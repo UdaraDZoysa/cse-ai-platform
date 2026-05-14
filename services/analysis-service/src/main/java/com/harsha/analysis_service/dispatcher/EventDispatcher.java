@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.dispatcher;
 
+import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.handler.EventHandler;
 import com.harsha.analysis_service.inbox.InboxEvent;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,10 @@ public class EventDispatcher {
     private final ObjectMapper objectMapper;
     private final Map<String, EventHandler<?>> handlers = new HashMap<>();
 
-    public EventDispatcher(ObjectMapper objectMapper, List<EventHandler<?>> handlerList) {
+    public EventDispatcher(
+            ObjectMapper objectMapper,
+            List<EventHandler<?>> handlerList
+    ) {
         this.objectMapper = objectMapper;
 
         for (EventHandler<?> handler : handlerList) {
@@ -26,7 +30,10 @@ public class EventDispatcher {
         EventHandler<?> handler = handlers.get(inboxEvent.getEventType());
 
         if (handler == null) {
-            throw new RuntimeException("No handler for event type: " + inboxEvent.getEventType());
+            throw new NonRetryableProcessingException(
+                    "No handler registered for event type: "
+                            + inboxEvent.getEventType()
+            );
         }
 
         handler.handle(inboxEvent, objectMapper);

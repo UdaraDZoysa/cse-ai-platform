@@ -34,6 +34,7 @@ public class InboxProcessor {
                         event.getId(),
                         e.getMessage());
                 event.markFailed();
+                inboxRepository.save(event);
             }
         }
     }

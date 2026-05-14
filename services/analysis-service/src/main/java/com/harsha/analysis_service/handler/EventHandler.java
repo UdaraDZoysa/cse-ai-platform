@@ -17,21 +17,34 @@ public interface EventHandler<T> {
             T event
     );
 
-    default void handle(InboxEvent inboxEvent, ObjectMapper objectMapper) {
+    default void  handle(InboxEvent inboxEvent, ObjectMapper objectMapper) {
         try {
             T event = objectMapper.readValue(inboxEvent.getPayload(), eventClass());
             handle(inboxEvent.getId(), event);
+
         } catch (JsonProcessingException e) {
-            throw new InvalidEventException(e);
+            throw new InvalidEventException(
+                    "Failed to deserialize event payload. eventId="
+                            + inboxEvent.getId(), e
+            );
+
+        } catch (InvalidEventException |
+                 RetryableProcessingException |
+                 NonRetryableProcessingException e
+            ) {
+            throw e;
+
         } catch (RuntimeException e) {
-            if (e instanceof InvalidEventException ||
-                    e instanceof RetryableProcessingException ||
-                    e instanceof NonRetryableProcessingException) {
-                throw e;
-            }
-            throw new RetryableProcessingException(e);
+            throw new RetryableProcessingException(
+                    "Unexpected runtime failure. eventId="
+                            + inboxEvent.getId(), e
+            );
+
         } catch (Exception e) {
-            throw new NonRetryableProcessingException(e);
+            throw new NonRetryableProcessingException(
+                    "Unexpected checked exception. eventId="
+                            + inboxEvent.getId(), e
+            );
         }
     }
 }

@@ -19,8 +19,6 @@ public class MarketDataScheduler {
     private final MarketDataParser parser;
     private final MarketDataTransformer transformer;
     private final MarketDataDiffEngine diffEngine;
-    //private final FeatureExtractor featureExtractor;
-    //private final SignalEngine signalEngine;
     private final KafkaPublisher publisher;
     private static final Logger log = LoggerFactory.getLogger(MarketDataScheduler.class);
 
@@ -57,17 +55,6 @@ public class MarketDataScheduler {
                     publisher.publish(event);
                     log.info("PUBLISH EVENT → {}", event);
                 }
-
-//                var features = featureExtractor.extract(event);
-//                if (features == null) {
-//                    log.info("First Observation → {}", event);
-//                    continue; // skip first observation
-//                }
-//
-//                var signal = signalEngine.evaluates(features);
-//                if (signal != null) {
-//                    log.info("SIGNAL → {}", signal);
-//                }
             }
         } catch (Exception e) {
             log.error("Market data pipeline failed", e);
