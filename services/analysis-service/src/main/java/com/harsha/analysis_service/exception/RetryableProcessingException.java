@@ -1,7 +1,23 @@
 package com.harsha.analysis_service.exception;
 
 public class RetryableProcessingException extends RuntimeException {
-    public RetryableProcessingException(Throwable cause) {
+
+    public RetryableProcessingException(
+            String message
+    ) {
+        super(message);
+    }
+
+    public RetryableProcessingException(
+            Throwable cause
+    ) {
         super(cause);
+    }
+
+    public RetryableProcessingException(
+            String message,
+            Throwable cause
+    ) {
+        super(message, cause);
     }
 }

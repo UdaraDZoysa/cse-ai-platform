@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.persistence.entity;
 
+import com.harsha.analysis_service.application.service.evaluator.MarketRegime;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -133,6 +134,18 @@ public class StockFeatureSnapshotEntity {
 
     @Column(nullable = false)
     private double ema20;
+
+    // ================= SIGNIFICANCE METADATA =================
+
+    @Column(nullable = false)
+    private double significanceScore;
+
+    @Column(nullable = false)
+    private double confidence;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MarketRegime marketRegime;
 
     // ================= SYSTEM =================
 

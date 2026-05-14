@@ -1,8 +1,8 @@
 package com.harsha.analysis_service.application.service.persistence;
 
+import com.harsha.analysis_service.application.service.evaluator.model.MarketEvaluationResult;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
 import com.harsha.analysis_service.persistence.entity.StockFeatureSnapshotEntity;
-import com.harsha.events.market.StockFeatureEvent;
 import com.harsha.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,8 @@ public class FeatureSnapshotMapper {
     public StockFeatureSnapshotEntity map(
             String latestEventId,
             Deque<StockTickEvent> window,
-            StockFeatureSnapshot snapshot
+            StockFeatureSnapshot snapshot,
+            MarketEvaluationResult evaluationResult
     ) {
         StockTickEvent latestTick = window.getLast();
 
@@ -61,6 +62,11 @@ public class FeatureSnapshotMapper {
                 .sma20(snapshot.movingAverage().sma20())
                 .ema5(snapshot.movingAverage().ema5())
                 .ema20(snapshot.movingAverage().ema20())
+
+                //significance metadata
+                .significanceScore(evaluationResult.significanceScore())
+                .confidence(evaluationResult.confidence())
+                .marketRegime(evaluationResult.marketRegime())
 
                 .build();
     }
