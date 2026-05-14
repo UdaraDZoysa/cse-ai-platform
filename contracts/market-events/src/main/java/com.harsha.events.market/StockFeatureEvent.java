@@ -6,6 +6,9 @@ public record StockFeatureEvent(
         TrendFeatures trend,
         MomentumFeatures momentum,
         VolatilityFeatures volatility,
-        MovingAverageFeatures movingAverage
+        MovingAverageFeatures movingAverage,
+        double significanceScore,
+        String marketRegime,
+        double confidence
 ) {
 }
