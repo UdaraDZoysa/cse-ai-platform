@@ -1,7 +1,9 @@
 package com.harsha.market_data_service.publisher;
 
-import com.harsha.events.core.EventEnvelope;
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.messaging.EventEnvelope;
+import com.harsha.contracts.events.market.StockTickEvent;
+import com.harsha.contracts.messaging.EventType;
+import com.harsha.contracts.versions.EventVersions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,8 @@ public class KafkaPublisher {
         EventEnvelope<StockTickEvent> envelope = new EventEnvelope<>(
                 UUID.randomUUID().toString(),
                 stockTickEvent.symbol(),
-                "STOCK_TICK_EVENT",
+                EventType.STOCK_TICK_EVENT,
+                EventVersions.V1,
                 "market-data-service",
                 Instant.now().toEpochMilli(),
                 stockTickEvent

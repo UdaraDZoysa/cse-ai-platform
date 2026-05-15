@@ -1,10 +1,11 @@
 package com.harsha.market_data_service.service;
 
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.market_data_service.filter.StockFilter;
 import com.harsha.market_data_service.model.TradeSummaryResponse;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -26,6 +27,7 @@ public class MarketDataTransformer {
                 .filter(s -> stockFilter.isWatched(s.symbol()))
                 .map(s -> new StockTickEvent(
                         s.symbol(),
+                        Instant.now().toEpochMilli(),
                         s.price(),
                         s.change(),
                         s.shareVolume(),

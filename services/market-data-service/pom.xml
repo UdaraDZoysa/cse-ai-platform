@@ -79,7 +79,7 @@
 
 		<dependency>
 			<groupId>com.harsha</groupId>
-			<artifactId>event-core</artifactId>
+			<artifactId>contracts</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 
