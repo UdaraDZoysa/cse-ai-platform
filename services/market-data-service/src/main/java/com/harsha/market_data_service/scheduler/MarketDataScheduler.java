@@ -4,7 +4,7 @@ import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.market_data_service.collector.MarketDataCollector;
 import com.harsha.market_data_service.diff.MarketDataDiffEngine;
 import com.harsha.market_data_service.parser.MarketDataParser;
-import com.harsha.market_data_service.publisher.KafkaPublisher;
+import com.harsha.market_data_service.publisher.StockTickPublisher;
 import com.harsha.market_data_service.service.MarketDataTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class MarketDataScheduler {
     private final MarketDataParser parser;
     private final MarketDataTransformer transformer;
     private final MarketDataDiffEngine diffEngine;
-    private final KafkaPublisher publisher;
+    private final StockTickPublisher publisher;
     private static final Logger log = LoggerFactory.getLogger(MarketDataScheduler.class);
 
     public MarketDataScheduler(
@@ -27,7 +27,7 @@ public class MarketDataScheduler {
             MarketDataParser parser,
             MarketDataTransformer transformer,
             MarketDataDiffEngine diffEngine,
-            KafkaPublisher publisher
+            StockTickPublisher publisher
     ) {
         this.collector = collector;
         this.parser = parser;
