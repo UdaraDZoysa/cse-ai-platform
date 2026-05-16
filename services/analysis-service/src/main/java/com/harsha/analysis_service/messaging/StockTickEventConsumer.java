@@ -3,8 +3,9 @@ package com.harsha.analysis_service.messaging;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.analysis_service.inbox.InboxEvent;
 import com.harsha.analysis_service.inbox.InboxRepository;
-import com.harsha.events.core.EventEnvelope;
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.messaging.EventEnvelope;
+import com.harsha.contracts.events.market.StockTickEvent;
+import com.harsha.contracts.messaging.KafkaTopics;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class StockTickEventConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = "${topic.market.ticks}", groupId = "analysis-group")
+    @KafkaListener(topics = KafkaTopics.MARKET_TICKS_V1, groupId = "analysis-group")
     public void handle(EventEnvelope<StockTickEvent> envelope) {
         String payload;
         try {

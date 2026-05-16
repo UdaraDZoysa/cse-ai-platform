@@ -1,9 +1,9 @@
-package com.harsha.events.core;
+package com.harsha.contracts.messaging;
 
 public record DltEventEnvelope(
         String eventId,
         String aggregateId,
-        String eventType,
+        EventType eventType,
         String source,
         long occurredAt,
         String payload,
@@ -11,4 +11,5 @@ public record DltEventEnvelope(
         String errorMessage,
         int retryCount,
         long failedAt
-) {}
+) {
+}

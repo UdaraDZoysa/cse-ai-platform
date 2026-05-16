@@ -37,7 +37,7 @@ public class MarketStateEvaluator {
 
         //Moving Average Spread
         double maSpread = Math.abs(
-                snapshot.movingAverage().sma5() - snapshot.movingAverage().sma20()
+                snapshot.movingAverage().sma5Tick() - snapshot.movingAverage().sma20Tick()
         );
         score += Math.min(maSpread, 10.0);
 

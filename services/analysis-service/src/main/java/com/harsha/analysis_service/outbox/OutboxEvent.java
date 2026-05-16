@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.outbox;
 
+import com.harsha.contracts.messaging.EventType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -14,7 +15,7 @@ import java.util.UUID;
         indexes = {
                 @Index(
                         name = "idx_outbox_status_created_at",
-                        columnList = "status, createdAt"
+                        columnList = "status, created_at"
                 )
         }
 )
@@ -25,7 +26,8 @@ public class OutboxEvent {
 
     private String aggregateId;
 
-    private String eventType;
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
@@ -49,7 +51,7 @@ public class OutboxEvent {
     public OutboxEvent(
             UUID id,
             String aggregateId,
-            String eventType,
+            EventType eventType,
             String payload
     ) {
         this.id = id;

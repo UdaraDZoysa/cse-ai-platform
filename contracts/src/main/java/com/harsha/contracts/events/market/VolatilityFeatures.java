@@ -1,4 +1,4 @@
-package com.harsha.events.market;
+package com.harsha.contracts.events.market;
 
 public record VolatilityFeatures(
         double standardDeviation,

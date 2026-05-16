@@ -5,9 +5,7 @@ import com.harsha.analysis_service.exception.DltErrorType;
 import com.harsha.analysis_service.exception.InvalidEventException;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.exception.RetryableProcessingException;
-import com.harsha.analysis_service.messaging.TopicResolver;
-import com.harsha.analysis_service.messaging.TopicType;
-import com.harsha.events.core.DltEventEnvelope;
+import com.harsha.contracts.messaging.DltEventEnvelope;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +19,16 @@ public class InboxEventService {
     private final EventDispatcher eventDispatcher;
     private final KafkaTemplate<String, DltEventEnvelope> kafkaTemplate;
     private final InboxRepository inboxRepository;
-    private final TopicResolver topicResolver;
     private static final Logger log = LoggerFactory.getLogger(InboxEventService.class);
 
     public InboxEventService(
             EventDispatcher eventDispatcher,
             InboxRepository inboxRepository,
-            KafkaTemplate<String, DltEventEnvelope> kafkaTemplate,
-            TopicResolver topicResolver
+            KafkaTemplate<String, DltEventEnvelope> kafkaTemplate
     ) {
         this.eventDispatcher = eventDispatcher;
         this.inboxRepository = inboxRepository;
         this.kafkaTemplate = kafkaTemplate;
-        this.topicResolver = topicResolver;
     }
 
     @Transactional
@@ -83,7 +78,7 @@ public class InboxEventService {
             inboxRepository.save(event);
 
             kafkaTemplate.send(
-                    topicResolver.resolveTopic(event.getEventType(), TopicType.DLT),
+                    event.getEventType().dltTopic(),
                     event.getAggregateId(),
                     dltEnvelope
             ).get();

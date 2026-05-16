@@ -1,4 +1,4 @@
-package com.harsha.events.market;
+package com.harsha.contracts.events.market;
 
 public record MomentumFeatures(
         double cumulativeReturn,
@@ -14,7 +14,6 @@ public record MomentumFeatures(
         double efficiencyRatio
 ) {
     public static MomentumFeatures empty() {
-
         return new MomentumFeatures(
                 0,
                 0,

@@ -1,6 +1,6 @@
 package com.harsha.analysis_service.application.service.feature.store;
 
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

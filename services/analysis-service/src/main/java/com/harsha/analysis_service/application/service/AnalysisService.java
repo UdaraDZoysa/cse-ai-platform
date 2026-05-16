@@ -7,8 +7,9 @@ import com.harsha.analysis_service.application.service.feature.FeatureExtractor;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
 import com.harsha.analysis_service.application.service.persistence.FeatureSnapshotMapper;
 import com.harsha.analysis_service.application.service.persistence.FeatureSnapshotService;
-import com.harsha.events.market.StockFeatureEvent;
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockFeatureEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
+import com.harsha.contracts.messaging.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -66,15 +67,12 @@ public class AnalysisService {
                             snapshot.trend(),
                             snapshot.momentum(),
                             snapshot.volatility(),
-                            snapshot.movingAverage(),
-                            evaluation.significanceScore(),
-                            evaluation.marketRegime().name(),
-                            evaluation.confidence()
+                            snapshot.movingAverage()
                     );
 
             eventPublisher.publish(
                     snapshot.symbol(),
-                    "STOCK_FEATURE_EVENT",
+                    EventType.STOCK_FEATURE_EVENT,
                     featureEvent);
         }
     }

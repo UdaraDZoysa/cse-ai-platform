@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.inbox;
 
+import com.harsha.contracts.messaging.EventType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -10,7 +11,7 @@ import java.time.Instant;
 @Table(
         name = "inbox_events",
         indexes = {
-                @Index(name = "idx_inbox_processed_created", columnList = "processed, created_at")
+                @Index(name = "idx_inbox_processed_created", columnList = "status, created_at")
         }
 )
 @Getter
@@ -20,7 +21,8 @@ public class InboxEvent {
 
     private String aggregateId;
 
-    private String eventType;
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
@@ -39,7 +41,7 @@ public class InboxEvent {
 
     protected InboxEvent() {}
 
-    public InboxEvent(String id, String aggregateId, String eventType, String payload) {
+    public InboxEvent(String id, String aggregateId, EventType eventType, String payload) {
         this.id = id;
         this.aggregateId = aggregateId;
         this.eventType = eventType;

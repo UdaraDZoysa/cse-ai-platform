@@ -3,6 +3,7 @@ package com.harsha.analysis_service.dispatcher;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.handler.EventHandler;
 import com.harsha.analysis_service.inbox.InboxEvent;
+import com.harsha.contracts.messaging.EventType;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 @Component
 public class EventDispatcher {
     private final ObjectMapper objectMapper;
-    private final Map<String, EventHandler<?>> handlers = new HashMap<>();
+    private final Map<EventType, EventHandler<?>> handlers = new HashMap<>();
 
     public EventDispatcher(
             ObjectMapper objectMapper,

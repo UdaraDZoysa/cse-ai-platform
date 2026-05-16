@@ -3,6 +3,7 @@ package com.harsha.analysis_service.outbox;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.analysis_service.application.events.EventPublisher;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
+import com.harsha.contracts.messaging.EventType;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -23,7 +24,7 @@ public class OutboxEventPublisher implements EventPublisher {
     @Override
     public void publish(
             String aggregateId,
-            String eventType,
+            EventType eventType,
             Object event
     ) {
         String payload;

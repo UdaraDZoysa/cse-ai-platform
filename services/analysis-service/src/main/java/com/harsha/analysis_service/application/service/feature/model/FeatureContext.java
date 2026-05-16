@@ -1,6 +1,6 @@
 package com.harsha.analysis_service.application.service.feature.model;
 
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
 
 import java.util.Deque;
 
