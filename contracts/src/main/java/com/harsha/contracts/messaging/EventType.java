@@ -1,5 +1,10 @@
 package com.harsha.contracts.messaging;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public enum EventType {
     STOCK_TICK_EVENT(
             KafkaTopics.MARKET_TICKS_V1,
@@ -13,6 +18,13 @@ public enum EventType {
 
     private final String mainTopic;
     private final String dltTopic;
+
+    private static final Map<String, EventType> TOPIC_MAP =
+            Arrays.stream(values())
+                    .collect(Collectors.toUnmodifiableMap(
+                            EventType::mainTopic,
+                            Function.identity()
+                    ));
 
     EventType(
             String mainTopic,
@@ -28,5 +40,18 @@ public enum EventType {
 
     public String dltTopic() {
         return dltTopic;
+    }
+
+    //reverse topic lookup
+    public static EventType fromTopic(String topic) {
+        EventType eventType = TOPIC_MAP.get(topic);
+
+        if (eventType == null) {
+            throw new IllegalArgumentException(
+                    "Unknown topic: " + topic
+            );
+        }
+
+        return eventType;
     }
 }

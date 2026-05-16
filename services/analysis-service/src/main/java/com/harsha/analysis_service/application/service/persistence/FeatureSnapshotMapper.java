@@ -3,7 +3,7 @@ package com.harsha.analysis_service.application.service.persistence;
 import com.harsha.analysis_service.application.service.evaluator.model.MarketEvaluationResult;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
 import com.harsha.analysis_service.persistence.entity.StockFeatureSnapshotEntity;
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
@@ -58,10 +58,10 @@ public class FeatureSnapshotMapper {
                 .volatilityVariance(snapshot.volatility().variance())
 
                 //MA
-                .sma5(snapshot.movingAverage().sma5())
-                .sma20(snapshot.movingAverage().sma20())
-                .ema5(snapshot.movingAverage().ema5())
-                .ema20(snapshot.movingAverage().ema20())
+                .sma5Tick(snapshot.movingAverage().sma5Tick())
+                .sma20Tick(snapshot.movingAverage().sma20Tick())
+                .ema5Tick(snapshot.movingAverage().ema5Tick())
+                .ema20Tick(snapshot.movingAverage().ema20Tick())
 
                 //significance metadata
                 .significanceScore(evaluationResult.significanceScore())

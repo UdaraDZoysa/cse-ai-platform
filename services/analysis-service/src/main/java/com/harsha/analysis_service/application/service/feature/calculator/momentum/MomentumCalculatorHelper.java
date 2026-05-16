@@ -1,6 +1,6 @@
 package com.harsha.analysis_service.application.service.feature.calculator.momentum;
 
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;

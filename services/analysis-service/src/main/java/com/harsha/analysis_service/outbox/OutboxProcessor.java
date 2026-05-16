@@ -1,6 +1,5 @@
 package com.harsha.analysis_service.outbox;
 
-import com.harsha.analysis_service.inbox.InboxProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;

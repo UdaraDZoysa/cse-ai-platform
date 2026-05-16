@@ -1,10 +1,9 @@
 package com.harsha.analysis_service.outbox;
 
 import com.harsha.analysis_service.exception.DltErrorType;
-import com.harsha.analysis_service.messaging.TopicResolver;
-import com.harsha.analysis_service.messaging.TopicType;
-import com.harsha.events.core.DltEventEnvelope;
-import com.harsha.events.core.EventEnvelope;
+import com.harsha.contracts.messaging.DltEventEnvelope;
+import com.harsha.contracts.messaging.EventEnvelope;
+import com.harsha.contracts.versions.EventVersions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -19,18 +18,15 @@ public class OutboxEventService {
     private final KafkaTemplate<String, EventEnvelope<String>> kafkaTemplate;
     private final KafkaTemplate<String, DltEventEnvelope> dltKafkaTemplate;
     private final OutboxRepository outboxRepository;
-    private final TopicResolver topicResolver;
 
     public OutboxEventService(
             KafkaTemplate<String, EventEnvelope<String>> kafkaTemplate,
             KafkaTemplate<String, DltEventEnvelope> dltKafkaTemplate,
-            OutboxRepository outboxRepository,
-            TopicResolver topicResolver
+            OutboxRepository outboxRepository
     ) {
         this.kafkaTemplate = kafkaTemplate;
         this.dltKafkaTemplate = dltKafkaTemplate;
         this.outboxRepository = outboxRepository;
-        this.topicResolver = topicResolver;
     }
 
     @Transactional
@@ -43,13 +39,14 @@ public class OutboxEventService {
                     event.getId().toString(),
                     event.getAggregateId(),
                     event.getEventType(),
+                    EventVersions.V1,
                     "analysis-service",
                     Instant.now().toEpochMilli(),
                     event.getPayload()
             );
 
             kafkaTemplate.send(
-                    topicResolver.resolveTopic(event.getEventType(), TopicType.MAIN),
+                    event.getEventType().mainTopic(),
                     envelope.aggregateId(),
                     envelope).get();
 
@@ -106,7 +103,7 @@ public class OutboxEventService {
             outboxRepository.save(event);
 
             dltKafkaTemplate.send(
-                    topicResolver.resolveTopic(event.getEventType(), TopicType.DLT),
+                    event.getEventType().dltTopic(),
                     event.getAggregateId(),
                     dltEnvelope
             ).get();

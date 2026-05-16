@@ -2,7 +2,8 @@ package com.harsha.analysis_service.handler;
 
 import com.harsha.analysis_service.application.service.AnalysisService;
 import com.harsha.analysis_service.application.service.idempotency.IdempotencyService;
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
+import com.harsha.contracts.messaging.EventType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,8 +20,8 @@ public class StockTickEventHandler implements EventHandler<StockTickEvent> {
     }
 
     @Override
-    public String eventType() {
-        return "STOCK_TICK_EVENT";
+    public EventType eventType() {
+        return EventType.STOCK_TICK_EVENT;
     }
 
     @Override

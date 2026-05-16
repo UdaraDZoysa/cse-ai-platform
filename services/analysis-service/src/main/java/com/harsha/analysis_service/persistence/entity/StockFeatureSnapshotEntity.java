@@ -11,8 +11,8 @@ import java.util.UUID;
 @Table(
         name = "stock_feature_snapshots",
         indexes = {
-                @Index(name = "idx_symbol_occurred_at", columnList = "symbol, occurredAt"),
-                @Index(name = "idx_occurred_at", columnList = "occurredAt")
+                @Index(name = "idx_symbol_occurred_at", columnList = "symbol, created_at"),
+                @Index(name = "idx_occurred_at", columnList = "created_at")
         }
 )
 @Getter
@@ -124,16 +124,16 @@ public class StockFeatureSnapshotEntity {
     // ================= MOVING AVERAGES =================
 
     @Column(nullable = false)
-    private double sma5;
+    private double sma5Tick;
 
     @Column(nullable = false)
-    private double sma20;
+    private double sma20Tick;
 
     @Column(nullable = false)
-    private double ema5;
+    private double ema5Tick;
 
     @Column(nullable = false)
-    private double ema20;
+    private double ema20Tick;
 
     // ================= SIGNIFICANCE METADATA =================
 

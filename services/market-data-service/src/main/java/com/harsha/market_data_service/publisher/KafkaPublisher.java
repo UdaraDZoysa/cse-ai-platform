@@ -3,6 +3,7 @@ package com.harsha.market_data_service.publisher;
 import com.harsha.contracts.messaging.EventEnvelope;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.contracts.messaging.EventType;
+import com.harsha.contracts.messaging.KafkaTopics;
 import com.harsha.contracts.versions.EventVersions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,14 +16,11 @@ import java.util.UUID;
 @Component
 public class KafkaPublisher {
     private final KafkaTemplate<String, EventEnvelope<StockTickEvent>> kafkaTemplate;
-    private final KafkaTopics topics;
 
     public KafkaPublisher(
-            KafkaTemplate<String, EventEnvelope<StockTickEvent>> kafkaTemplate,
-            KafkaTopics topics
+            KafkaTemplate<String, EventEnvelope<StockTickEvent>> kafkaTemplate
     ) {
         this.kafkaTemplate = kafkaTemplate;
-        this.topics = topics;
     }
 
     public void publish(StockTickEvent stockTickEvent) {
@@ -36,7 +34,7 @@ public class KafkaPublisher {
                 stockTickEvent
         );
 
-        kafkaTemplate.send(topics.getStockTicksTopic(), stockTickEvent.symbol(), envelope)
+        kafkaTemplate.send(KafkaTopics.MARKET_TICKS_V1, stockTickEvent.symbol(), envelope)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("Failed to publish event for symbol={} error={}",

@@ -6,9 +6,10 @@ import com.harsha.analysis_service.exception.InvalidEventException;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.exception.RetryableProcessingException;
 import com.harsha.analysis_service.inbox.InboxEvent;
+import com.harsha.contracts.messaging.EventType;
 
 public interface EventHandler<T> {
-    String eventType();
+    EventType eventType();
 
     Class<T> eventClass();
 

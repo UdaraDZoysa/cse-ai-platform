@@ -1,7 +1,7 @@
 package com.harsha.analysis_service.messaging;
 
+import com.harsha.contracts.messaging.EventType;
 import org.apache.kafka.common.TopicPartition;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,8 +11,6 @@ import org.springframework.util.backoff.FixedBackOff;
 
 @Configuration
 public class KafkaConsumerConfig {
-    @Value("${topic.market.ticks.dlt}")
-    private String dltTopic;
 
     @Bean
     public DefaultErrorHandler errorHandler(
@@ -21,8 +19,16 @@ public class KafkaConsumerConfig {
         DeadLetterPublishingRecoverer recover =
                 new DeadLetterPublishingRecoverer(
                         kafkaTemplate,
-                        (record, ex) ->
-                                new TopicPartition(dltTopic, record.partition())
+                        (record, ex) -> {
+                            EventType eventType =
+                                    EventType.fromTopic(
+                                            record.topic()
+                                    );
+                            return new TopicPartition(
+                                    eventType.dltTopic(),
+                                    record.partition()
+                            );
+                        }
                 );
         FixedBackOff backOff = new FixedBackOff(2000L, 3);
         return new DefaultErrorHandler(recover, backOff);

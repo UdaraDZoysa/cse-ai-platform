@@ -5,7 +5,7 @@ import com.harsha.analysis_service.application.service.feature.calculator.moving
 import com.harsha.analysis_service.application.service.feature.calculator.trend.TrendCalculator;
 import com.harsha.analysis_service.application.service.feature.calculator.volatility.VolatilityCalculator;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
-import com.harsha.events.market.StockTickEvent;
+import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
