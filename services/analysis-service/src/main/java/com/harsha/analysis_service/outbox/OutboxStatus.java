@@ -4,5 +4,5 @@ public enum OutboxStatus {
     PENDING,
     PROCESSING,
     PROCESSED,
-    FAILED
+    DLT_QUEUED
 }

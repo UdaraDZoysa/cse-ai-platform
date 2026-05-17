@@ -4,5 +4,5 @@ public enum InboxStatus {
     PENDING,
     PROCESSING,
     PROCESSED,
-    FAILED
+    DLT_QUEUED
 }

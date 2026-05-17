@@ -68,8 +68,8 @@ public class OutboxEvent {
         this.processingFinishedAt = Instant.now();
     }
 
-    public void markFailed() {
-        this.status = OutboxStatus.FAILED;
+    public void markDltQueued() {
+        this.status = OutboxStatus.DLT_QUEUED;
         this.processingFinishedAt = Instant.now();
     }
 

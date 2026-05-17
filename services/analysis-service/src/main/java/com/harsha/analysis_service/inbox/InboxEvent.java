@@ -55,8 +55,8 @@ public class InboxEvent {
         this.status = InboxStatus.PROCESSED;
     }
 
-    public void markFailed() {
-        this.status = InboxStatus.FAILED;
+    public void markDltQueued() {
+        this.status = InboxStatus.DLT_QUEUED;
     }
 
     public void markPending() {
@@ -77,6 +77,4 @@ public class InboxEvent {
         return retryCount < 20 &&
                 createdAt.plusSeconds(3600).isAfter(Instant.now());
     }
-
-
 }
