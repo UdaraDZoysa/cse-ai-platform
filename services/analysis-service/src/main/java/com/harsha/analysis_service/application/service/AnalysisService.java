@@ -41,25 +41,43 @@ public class AnalysisService {
             String eventId,
             StockTickEvent event
     ) {
-        StockFeatureSnapshot snapshot = featureExtractor.extract(event);
+        //generate snapshot
+        StockFeatureSnapshot snapshot =
+                featureExtractor.extract(event);
+
         if (snapshot == null) {
             log.info("First Observation → {}", event);
             return;
         }
 
+        //evaluate snapshot
         MarketEvaluationResult evaluation =
                 marketStateEvaluator.evaluate(snapshot);
 
-        if (evaluation.persist()){
-            var window = featureExtractor.currentWindow(event.symbol());
+        //get last tick
+        var window =
+                featureExtractor.currentWindow(event.symbol());
 
-            var entity = mapper.map(eventId, window, snapshot, evaluation);
+        var entity =
+                mapper.map(eventId, window, snapshot, evaluation);
 
-            snapshotService.save(entity);
-        }
+        //persist snapshot
+        snapshotService.save(entity);
 
-        if (evaluation.publish()) {
+        StockFeatureEvent featureEvent =
+                new StockFeatureEvent(
+                        snapshot.symbol(),
+                        snapshot.occurredAt(),
+                        snapshot.trend(),
+                        snapshot.momentum(),
+                        snapshot.volatility(),
+                        snapshot.movingAverage(),
+                        evaluation.significanceScore(),
+                        evaluation.marketRegime().name(),
+                        evaluation.confidence()
+                );
 
+<<<<<<< Updated upstream
             StockFeatureEvent featureEvent =
                     new StockFeatureEvent(
                             snapshot.symbol(),
@@ -75,5 +93,11 @@ public class AnalysisService {
                     EventType.STOCK_FEATURE_EVENT,
                     featureEvent);
         }
+=======
+        eventPublisher.publish(
+                snapshot.symbol(),
+                "STOCK_FEATURE_EVENT",
+                featureEvent);
+>>>>>>> Stashed changes
     }
 }
