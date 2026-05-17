@@ -5,11 +5,12 @@ import com.harsha.analysis_service.exception.DltErrorType;
 import com.harsha.analysis_service.exception.InvalidEventException;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.exception.RetryableProcessingException;
-import com.harsha.contracts.messaging.DltEventEnvelope;
+import com.harsha.analysis_service.messaging.dlt.DltMessage;
+import com.harsha.analysis_service.messaging.dlt.DltRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,18 +18,18 @@ import java.time.Instant;
 @Service
 public class InboxEventService {
     private final EventDispatcher eventDispatcher;
-    private final KafkaTemplate<String, DltEventEnvelope> kafkaTemplate;
+    private final DltRepository dltRepository;
     private final InboxRepository inboxRepository;
     private static final Logger log = LoggerFactory.getLogger(InboxEventService.class);
 
     public InboxEventService(
             EventDispatcher eventDispatcher,
             InboxRepository inboxRepository,
-            KafkaTemplate<String, DltEventEnvelope> kafkaTemplate
+            DltRepository dltRepository
     ) {
         this.eventDispatcher = eventDispatcher;
         this.inboxRepository = inboxRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.dltRepository = dltRepository;
     }
 
     @Transactional
@@ -36,17 +37,20 @@ public class InboxEventService {
         try {
             event.markProcessing();
             inboxRepository.save(event);
+
             eventDispatcher.dispatch(event);
+
             event.markProcessed();
             inboxRepository.save(event);
+
         } catch (InvalidEventException ex) {
-            sendToDlt(event, DltErrorType.INVALID_EVENT, ex);
+            queueToDlt(event, DltErrorType.INVALID_EVENT, ex);
 
         } catch (RetryableProcessingException ex) {
             handleRetry(event, ex, DltErrorType.RETRY_EXHAUSTED);
 
         } catch (NonRetryableProcessingException ex) {
-            sendToDlt(event, DltErrorType.NON_RETRYABLE, ex);
+            queueToDlt(event, DltErrorType.NON_RETRYABLE, ex);
 
         } catch (Exception ex) {
             handleRetry(event, ex, DltErrorType.UNKNOWN);
@@ -59,43 +63,33 @@ public class InboxEventService {
         return (long) (baseDelay * jitter);
     }
 
-    private void sendToDlt(InboxEvent event,DltErrorType errorType, Exception ex) {
+    private void queueToDlt(InboxEvent event,DltErrorType errorType, Exception ex) {
         try {
-            DltEventEnvelope dltEnvelope = new DltEventEnvelope(
+            DltMessage dltMessage = new DltMessage(
                     event.getId(),
                     event.getAggregateId(),
                     event.getEventType(),
-                    "analysis-service",
-                    event.getCreatedAt().toEpochMilli(),
+                    event.getEventType().dltTopic(),
                     event.getPayload(),
-                    errorType.name(),
+                    errorType,
                     ex.getMessage(),
                     event.getRetryCount(),
-                    System.currentTimeMillis()
+                    event.getCreatedAt()
             );
-            
-            event.markFailed();
+
+            event.markDltQueued();
             inboxRepository.save(event);
 
-            kafkaTemplate.send(
-                    event.getEventType().dltTopic(),
-                    event.getAggregateId(),
-                    dltEnvelope
-            ).get();
-
-            log.debug(
-                    "DLT published successfully -> eventId={}",
-                    event.getId()
-            );
+            try {
+                dltRepository.save(dltMessage);
+            } catch (DataIntegrityViolationException e) {
+                // duplicate --> ignore
+            }
 
         } catch (Exception sendEx) {
-            log.error("Failed to publish inbox event to DLT → id={}, reason={}",
+            log.error("Failed to save in DltMessage → id={}, reason={}",
                     event.getId(),
                     sendEx.getMessage());
-
-            event.markAttempt();
-            event.markPending();
-            inboxRepository.save(event);
         }
     }
 
@@ -110,7 +104,7 @@ public class InboxEventService {
         event.markAttempt();
 
         if (!event.shouldRetry()){
-            sendToDlt(event, finalErrorType, ex);
+            queueToDlt(event, finalErrorType, ex);
         } else {
             event.markPending();
             inboxRepository.save(event);

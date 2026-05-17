@@ -1,31 +1,39 @@
 package com.harsha.analysis_service.outbox;
 
 import com.harsha.analysis_service.exception.DltErrorType;
+import com.harsha.analysis_service.messaging.dlt.DltMessage;
+import com.harsha.analysis_service.messaging.dlt.DltRepository;
 import com.harsha.contracts.messaging.DltEventEnvelope;
 import com.harsha.contracts.messaging.EventEnvelope;
 import com.harsha.contracts.versions.EventVersions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.KafkaException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
+@Service
 public class OutboxEventService {
     private final KafkaTemplate<String, EventEnvelope<String>> kafkaTemplate;
     private final KafkaTemplate<String, DltEventEnvelope> dltKafkaTemplate;
+    private final DltRepository dltRepository;
     private final OutboxRepository outboxRepository;
 
     public OutboxEventService(
             KafkaTemplate<String, EventEnvelope<String>> kafkaTemplate,
             KafkaTemplate<String, DltEventEnvelope> dltKafkaTemplate,
+            DltRepository dltRepository,
             OutboxRepository outboxRepository
     ) {
         this.kafkaTemplate = kafkaTemplate;
         this.dltKafkaTemplate = dltKafkaTemplate;
+        this.dltRepository = dltRepository;
         this.outboxRepository = outboxRepository;
     }
 
@@ -67,7 +75,7 @@ public class OutboxEventService {
             handleRetry(event, DltErrorType.RETRY_EXHAUSTED, ex);
 
         } catch (SerializationException ex) {
-            sendToDlt(event, DltErrorType.INVALID_EVENT, ex);
+            queueToDlt(event, DltErrorType.INVALID_EVENT, ex);
 
         } catch (Exception ex) {
             handleRetry(event, DltErrorType.UNKNOWN, ex);
@@ -80,47 +88,37 @@ public class OutboxEventService {
         return (long) (baseDelay * jitter);
     }
 
-    public void sendToDlt(
+    public void queueToDlt(
             OutboxEvent event,
             DltErrorType errorType,
             Exception ex
     ) {
         try {
-            DltEventEnvelope dltEnvelope = new DltEventEnvelope(
+            DltMessage dltMessage = new DltMessage(
                     event.getId().toString(),
                     event.getAggregateId(),
                     event.getEventType(),
-                    "analysis-service",
-                    event.getCreatedAt().toEpochMilli(),
+                    event.getEventType().dltTopic(),
                     event.getPayload(),
-                    errorType.name(),
+                    errorType,
                     ex.getMessage(),
                     event.getRetryCount(),
-                    System.currentTimeMillis()
+                    event.getCreatedAt()
             );
 
-            event.markFailed();
-            outboxRepository.save(event);
+            event.markDltQueued();
+            dltRepository.save(dltMessage);
 
-            dltKafkaTemplate.send(
-                    event.getEventType().dltTopic(),
-                    event.getAggregateId(),
-                    dltEnvelope
-            ).get();
-
-            log.debug(
-                    "DLT published successfully -> eventId={}",
-                    event.getId()
-            );
+            try {
+                dltRepository.save(dltMessage);
+            } catch (DataIntegrityViolationException e) {
+                // duplicate --> ignore
+            }
 
         } catch (Exception sendEx) {
-            log.error("Failed to publish outbox event to DLT → id={}, reason={}",
+            log.error("Failed to save in DltMessage → id={}, reason={}",
                     event.getId(),
                     sendEx.getMessage());
-
-            event.markAttempt();
-            event.markPending();
-            outboxRepository.save(event);
         }
     }
 
@@ -139,7 +137,7 @@ public class OutboxEventService {
         event.markAttempt();
 
         if (!event.shouldRetry()) {
-            sendToDlt(event, finalErrorType, ex);
+            queueToDlt(event, finalErrorType, ex);
         } else {
             event.markPending();
             outboxRepository.save(event);
