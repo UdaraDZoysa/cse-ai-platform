@@ -47,19 +47,11 @@ public class MarketStateEvaluator {
         //Confidence
         double confidence = score / 100.0;
 
-        //Publish Decision
-        boolean publish = score >= 60.0;
-
-        //Persist Decision
-        boolean persist = score >= 40.0;
-
         //Market Regime
         MarketRegime marketRegime = determineMarketRegime(snapshot);
 
         return new MarketEvaluationResult(
                 score,
-                publish,
-                persist,
                 marketRegime,
                 confidence
         );

@@ -73,12 +73,6 @@
 
 		<dependency>
 			<groupId>com.harsha</groupId>
-			<artifactId>market-events</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.harsha</groupId>
 			<artifactId>contracts</artifactId>
 			<version>1.0.0</version>
 		</dependency>
