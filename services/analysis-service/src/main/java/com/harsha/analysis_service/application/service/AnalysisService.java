@@ -71,33 +71,12 @@ public class AnalysisService {
                         snapshot.trend(),
                         snapshot.momentum(),
                         snapshot.volatility(),
-                        snapshot.movingAverage(),
-                        evaluation.significanceScore(),
-                        evaluation.marketRegime().name(),
-                        evaluation.confidence()
+                        snapshot.movingAverage()
                 );
 
-<<<<<<< Updated upstream
-            StockFeatureEvent featureEvent =
-                    new StockFeatureEvent(
-                            snapshot.symbol(),
-                            snapshot.occurredAt(),
-                            snapshot.trend(),
-                            snapshot.momentum(),
-                            snapshot.volatility(),
-                            snapshot.movingAverage()
-                    );
-
-            eventPublisher.publish(
-                    snapshot.symbol(),
-                    EventType.STOCK_FEATURE_EVENT,
-                    featureEvent);
-        }
-=======
         eventPublisher.publish(
                 snapshot.symbol(),
-                "STOCK_FEATURE_EVENT",
+                EventType.STOCK_FEATURE_EVENT,
                 featureEvent);
->>>>>>> Stashed changes
     }
 }
