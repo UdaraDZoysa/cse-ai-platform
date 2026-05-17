@@ -8,5 +8,5 @@ public record EventEnvelope<T>(
         String source,
         long createdAt,
         T payload
-) {
+) implements MessageEnvelope{
 }
