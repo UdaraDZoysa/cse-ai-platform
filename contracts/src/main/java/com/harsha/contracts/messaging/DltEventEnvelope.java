@@ -11,5 +11,5 @@ public record DltEventEnvelope(
         String errorMessage,
         int retryCount,
         long failedAt
-) implements MessageEnvelope{
+) {
 }
