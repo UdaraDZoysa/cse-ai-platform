@@ -18,11 +18,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>contracts/market-events</module>
-        <module>contracts/event-core</module>
+        <module>contracts</module>
         <module>services/market-data-service</module>
         <module>services/analysis-service</module>
-        <module>contracts</module>
+        <module>services/strategy-service</module>
     </modules>
 
 </project>
