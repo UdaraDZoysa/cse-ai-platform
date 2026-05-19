@@ -1,6 +1,6 @@
 package com.harsha.strategy_service.handler;
 
-import com.harsha.contracts.events.market.StockFeatureEvent;
+import com.harsha.contracts.events.analysis.StockFeatureEvent;
 import com.harsha.contracts.messaging.EventType;
 import com.harsha.strategy_service.application.service.idempotency.IdempotencyService;
 import org.springframework.stereotype.Component;

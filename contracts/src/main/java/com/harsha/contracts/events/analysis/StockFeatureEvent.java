@@ -1,4 +1,4 @@
-package com.harsha.contracts.events.market;
+package com.harsha.contracts.events.analysis;
 
 import com.harsha.contracts.events.DomainEvent;
 import com.harsha.contracts.messaging.EventType;

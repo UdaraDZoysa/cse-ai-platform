@@ -1,6 +1,6 @@
 package com.harsha.analysis_service.application.service.feature.calculator.movingaverage;
 
-import com.harsha.contracts.events.market.MovingAverageFeatures;
+import com.harsha.contracts.events.analysis.MovingAverageFeatures;
 import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 

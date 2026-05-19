@@ -1,7 +1,7 @@
 package com.harsha.analysis_service.application.service.feature.calculator.trend;
 
 import com.harsha.contracts.events.market.StockTickEvent;
-import com. harsha. contracts. events. market. TrendFeatures;
+import com.harsha.contracts.events.analysis.TrendFeatures;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;

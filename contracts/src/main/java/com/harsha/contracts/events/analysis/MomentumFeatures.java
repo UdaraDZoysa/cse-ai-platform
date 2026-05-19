@@ -1,4 +1,4 @@
-package com.harsha.contracts.events.market;
+package com.harsha.contracts.events.analysis;
 
 public record MomentumFeatures(
         double cumulativeReturn,

@@ -7,7 +7,7 @@ import com.harsha.analysis_service.application.service.feature.FeatureExtractor;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
 import com.harsha.analysis_service.application.service.persistence.FeatureSnapshotMapper;
 import com.harsha.analysis_service.application.service.persistence.FeatureSnapshotService;
-import com.harsha.contracts.events.market.StockFeatureEvent;
+import com.harsha.contracts.events.analysis.StockFeatureEvent;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.contracts.messaging.EventType;
 import org.slf4j.Logger;
