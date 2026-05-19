@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.inbox;
+package com.harsha.analysis_service.messaging.inbox;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

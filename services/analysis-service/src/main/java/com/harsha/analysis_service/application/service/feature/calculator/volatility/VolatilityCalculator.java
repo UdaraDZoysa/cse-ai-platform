@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.application.service.feature.calculator.volatility;
 
+import com.harsha.contracts.events.analysis.VolatilityRegime;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.contracts.events.analysis.VolatilityFeatures;
 import org.springframework.stereotype.Component;
@@ -14,49 +15,74 @@ public class VolatilityCalculator {
             Deque<StockTickEvent> window
     ) {
         if (window.size() < 2) {
-            return new VolatilityFeatures(0, 0, "LOW");
+            return new VolatilityFeatures(
+                    Double.NaN,
+                    Double.NaN,
+                    VolatilityRegime.UNKNOWN
+            );
         }
 
         List<Double> returns = new ArrayList<>();
+
         StockTickEvent previous = null;
 
         for (StockTickEvent current : window) {
-            if (previous != null && previous.price() > 0) {
-                double r = (current.price() - previous.price()) / previous.price();
-                returns.add(r);
+            if (previous != null &&
+                    previous.price() > 0 &&
+                        current.price() > 0
+            ) {
+                double logReturn = Math.log(
+                        current.price() / previous.price()
+                );
+
+                returns.add(logReturn);
             }
+
             previous = current;
         }
 
-        if (returns.isEmpty()) {
-            return new VolatilityFeatures(0, 0, "LOW");
+        if (returns.size() < 2) {
+            return new VolatilityFeatures(
+                    Double.NaN,
+                    Double.NaN,
+                    VolatilityRegime.UNKNOWN
+            );
         }
 
         double mean = returns.stream()
                 .mapToDouble(Double::doubleValue)
                 .average()
-                .orElse(0);
+                .orElse(Double.NaN);
 
         double variance = 0;
-        for (double r : returns) {
-            double diff = r - mean;
+
+        for (double value : returns) {
+            double diff = value - mean;
+
             variance += diff * diff;
         }
-        variance /= returns.size();
+
+        variance /= (returns.size() - 1);
 
         double stdDev = Math.sqrt(variance);
 
-        String regime;
+        VolatilityRegime regime;
+
         if (stdDev < 0.002) {
-            regime = "LOW";
+            regime = VolatilityRegime.LOW;
+
         } else if (stdDev < 0.01) {
-            regime = "MEDIUM";
+            regime = VolatilityRegime.MEDIUM;
+
+        } else if (stdDev < 0.03) {
+            regime = VolatilityRegime.HIGH;
+
         } else {
-            regime = "HIGH";
+            regime = VolatilityRegime.EXTREME;
         }
 
         return new VolatilityFeatures(
-                mean,
+                stdDev,
                 variance,
                 regime
         );

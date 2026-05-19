@@ -1,6 +1,5 @@
 package com.harsha.analysis_service.messaging.dlt;
 
-import com.harsha.analysis_service.inbox.InboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.outbox;
+package com.harsha.analysis_service.messaging.outbox;
 
 import com.harsha.analysis_service.exception.DltErrorType;
 import com.harsha.analysis_service.messaging.dlt.DltMessage;

@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.application.service.feature.calculator.momentum;
 
+import com.harsha.analysis_service.application.service.feature.model.MoveDirection;
 import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +16,11 @@ public class MomentumCalculatorHelper {
 
         double last = window.getLast().price();
 
-        if (first <= 0) {
+        if (first <= 0 || last <= 0) {
             return 0;
         }
 
-        return (last - first) / first;
+        return Math.log(last / first);
     }
 
     double mean(
@@ -44,7 +45,7 @@ public class MomentumCalculatorHelper {
             double mean
     ) {
 
-        if (values.isEmpty()) {
+        if (values.size() < 2) {
             return 0;
         }
 
@@ -55,27 +56,27 @@ public class MomentumCalculatorHelper {
             variance += diff * diff;
         }
 
-        variance /= values.size();
+        variance /= (values.size() - 1);
 
         return Math.sqrt(variance);
     }
 
-    double calculateAcceleration(
-            List<Double> priceChanges
+    double calculateReturnAcceleration(
+            List<Double> returns
     ) {
 
-        if (priceChanges.size() < 2) {
+        if (returns.size() < 2) {
             return 0;
         }
 
         double totalAcceleration = 0;
 
-        for (int i = 1; i < priceChanges.size(); i++) {
+        for (int i = 1; i < returns.size(); i++) {
 
-            totalAcceleration += priceChanges.get(i) - priceChanges.get(i - 1);
+            totalAcceleration += returns.get(i) - returns.get(i - 1);
         }
 
-        return totalAcceleration / (priceChanges.size() - 1);
+        return totalAcceleration / (returns.size() - 1);
     }
 
     double calculateEfficiencyRatio(
@@ -87,11 +88,64 @@ public class MomentumCalculatorHelper {
             return 0;
         }
 
-        double netDistance =
-                Math.abs(
-                        window.getLast().price() - window.getFirst().price()
-                );
+        double first = window.getFirst().price();
+
+        double last = window.getLast().price();
+
+        double netDistance = Math.abs(
+                Math.log(last / first)
+        );
 
         return netDistance / totalPathDistance;
+    }
+
+    double calculateDirectionalPersistence(
+            List<Double> returns
+    ) {
+
+        if (returns.isEmpty()) {
+            return 0;
+        }
+
+        int longestSequence = 0;
+
+        int currentSequence = 0;
+
+        MoveDirection previousDirection = MoveDirection.FLAT;
+
+        for (double value : returns) {
+
+            MoveDirection currentDirection;
+
+            if (value > 0) {
+                currentDirection = MoveDirection.UP;
+
+            } else if (value < 0) {
+                currentDirection = MoveDirection.DOWN;
+
+            } else {
+                currentDirection = MoveDirection.FLAT;
+            }
+
+            if (currentDirection == MoveDirection.FLAT) {
+                continue;
+            }
+
+            if (currentDirection == previousDirection) {
+                currentSequence++;
+
+            } else {
+                currentSequence = 1;
+            }
+
+            longestSequence = Math.max(
+                    longestSequence,
+                    currentSequence
+            );
+
+            previousDirection = currentDirection;
+        }
+
+        return (double) longestSequence / returns.size();
     }
 }
