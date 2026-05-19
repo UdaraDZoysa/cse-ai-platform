@@ -25,7 +25,6 @@ public class MomentumCalculator {
         }
 
         List<Double> returns = new ArrayList<>();
-        List<Double> priceChanges = new ArrayList<>();
 
         StockTickEvent previous = null;
 
@@ -33,8 +32,8 @@ public class MomentumCalculator {
         int positiveMoves = 0;
         int negativeMoves = 0;
 
-        double largestUpMove = Double.MIN_VALUE;
-        double largestDownMove = Double.MAX_VALUE;
+        double largestPositiveReturn = Double.NEGATIVE_INFINITY;
+        double largestNegativeReturn = Double.POSITIVE_INFINITY;
 
         for (StockTickEvent current : window) {
             if (previous != null) {
@@ -46,23 +45,22 @@ public class MomentumCalculator {
                     continue;
                 }
 
-                double delta = currentPrice - previousPrice;
-
-                double returnValue = delta / previousPrice;
+                double returnValue = Math.log(
+                        currentPrice / previousPrice
+                );
 
                 returns.add(returnValue);
-                priceChanges.add(delta);
 
-                totalPathDistance += Math.abs(delta);
+                totalPathDistance += Math.abs(returnValue);
 
-                if (delta > 0) {
+                if (returnValue > 0) {
                     positiveMoves++;
-                    largestUpMove = Math.max(largestUpMove, delta);
+                    largestPositiveReturn = Math.max(largestPositiveReturn, returnValue);
                 }
 
-                if (delta < 0) {
+                if (returnValue < 0) {
                     negativeMoves++;
-                    largestDownMove = Math.max(largestDownMove, delta);
+                    largestNegativeReturn = Math.min(largestNegativeReturn, returnValue);
                 }
             }
             previous = current;
@@ -72,43 +70,42 @@ public class MomentumCalculator {
             return MomentumFeatures.empty();
         }
 
-        double cumulativeReturn = helperCalculator.calculateCumulativeReturn(window);
+        double cumulativeReturn = helperCalculator.calculateCumulativeReturn( window );
 
-        double averageReturn = helperCalculator.mean(returns);
+        double averageReturn = helperCalculator.mean( returns );
 
-        double returnStdDev = helperCalculator.standardDeviation(returns, averageReturn);
+        double returnStdDev = helperCalculator.standardDeviation( returns, averageReturn );
 
-        double averageDelta = helperCalculator.mean(priceChanges);
+        double acceleration = helperCalculator.calculateReturnAcceleration( returns );
 
-        double acceleration = helperCalculator.calculateAcceleration(priceChanges);
+        double positiveMoveRatio =
+                (double) positiveMoves / returns.size();
 
-        double positiveMoveRatio = (double) positiveMoves / returns.size();
+        double negativeMoveRatio =
+                (double) negativeMoves / returns.size();
 
-        double negativeMoveRatio = (double) negativeMoves / returns.size();
+        double momentumPersistence = helperCalculator.calculateDirectionalPersistence( returns );
 
-        double momentumPersistence = Math.max(positiveMoveRatio, negativeMoveRatio);
+        double efficiencyRatio = helperCalculator.calculateEfficiencyRatio( window, totalPathDistance );
 
-        double efficiencyRatio = helperCalculator.calculateEfficiencyRatio(window, totalPathDistance);
-
-        if (largestUpMove == Double.MIN_VALUE) {
-            largestUpMove = 0;
+        if (largestPositiveReturn == Double.NEGATIVE_INFINITY) {
+            largestPositiveReturn = 0;
         }
 
-        if (largestDownMove == Double.MAX_VALUE) {
-            largestDownMove = 0;
+        if (largestNegativeReturn == Double.POSITIVE_INFINITY) {
+            largestNegativeReturn = 0;
         }
 
         return new MomentumFeatures(
                 cumulativeReturn,
                 averageReturn,
                 returnStdDev,
-                averageDelta,
                 acceleration,
                 positiveMoveRatio,
                 negativeMoveRatio,
                 momentumPersistence,
-                largestUpMove,
-                largestDownMove,
+                largestPositiveReturn,
+                largestNegativeReturn,
                 efficiencyRatio
         );
 

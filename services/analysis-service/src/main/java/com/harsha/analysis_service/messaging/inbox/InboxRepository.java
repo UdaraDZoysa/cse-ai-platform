@@ -1,16 +1,15 @@
-package com.harsha.analysis_service.outbox;
+package com.harsha.analysis_service.messaging.inbox;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
-public interface OutboxRepository extends JpaRepository<OutboxEvent, UUID> {
+public interface InboxRepository extends JpaRepository<InboxEvent, String> {
     @Query(value = """
          SELECT *
-            FROM outbox_events
+            FROM inbox_events
             WHERE status =  'PENDING'
             ORDER BY created_at ASC 
             LIMIT 20
@@ -18,13 +17,13 @@ public interface OutboxRepository extends JpaRepository<OutboxEvent, UUID> {
         """,
             nativeQuery = true
     )
-    List<OutboxEvent> lockNextBatch();
+    List<InboxEvent> lockNextBatch();
 
     @Query("""
     SELECT e
-    FROM OutboxEvent e
+    FROM InboxEvent e
     WHERE e.status = 'PROCESSING'
     AND e.processingStartedAt < :cutoff
 """)
-    List<OutboxEvent> findStuckProcessingEvents(Instant cutoff);
+    List<InboxEvent> findStuckProcessingEvents(Instant cutoff);
 }

@@ -1,8 +1,8 @@
 package com.harsha.analysis_service.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.harsha.analysis_service.inbox.InboxEvent;
-import com.harsha.analysis_service.inbox.InboxRepository;
+import com.harsha.analysis_service.messaging.inbox.InboxEvent;
+import com.harsha.analysis_service.messaging.inbox.InboxRepository;
 import com.harsha.contracts.messaging.EventEnvelope;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.contracts.messaging.KafkaTopics;

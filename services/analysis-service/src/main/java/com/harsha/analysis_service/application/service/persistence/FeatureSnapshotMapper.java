@@ -43,13 +43,12 @@ public class FeatureSnapshotMapper {
                 .cumulativeReturn(snapshot.momentum().cumulativeReturn())
                 .averageReturn(snapshot.momentum().averageReturn())
                 .returnStdDev(snapshot.momentum().returnStdDev())
-                .averageDelta(snapshot.momentum().averageDelta())
                 .acceleration(snapshot.momentum().acceleration())
                 .positiveMoveRatio(snapshot.momentum().positiveMoveRatio())
                 .negativeMoveRatio(snapshot.momentum().negativeMoveRatio())
                 .momentumPersistence(snapshot.momentum().momentumPersistence())
-                .largestUpMove(snapshot.momentum().largestUpMove())
-                .largestDownMove(snapshot.momentum().largestDownMove())
+                .largestUpMove(snapshot.momentum().largestPositiveReturn())
+                .largestDownMove(snapshot.momentum().largestNegativeReturn())
                 .efficiencyRatio(snapshot.momentum().efficiencyRatio())
 
                 //volatility

@@ -13,7 +13,7 @@ import java.time.Instant;
 @Table(
         name = "dlt_messages",
         indexes = {
-                @Index(name = "idx_inbox_processed_created", columnList = "status, created_at")
+                @Index(name = "idx_dlt_message_created", columnList = "status, dlt_created_at")
         }
 )
 @Getter

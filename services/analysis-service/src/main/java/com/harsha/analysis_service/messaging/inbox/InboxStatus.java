@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.inbox;
+package com.harsha.analysis_service.messaging.inbox;
 
 public enum InboxStatus {
     PENDING,

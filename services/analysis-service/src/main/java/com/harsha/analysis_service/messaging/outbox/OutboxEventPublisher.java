@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.outbox;
+package com.harsha.analysis_service.messaging.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.analysis_service.application.events.EventPublisher;

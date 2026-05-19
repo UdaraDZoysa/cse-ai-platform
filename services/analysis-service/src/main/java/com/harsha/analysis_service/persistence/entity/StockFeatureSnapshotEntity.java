@@ -1,6 +1,8 @@
 package com.harsha.analysis_service.persistence.entity;
 
 import com.harsha.analysis_service.application.service.evaluator.MarketRegime;
+import com.harsha.contracts.events.analysis.TrendDirection;
+import com.harsha.contracts.events.analysis.VolatilityRegime;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -73,7 +75,8 @@ public class StockFeatureSnapshotEntity {
     private double trendPersistence;
 
     @Column(nullable = false)
-    private String trendDirection;
+    @Enumerated(EnumType.STRING)
+    private TrendDirection trendDirection;
 
     // ================= MOMENTUM =================
 
@@ -119,7 +122,8 @@ public class StockFeatureSnapshotEntity {
     private double volatilityVariance;
 
     @Column(nullable = false)
-    private String volatilityRegime;
+    @Enumerated(EnumType.STRING)
+    private VolatilityRegime volatilityRegime;
 
     // ================= MOVING AVERAGES =================
 

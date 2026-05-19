@@ -2,7 +2,7 @@ package com.harsha.analysis_service.dispatcher;
 
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
 import com.harsha.analysis_service.handler.EventHandler;
-import com.harsha.analysis_service.inbox.InboxEvent;
+import com.harsha.analysis_service.messaging.inbox.InboxEvent;
 import com.harsha.contracts.messaging.EventType;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;

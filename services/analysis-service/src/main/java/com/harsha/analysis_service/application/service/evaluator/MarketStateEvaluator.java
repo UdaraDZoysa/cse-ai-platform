@@ -2,6 +2,8 @@ package com.harsha.analysis_service.application.service.evaluator;
 
 import com.harsha.analysis_service.application.service.evaluator.model.MarketEvaluationResult;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
+import com.harsha.contracts.events.analysis.TrendDirection;
+import com.harsha.contracts.events.analysis.VolatilityRegime;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,14 +23,14 @@ public class MarketStateEvaluator {
         score += snapshot.momentum().efficiencyRatio() * 20.0;
 
         //Volatility Regime
-        score += switch (
-                snapshot.volatility().regime()
-                ) {
-            case "LOW" -> 5;
-            case "MEDIUM" -> 15;
-            case "HIGH" -> 25;
-            default -> 0;
-        };
+//        score += switch (
+//                snapshot.volatility().regime()
+//                ) {
+//            case  -> 5;
+//            case "MEDIUM" -> 15;
+//            case "HIGH" -> 25;
+//            default -> 0;
+//        };
 
         //Acceleration
         double acceleration = Math.abs(snapshot.momentum().acceleration());
@@ -60,9 +62,9 @@ public class MarketStateEvaluator {
     private MarketRegime determineMarketRegime(
             StockFeatureSnapshot snapshot
     ) {
-        String trend =snapshot.trend().direction();
+        TrendDirection trend =snapshot.trend().direction();
 
-        String volatility = snapshot.volatility().regime();
+        VolatilityRegime volatility = snapshot.volatility().regime();
 
         if (trend.equals("UP")
                 && volatility.equals("HIGH")) {

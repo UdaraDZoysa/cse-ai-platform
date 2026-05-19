@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.inbox;
+package com.harsha.analysis_service.messaging.inbox;
 
 import com.harsha.analysis_service.dispatcher.EventDispatcher;
 import com.harsha.analysis_service.exception.DltErrorType;

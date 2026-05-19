@@ -1,4 +1,4 @@
-package com.harsha.analysis_service.outbox;
+package com.harsha.analysis_service.messaging.outbox;
 
 public enum OutboxStatus {
     PENDING,
