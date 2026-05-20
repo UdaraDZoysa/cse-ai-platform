@@ -16,8 +16,8 @@ public class VolatilityCalculator {
     ) {
         if (window.size() < 2) {
             return new VolatilityFeatures(
-                    Double.NaN,
-                    Double.NaN,
+                    null,
+                    null,
                     VolatilityRegime.UNKNOWN
             );
         }
@@ -43,8 +43,8 @@ public class VolatilityCalculator {
 
         if (returns.size() < 2) {
             return new VolatilityFeatures(
-                    Double.NaN,
-                    Double.NaN,
+                    null,
+                    null,
                     VolatilityRegime.UNKNOWN
             );
         }
@@ -52,7 +52,7 @@ public class VolatilityCalculator {
         double mean = returns.stream()
                 .mapToDouble(Double::doubleValue)
                 .average()
-                .orElse(Double.NaN);
+                .orElse(0.0);
 
         double variance = 0;
 
