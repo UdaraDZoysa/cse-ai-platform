@@ -26,12 +26,12 @@ public class MovingAverageCalculator {
                 ema(prices, 20)
         );
     }
-    private double sma(
+    private Double sma(
             List<Double> prices,
             int period
     ) {
         if (prices.size() < period) {
-            return Double.NaN;
+            return null;
         }
 
         double sum = 0;
@@ -42,12 +42,12 @@ public class MovingAverageCalculator {
         return sum / period;
     }
 
-    private double ema(
+    private Double ema(
             List<Double> prices,
             int period
     ) {
         if (prices.size() < period) {
-            return Double.NaN;
+            return null;
         }
 
         double multiplier = 2.0 / (period + 1);

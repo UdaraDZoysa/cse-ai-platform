@@ -16,9 +16,9 @@ public class TrendCalculator {
     ) {
         if (window.size() < 2) {
             return new TrendFeatures(
-                    0,
-                    0,
-                    0,
+                    null,
+                    null,
+                    null,
                     TrendDirection.UNCERTAIN
             );
         }
@@ -73,9 +73,9 @@ public class TrendCalculator {
 
         if (totalMoves == 0) {
             return new TrendFeatures(
-                    0,
-                    0,
-                    0,
+                    null,
+                    null,
+                    null,
                     TrendDirection.SIDEWAYS
             );
         }
