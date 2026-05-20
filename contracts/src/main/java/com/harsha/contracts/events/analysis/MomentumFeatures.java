@@ -1,29 +1,29 @@
 package com.harsha.contracts.events.analysis;
 
 public record MomentumFeatures(
-        double cumulativeReturn,
-        double averageReturn,
-        double returnStdDev,
-        double acceleration,
-        double positiveMoveRatio,
-        double negativeMoveRatio,
-        double momentumPersistence,
-        double largestPositiveReturn,
-        double largestNegativeReturn,
-        double efficiencyRatio
+        Double cumulativeReturn,
+        Double averageReturn,
+        Double returnStdDev,
+        Double acceleration,
+        Double positiveMoveRatio,
+        Double negativeMoveRatio,
+        Double momentumPersistence,
+        Double largestPositiveReturn,
+        Double largestNegativeReturn,
+        Double efficiencyRatio
 ) {
     public static MomentumFeatures empty() {
         return new MomentumFeatures(
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN,
-                Double.NaN
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
     }
 }
