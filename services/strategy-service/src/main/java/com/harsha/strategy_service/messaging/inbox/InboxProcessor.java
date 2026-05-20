@@ -2,6 +2,7 @@ package com.harsha.strategy_service.messaging.inbox;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class InboxProcessor {
         this.inboxEventService = inboxEventService;
     }
 
+    @Scheduled(fixedRate = 5000)
     public void process() {
         List<InboxEvent> events = inboxRepository.lockNextBatch();
 
