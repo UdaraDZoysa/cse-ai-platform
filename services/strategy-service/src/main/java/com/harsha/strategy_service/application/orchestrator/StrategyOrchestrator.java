@@ -1,20 +1,19 @@
 package com.harsha.strategy_service.application.orchestrator;
 
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
-import com.harsha.strategy_service.application.detector.BreakoutDetector;
-import com.harsha.strategy_service.application.detector.MomentumDetector;
-import com.harsha.strategy_service.application.detector.TrendDetector;
-import com.harsha.strategy_service.application.detector.VolatilityDetector;
+import com.harsha.strategy_service.application.detector.*;
 import com.harsha.strategy_service.application.evaluator.ConfidenceEngine;
 import com.harsha.strategy_service.application.evaluator.SignalFusionEngine;
 import com.harsha.strategy_service.application.lifecycle.OpportunityLifecycleManager;
-import com.harsha.strategy_service.domain.model.DetectorSignal;
-import com.harsha.strategy_service.domain.model.OpportunityState;
-import com.harsha.strategy_service.domain.model.SignalDirection;
+import com.harsha.strategy_service.application.regime.RegimeContext;
+import com.harsha.strategy_service.application.regime.RegimeContextService;
+import com.harsha.strategy_service.application.statistics.SymbolStatisticsService;
+import com.harsha.strategy_service.domain.model.*;
 import com.harsha.strategy_service.domain.repository.OpportunityStateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Watchable;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +27,10 @@ public class StrategyOrchestrator {
     private final SignalFusionEngine fusionEngine;
     private final ConfidenceEngine confidenceEngine;
     private final OpportunityLifecycleManager lifecycleManager;
+    private final SymbolStatisticsService statisticsService;
+    private final RegimeContextService regimeContextService;
+    private final WeightApplier weightApplier;
+
 
     public StrategyOrchestrator(
             OpportunityStateRepository repository,
@@ -37,7 +40,11 @@ public class StrategyOrchestrator {
             VolatilityDetector volatilityDetector,
             SignalFusionEngine fusionEngine,
             ConfidenceEngine confidenceEngine,
-            OpportunityLifecycleManager lifecycleManager
+            OpportunityLifecycleManager lifecycleManager,
+            SymbolStatisticsService statisticsService,
+            RegimeContextService regimeContextService,
+            WeightApplier weightApplier
+
     ) {
         this.repository = repository;
         this.trendDetector = trendDetector;
@@ -47,6 +54,9 @@ public class StrategyOrchestrator {
         this.fusionEngine = fusionEngine;
         this.confidenceEngine = confidenceEngine;
         this.lifecycleManager = lifecycleManager;
+        this.statisticsService = statisticsService;
+        this.regimeContextService = regimeContextService;
+        this.weightApplier = weightApplier;
     }
 
     public void process(
@@ -60,20 +70,58 @@ public class StrategyOrchestrator {
                         )
                 );
 
+        SymbolStatisticsState statistics = statisticsService.updateAndGet(event);
+
+        RegimeContext context =
+                regimeContextService.resolve(
+                        event,
+                        statistics
+                );
+
+        RegimeEvaluation regimeEvaluation = context.regimeEvaluation();
+
+        DetectorSignal trendSignal =
+                weightApplier.applyWeight(
+                        trendDetector.detect(event),
+                        regimeEvaluation.trendWeight()
+                );
+
+        DetectorSignal breakoutSignal =
+                weightApplier.applyWeight(
+                        breakoutDetector.detect(event),
+                        regimeEvaluation.breakoutWeight()
+                );
+
+        DetectorSignal momentumSignal =
+                weightApplier.applyWeight(
+                        momentumDetector.detect(event),
+                        regimeEvaluation.momentumWeight()
+                );
+
+        DetectorSignal volatilitySignal =
+                weightApplier.applyWeight(
+                        volatilityDetector.detect(event),
+                        regimeEvaluation.volatilityWeight()
+                );
         List<DetectorSignal> signals =
                 List.of(
-                        trendDetector.detect(event),
-                        momentumDetector.detect(event),
-                        breakoutDetector.detect(event),
-                        volatilityDetector.detect(event)
+                        trendSignal,
+                        breakoutSignal,
+                        momentumSignal,
+                        volatilitySignal
                 );
+
 
         double confidence =
                 fusionEngine.calculateConfidence(signals);
 
-        SignalDirection direction = fusionEngine.determineDirection(signals);
+        SignalDirection direction =
+                fusionEngine.determineDirection(signals);
 
-        confidenceEngine.update(state, confidence);
+        confidenceEngine.update(
+                state,
+                confidence
+        );
 
         state.setDirection(direction);
 
@@ -83,14 +131,38 @@ public class StrategyOrchestrator {
 
         log.info(
                 """
-                Strategy evaluation completed.
+                ========================================
+
+                STRATEGY EVALUATION
+
+                ========================================
+
                 symbol={}
+                statisticalReady={}
+                sampleCount={}
+
+                regime={}
+                regimeConfidence={}
+
                 confidence={}
                 direction={}
                 status={}
                 persistence={}
+
+                ========================================
                 """,
-                state.getSymbol(),
+
+                event.symbol(),
+                context.statisticalReady(),
+                statistics.getSampleCount(),
+                regimeEvaluation
+                        .regimeState()
+                        .regime(),
+
+                regimeEvaluation
+                        .regimeState()
+                        .confidence(),
+
                 state.getConfidence(),
                 state.getDirection(),
                 state.getStatus(),

@@ -20,21 +20,10 @@ public interface EventHandler<T> {
 
     default void handle(InboxEvent inboxEvent, ObjectMapper objectMapper) {
         try {
-
-            System.out.println("######################################: 01" + inboxEvent.getPayload());
-            System.out.println("######################################:2" + eventClass());
-
             T event = objectMapper.readValue(inboxEvent.getPayload(), eventClass());
-
-            System.out.println("######################################:1" + event);
-
             handle(inboxEvent.getId(), event);
 
         } catch (JsonProcessingException e) {
-//            throw new InvalidEventException(
-//                    "Failed to deserialize event payload. eventId="
-//                            + inboxEvent.getId(), e
-//            );
             throw new InvalidEventException(
                     """
                     Failed to deserialize event payload.
