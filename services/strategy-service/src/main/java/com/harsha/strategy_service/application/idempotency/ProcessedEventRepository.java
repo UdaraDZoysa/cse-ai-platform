@@ -1,4 +1,4 @@
-package com.harsha.strategy_service.application.service.idempotency;
+package com.harsha.strategy_service.application.idempotency;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

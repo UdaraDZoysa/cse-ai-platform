@@ -2,17 +2,21 @@ package com.harsha.strategy_service.handler;
 
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
 import com.harsha.contracts.messaging.EventType;
-import com.harsha.strategy_service.application.service.idempotency.IdempotencyService;
+import com.harsha.strategy_service.application.idempotency.IdempotencyService;
+import com.harsha.strategy_service.application.orchestrator.StrategyOrchestrator;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StockFeatureEventHandler implements EventHandler<StockFeatureEvent>{
     private final IdempotencyService idempotencyService;
+    private final StrategyOrchestrator orchestrator;
 
     public StockFeatureEventHandler(
-            IdempotencyService idempotencyService
+            IdempotencyService idempotencyService,
+            StrategyOrchestrator orchestrator
     ) {
         this.idempotencyService = idempotencyService;
+        this.orchestrator = orchestrator;
     }
 
     @Override
@@ -31,9 +35,7 @@ public class StockFeatureEventHandler implements EventHandler<StockFeatureEvent>
             return;
         }
         //For now
-        System.out.println(
-                "Handle StockFeatureEvent with inbox event id " + eventId +
-                        " and StockFeatureEvent symbol " + event.symbol()
-        );
+        orchestrator.process(event);
+        idempotencyService.markProcessed(eventId);
     }
 }
