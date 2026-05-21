@@ -12,18 +12,5 @@ public record MomentumFeatures(
         Double largestNegativeReturn,
         Double efficiencyRatio
 ) {
-    public static MomentumFeatures empty() {
-        return new MomentumFeatures(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-    }
+
 }

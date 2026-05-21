@@ -20,7 +20,7 @@ public interface EventHandler<T> {
 
     default void  handle(InboxEvent inboxEvent, ObjectMapper objectMapper) {
         try {
-            T event = objectMapper.readValue(inboxEvent.getPayload(), eventClass());
+            T event = objectMapper.treeToValue(inboxEvent.getPayload(), eventClass());
             handle(inboxEvent.getId(), event);
 
         } catch (JsonProcessingException e) {
@@ -28,7 +28,7 @@ public interface EventHandler<T> {
                     "Failed to deserialize event payload. eventId="
                             + inboxEvent.getId(), e
             );
-
+            
         } catch (InvalidEventException |
                  RetryableProcessingException |
                  NonRetryableProcessingException e
