@@ -10,7 +10,7 @@ public interface DltRepository extends JpaRepository<DltMessage, String> {
          SELECT *
             FROM dlt_messages
             WHERE status =  'PENDING'
-            ORDER BY created_at ASC 
+            ORDER BY dlt_created_at ASC 
             LIMIT 100
             FOR UPDATE SKIP LOCKED
         """,

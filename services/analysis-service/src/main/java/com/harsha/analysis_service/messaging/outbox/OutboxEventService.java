@@ -1,9 +1,9 @@
 package com.harsha.analysis_service.messaging.outbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.harsha.analysis_service.exception.DltErrorType;
 import com.harsha.analysis_service.messaging.dlt.DltMessage;
 import com.harsha.analysis_service.messaging.dlt.DltRepository;
-import com.harsha.contracts.messaging.DltEventEnvelope;
 import com.harsha.contracts.messaging.EventEnvelope;
 import com.harsha.contracts.versions.EventVersions;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +20,16 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @Service
 public class OutboxEventService {
-    private final KafkaTemplate<String, EventEnvelope<String>> kafkaTemplate;
-    private final KafkaTemplate<String, DltEventEnvelope> dltKafkaTemplate;
+    private final KafkaTemplate<String, EventEnvelope<JsonNode>> kafkaTemplate;
     private final DltRepository dltRepository;
     private final OutboxRepository outboxRepository;
 
     public OutboxEventService(
-            KafkaTemplate<String, EventEnvelope<String>> kafkaTemplate,
-            KafkaTemplate<String, DltEventEnvelope> dltKafkaTemplate,
+            KafkaTemplate<String, EventEnvelope<JsonNode>> kafkaTemplate,
             DltRepository dltRepository,
             OutboxRepository outboxRepository
     ) {
         this.kafkaTemplate = kafkaTemplate;
-        this.dltKafkaTemplate = dltKafkaTemplate;
         this.dltRepository = dltRepository;
         this.outboxRepository = outboxRepository;
     }
@@ -43,7 +40,7 @@ public class OutboxEventService {
             event.markProcessing();
             outboxRepository.save(event);
 
-            EventEnvelope<String> envelope = new EventEnvelope<String>(
+            EventEnvelope<JsonNode> envelope = new EventEnvelope<>(
                     event.getId().toString(),
                     event.getAggregateId(),
                     event.getEventType(),

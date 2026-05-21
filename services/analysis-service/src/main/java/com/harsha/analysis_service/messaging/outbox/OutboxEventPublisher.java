@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.messaging.outbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.analysis_service.application.events.EventPublisher;
 import com.harsha.analysis_service.exception.NonRetryableProcessingException;
@@ -27,9 +28,9 @@ public class OutboxEventPublisher implements EventPublisher {
             EventType eventType,
             Object event
     ) {
-        String payload;
+        JsonNode payload;
         try {
-            payload = objectMapper.writeValueAsString(event);
+            payload = objectMapper.valueToTree(event);
 
             OutboxEvent outboxEvent = new OutboxEvent(
                     UUID.randomUUID(),

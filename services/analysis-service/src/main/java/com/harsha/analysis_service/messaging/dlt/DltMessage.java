@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.messaging.dlt;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.harsha.analysis_service.exception.DltErrorType;
 import com.harsha.contracts.messaging.EventType;
 import jakarta.persistence.*;
@@ -30,7 +31,7 @@ public class DltMessage {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String payload;
+    private JsonNode payload;
 
     @Enumerated(EnumType.STRING)
     private DltErrorType errorType;
@@ -68,7 +69,7 @@ public class DltMessage {
             String aggregateId,
             EventType eventType,
             String targetTopic,
-            String payload,
+            JsonNode payload,
             DltErrorType errorType,
             String errorMessage,
             int originRetryCount,

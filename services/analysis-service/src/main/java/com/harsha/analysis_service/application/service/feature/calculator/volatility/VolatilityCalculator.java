@@ -14,14 +14,6 @@ public class VolatilityCalculator {
     public VolatilityFeatures calculate(
             Deque<StockTickEvent> window
     ) {
-        if (window.size() < 2) {
-            return new VolatilityFeatures(
-                    null,
-                    null,
-                    VolatilityRegime.UNKNOWN
-            );
-        }
-
         List<Double> returns = new ArrayList<>();
 
         StockTickEvent previous = null;
@@ -39,14 +31,6 @@ public class VolatilityCalculator {
             }
 
             previous = current;
-        }
-
-        if (returns.size() < 2) {
-            return new VolatilityFeatures(
-                    null,
-                    null,
-                    VolatilityRegime.UNKNOWN
-            );
         }
 
         double mean = returns.stream()

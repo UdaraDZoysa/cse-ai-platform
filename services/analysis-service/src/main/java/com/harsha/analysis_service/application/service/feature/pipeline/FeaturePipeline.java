@@ -5,6 +5,10 @@ import com.harsha.analysis_service.application.service.feature.calculator.moving
 import com.harsha.analysis_service.application.service.feature.calculator.trend.TrendCalculator;
 import com.harsha.analysis_service.application.service.feature.calculator.volatility.VolatilityCalculator;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
+import com.harsha.contracts.events.analysis.MomentumFeatures;
+import com.harsha.contracts.events.analysis.MovingAverageFeatures;
+import com.harsha.contracts.events.analysis.TrendFeatures;
+import com.harsha.contracts.events.analysis.VolatilityFeatures;
 import com.harsha.contracts.events.market.StockTickEvent;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +16,8 @@ import java.util.Deque;
 
 @Component
 public class FeaturePipeline {
+    private static final int MIN_REQUIRED_WINDOW = 20;
+
     private final TrendCalculator trendCalculator;
     private final MomentumCalculator momentumCalculator;
     private final VolatilityCalculator volatilityCalculator;
@@ -34,13 +40,30 @@ public class FeaturePipeline {
             long occurredAt,
             Deque<StockTickEvent> window
     ) {
+        // Centralized Readiness validation
+        if (window.size() < MIN_REQUIRED_WINDOW) {
+            return null;
+        }
+
+        TrendFeatures trend =
+                trendCalculator.calculate(window);
+
+        MomentumFeatures momentum =
+                momentumCalculator.calculate(window);
+
+        VolatilityFeatures volatility =
+                volatilityCalculator.calculate(window);
+
+        MovingAverageFeatures movingAverage =
+                movingAverageCalculator.calculate(window);
+
         return new StockFeatureSnapshot(
                 symbol,
                 occurredAt,
-                trendCalculator.calculate(window),
-                momentumCalculator.calculate(window),
-                volatilityCalculator.calculate(window),
-                movingAverageCalculator.calculate(window)
+                trend,
+                momentum,
+                volatility,
+                movingAverage
         );
     }
 }

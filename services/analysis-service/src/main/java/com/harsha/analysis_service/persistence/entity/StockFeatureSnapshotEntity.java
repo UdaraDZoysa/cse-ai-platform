@@ -139,18 +139,6 @@ public class StockFeatureSnapshotEntity {
     @Column(nullable = false)
     private double ema20Tick;
 
-    // ================= SIGNIFICANCE METADATA =================
-
-    @Column(nullable = false)
-    private double significanceScore;
-
-    @Column(nullable = false)
-    private double confidence;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private MarketRegime marketRegime;
-
     // ================= SYSTEM =================
 
     @Column(nullable = false, updatable = false)

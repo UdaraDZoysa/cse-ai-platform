@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.messaging.inbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.harsha.contracts.messaging.EventType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class InboxEvent {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String payload;
+    private JsonNode payload;
 
     private int retryCount;
 
@@ -41,7 +42,7 @@ public class InboxEvent {
 
     protected InboxEvent() {}
 
-    public InboxEvent(String id, String aggregateId, EventType eventType, String payload) {
+    public InboxEvent(String id, String aggregateId, EventType eventType, JsonNode payload) {
         this.id = id;
         this.aggregateId = aggregateId;
         this.eventType = eventType;

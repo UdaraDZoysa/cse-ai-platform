@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.messaging.dlt;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.harsha.contracts.messaging.DltEventEnvelope;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,11 +13,11 @@ import java.time.Instant;
 @Service
 public class DltMessageService {
     private final DltRepository dltRepository;
-    private final KafkaTemplate<String, DltEventEnvelope> kafkaTemplate;
+    private final KafkaTemplate<String, DltEventEnvelope<JsonNode>> kafkaTemplate;
 
     public DltMessageService(
-            DltRepository dltRepository, KafkaTemplate<String,
-                    DltEventEnvelope> kafkaTemplate) {
+            DltRepository dltRepository,
+            KafkaTemplate<String, DltEventEnvelope<JsonNode>> kafkaTemplate) {
         this.dltRepository = dltRepository;
         this.kafkaTemplate = kafkaTemplate;
     }
@@ -27,7 +28,7 @@ public class DltMessageService {
             message.markProcessing();
             dltRepository.save(message);
 
-            DltEventEnvelope dltEnvelope = new DltEventEnvelope(
+            DltEventEnvelope<JsonNode> dltEnvelope = new DltEventEnvelope<>(
                     message.getId(),
                     message.getAggregateId(),
                     message.getEventType(),

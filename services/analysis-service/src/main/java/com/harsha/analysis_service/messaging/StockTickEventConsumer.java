@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.messaging;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.analysis_service.messaging.inbox.InboxEvent;
 import com.harsha.analysis_service.messaging.inbox.InboxRepository;
@@ -27,9 +28,11 @@ public class StockTickEventConsumer {
     @Transactional
     @KafkaListener(topics = KafkaTopics.MARKET_TICKS_V1, groupId = "analysis-group")
     public void handle(EventEnvelope<StockTickEvent> envelope) {
-        String payload;
+        JsonNode payload;
         try {
-            payload = objectMapper.writeValueAsString(envelope.payload());
+            payload = objectMapper.valueToTree(
+                    envelope.payload()
+            );
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize payload", e);
         }

@@ -20,10 +20,6 @@ public class MomentumCalculator {
     public MomentumFeatures calculate(
             Deque<StockTickEvent> window
     ) {
-        if (window.size() < 3) {
-            return MomentumFeatures.empty();
-        }
-
         List<Double> returns = new ArrayList<>();
 
         StockTickEvent previous = null;
@@ -64,10 +60,6 @@ public class MomentumCalculator {
                 }
             }
             previous = current;
-        }
-
-        if (returns.isEmpty()) {
-            return MomentumFeatures.empty();
         }
 
         double cumulativeReturn = helperCalculator.calculateCumulativeReturn( window );
