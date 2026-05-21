@@ -1,5 +1,6 @@
 package com.harsha.analysis_service.messaging.outbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.harsha.contracts.messaging.EventType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public class OutboxEvent {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String payload;
+    private JsonNode payload;
 
     private Instant createdAt;
 
@@ -52,7 +53,7 @@ public class OutboxEvent {
             UUID id,
             String aggregateId,
             EventType eventType,
-            String payload
+            JsonNode payload
     ) {
         this.id = id;
         this.aggregateId = aggregateId;

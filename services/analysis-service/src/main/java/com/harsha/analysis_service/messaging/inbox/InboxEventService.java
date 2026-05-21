@@ -44,15 +44,36 @@ public class InboxEventService {
             inboxRepository.save(event);
 
         } catch (InvalidEventException ex) {
+            log.error(
+                    "Invalid event failure. id={}",
+                    event.getId(),
+                    ex
+            );
             queueToDlt(event, DltErrorType.INVALID_EVENT, ex);
 
         } catch (RetryableProcessingException ex) {
+            log.error(
+                    "Retryable processing failure. id={}",
+                    event.getId(),
+                    ex
+            );
             handleRetry(event, ex, DltErrorType.RETRY_EXHAUSTED);
 
         } catch (NonRetryableProcessingException ex) {
+            log.error(
+                    "Non-retryable processing failure. id={}",
+                    event.getId(),
+                    ex
+            );
+            log.info("######################################################################Message: {}", ex.getMessage());
             queueToDlt(event, DltErrorType.NON_RETRYABLE, ex);
 
         } catch (Exception ex) {
+            log.error(
+                    "Unexpected processing failure. id={}",
+                    event.getId(),
+                    ex
+            );
             handleRetry(event, ex, DltErrorType.UNKNOWN);
         }
     }
