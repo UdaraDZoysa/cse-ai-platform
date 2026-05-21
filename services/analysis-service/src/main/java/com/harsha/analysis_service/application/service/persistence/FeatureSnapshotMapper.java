@@ -13,8 +13,7 @@ public class FeatureSnapshotMapper {
     public StockFeatureSnapshotEntity map(
             String latestEventId,
             Deque<StockTickEvent> window,
-            StockFeatureSnapshot snapshot,
-            MarketEvaluationResult evaluationResult
+            StockFeatureSnapshot snapshot
     ) {
         StockTickEvent latestTick = window.getLast();
 
@@ -61,11 +60,6 @@ public class FeatureSnapshotMapper {
                 .sma20Tick(snapshot.movingAverage().sma20Tick())
                 .ema5Tick(snapshot.movingAverage().ema5Tick())
                 .ema20Tick(snapshot.movingAverage().ema20Tick())
-
-                //significance metadata
-                .significanceScore(evaluationResult.significanceScore())
-                .confidence(evaluationResult.confidence())
-                .marketRegime(evaluationResult.marketRegime())
 
                 .build();
     }

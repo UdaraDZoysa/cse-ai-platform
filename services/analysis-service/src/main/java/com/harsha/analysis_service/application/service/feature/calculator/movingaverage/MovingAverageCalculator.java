@@ -26,14 +26,10 @@ public class MovingAverageCalculator {
                 ema(prices, 20)
         );
     }
-    private Double sma(
+    private double sma(
             List<Double> prices,
             int period
     ) {
-        if (prices.size() < period) {
-            return null;
-        }
-
         double sum = 0;
         for (int i = (prices.size() - period); i < prices.size(); i++) {
             sum += prices.get(i);
@@ -42,14 +38,10 @@ public class MovingAverageCalculator {
         return sum / period;
     }
 
-    private Double ema(
+    private double ema(
             List<Double> prices,
             int period
     ) {
-        if (prices.size() < period) {
-            return null;
-        }
-
         double multiplier = 2.0 / (period + 1);
 
         double ema = 0;

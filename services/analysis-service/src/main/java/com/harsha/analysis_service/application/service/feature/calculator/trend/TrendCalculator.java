@@ -14,17 +14,9 @@ public class TrendCalculator {
     public TrendFeatures calculate(
             Deque<StockTickEvent> window
     ) {
-        if (window.size() < 2) {
-            return new TrendFeatures(
-                    null,
-                    null,
-                    null,
-                    TrendDirection.UNCERTAIN
-            );
-        }
-
         int upward = 0;
         int downward = 0;
+
         int longestSequence = 0;
         int currentSequence = 0;
         MoveDirection previousMove = null;
@@ -70,15 +62,6 @@ public class TrendCalculator {
         }
 
         int totalMoves = upward + downward;
-
-        if (totalMoves == 0) {
-            return new TrendFeatures(
-                    null,
-                    null,
-                    null,
-                    TrendDirection.SIDEWAYS
-            );
-        }
 
         double upwardRatio =
                 (double) upward / totalMoves;

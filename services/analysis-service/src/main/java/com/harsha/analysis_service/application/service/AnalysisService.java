@@ -7,6 +7,7 @@ import com.harsha.analysis_service.application.service.feature.FeatureExtractor;
 import com.harsha.analysis_service.application.service.feature.model.StockFeatureSnapshot;
 import com.harsha.analysis_service.application.service.persistence.FeatureSnapshotMapper;
 import com.harsha.analysis_service.application.service.persistence.FeatureSnapshotService;
+import com.harsha.contracts.events.analysis.MovingAverageFeatures;
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.contracts.messaging.EventType;
@@ -19,7 +20,6 @@ public class AnalysisService {
     private final FeatureExtractor featureExtractor;
     private final FeatureSnapshotMapper mapper;
     private final FeatureSnapshotService snapshotService;
-    private final MarketStateEvaluator marketStateEvaluator;
     private final EventPublisher eventPublisher;
     private static final Logger log = LoggerFactory.getLogger(AnalysisService.class);
 
@@ -27,13 +27,11 @@ public class AnalysisService {
             FeatureExtractor featureExtractor,
             FeatureSnapshotMapper mapper,
             FeatureSnapshotService snapshotService,
-            MarketStateEvaluator marketStateEvaluator,
             EventPublisher eventPublisher
     ) {
         this.featureExtractor = featureExtractor;
         this.mapper = mapper;
         this.snapshotService = snapshotService;
-        this.marketStateEvaluator = marketStateEvaluator;
         this.eventPublisher = eventPublisher;
     }
 
@@ -41,25 +39,24 @@ public class AnalysisService {
             String eventId,
             StockTickEvent event
     ) {
+
         //generate snapshot
         StockFeatureSnapshot snapshot =
                 featureExtractor.extract(event);
 
         if (snapshot == null) {
-            log.info("First Observation → {}", event);
+            log.info("Feature warmup phase. symbol={}",
+                    event.symbol()
+            );
             return;
         }
-
-        //evaluate snapshot
-        MarketEvaluationResult evaluation =
-                marketStateEvaluator.evaluate(snapshot);
 
         //get last tick
         var window =
                 featureExtractor.currentWindow(event.symbol());
 
         var entity =
-                mapper.map(eventId, window, snapshot, evaluation);
+                mapper.map(eventId, window, snapshot);
 
         //persist snapshot
         snapshotService.save(entity);
@@ -78,5 +75,17 @@ public class AnalysisService {
                 snapshot.symbol(),
                 EventType.STOCK_FEATURE_EVENT,
                 featureEvent);
+    }
+
+    private boolean isReady(
+            StockFeatureSnapshot snapshot
+    ) {
+
+        MovingAverageFeatures movingAverage =
+                snapshot.movingAverage();
+
+        return movingAverage != null
+                && movingAverage.sma20Tick() != null
+                && movingAverage.ema20Tick() != null;
     }
 }
