@@ -14,6 +14,11 @@ public enum EventType {
     STOCK_FEATURE_EVENT(
             KafkaTopics.STOCK_FEATURES_V1,
             KafkaTopics.STOCK_FEATURES_DLT_V1
+    ),
+
+    WATCHLIST_UPDATED_EVENT(
+            KafkaTopics.WATCHLIST_UPDATED_EVENT_V1,
+            KafkaTopics.WATCHLIST_UPDATED_EVENT_DLT_V1
     );
 
     private final String mainTopic;

@@ -16,7 +16,7 @@ public class WatchlistController {
 
     @PostMapping
     public void update(@RequestBody Set<String> symbols) {
-        stockFilter.updateWatchlist(symbols);
+        stockFilter.handleWatchlist(symbols);
     }
 
     @GetMapping
