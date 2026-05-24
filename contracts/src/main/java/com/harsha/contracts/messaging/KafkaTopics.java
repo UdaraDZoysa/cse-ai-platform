@@ -15,4 +15,10 @@ public final class KafkaTopics {
     public static final String STOCK_FEATURES_DLT_V1 =
             "market.stock-features.dlt.v1";
 
+    public static final String WATCHLIST_UPDATED_EVENT_V1 =
+            "market.watchlist-updated-event.v1";
+
+    public static final String WATCHLIST_UPDATED_EVENT_DLT_V1 =
+            "market.watchlist-updated-event.dlt.v1";
+
 }
