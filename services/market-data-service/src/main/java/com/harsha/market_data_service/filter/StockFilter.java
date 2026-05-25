@@ -2,7 +2,6 @@ package com.harsha.market_data_service.filter;
 
 import com.harsha.contracts.events.common.WatchlistUpdatedEvent;
 import com.harsha.market_data_service.publisher.WatchListPublisher;
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -26,6 +25,15 @@ public class StockFilter {
     }
 
     public void handleWatchlist(Set<String> symbols) {
+
+        Set<String> updated =
+                Set.copyOf(symbols);
+
+        //Avoid Unnecessary Events
+        if (watchlist.equals(updated)) {
+            return;
+        }
+
         watchlist.clear();
         watchlist.addAll(symbols);
 

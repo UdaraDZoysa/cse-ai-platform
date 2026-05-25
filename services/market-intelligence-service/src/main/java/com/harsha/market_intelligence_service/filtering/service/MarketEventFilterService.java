@@ -12,6 +12,10 @@ public class MarketEventFilterService {
         this.trackedSymbolService = trackedSymbolService;
     }
 
+    public boolean isReady() {
+        return !trackedSymbolService.getTrackedSymbols().isEmpty();
+    }
+
     public boolean isRelevant(String symbol) {
         if (symbol == null || symbol.isEmpty()) {
             return false;

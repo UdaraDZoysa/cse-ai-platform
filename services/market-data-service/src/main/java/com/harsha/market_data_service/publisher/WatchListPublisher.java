@@ -26,7 +26,7 @@ public class WatchListPublisher {
         try {
             EventEnvelope<WatchlistUpdatedEvent> envelope = new EventEnvelope<>(
                     UUID.randomUUID().toString(),
-                    event.watchlistId(),
+                    "DEFAULT_WATCHLIST",
                     EventType.WATCHLIST_UPDATED_EVENT,
                     EventVersions.V1,
                     "market-data-service",

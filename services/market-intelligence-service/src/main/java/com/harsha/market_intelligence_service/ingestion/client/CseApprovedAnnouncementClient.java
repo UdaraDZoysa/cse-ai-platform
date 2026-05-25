@@ -17,7 +17,7 @@ public class CseApprovedAnnouncementClient {
 
     public CseApprovedAnnouncementsResponse fetch() {
         return cseWebClient
-                .get()
+                .post()
                 .uri("/approvedAnnouncement")
                 .retrieve()
                 .bodyToMono(CseApprovedAnnouncementsResponse.class)

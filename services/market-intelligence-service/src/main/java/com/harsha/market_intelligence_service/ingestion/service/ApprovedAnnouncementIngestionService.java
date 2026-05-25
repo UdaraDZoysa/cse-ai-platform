@@ -36,6 +36,15 @@ public class ApprovedAnnouncementIngestionService {
     }
 
     public void ingest() {
+        if (!filterService.isReady()) {
+
+            log.info(
+                    "Skipping ingestion because watchlist not initialized"
+            );
+
+            return;
+        }
+
         var response = client.fetch();
 
         if (response == null || response.approvedAnnouncements() == null) {

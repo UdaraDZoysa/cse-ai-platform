@@ -43,12 +43,11 @@ public class CompanySymbolResolver {
             );
 
             mappings.put(normalizedName, securityCode.symbol());
-
-            log.info(
-                    "Loaded {} company-symbol mappings",
-                    mappings.size()
-            );
         }
+        log.info(
+                "Loaded {} company-symbol mappings",
+                mappings.size()
+        );
     }
 
     public String resolve(String companyName) {
