@@ -1,4 +1,4 @@
-package com.harsha.market_intelligence_service.messaging;
+package com.harsha.market_intelligence_service.messaging.consumer;
 
 import com.harsha.contracts.messaging.EventType;
 import org.apache.kafka.common.TopicPartition;
