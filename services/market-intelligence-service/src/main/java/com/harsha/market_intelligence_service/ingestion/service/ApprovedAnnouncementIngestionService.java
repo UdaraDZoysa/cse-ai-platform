@@ -1,6 +1,5 @@
 package com.harsha.market_intelligence_service.ingestion.service;
 
-import com.harsha.market_intelligence_service.filtering.service.MarketEventFilterService;
 import com.harsha.market_intelligence_service.ingestion.client.CseApprovedAnnouncementClient;
 import com.harsha.market_intelligence_service.ingestion.dto.CseApprovedAnnouncementDto;
 import com.harsha.market_intelligence_service.ingestion.dto.SourceType;
@@ -12,39 +11,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class ApprovedAnnouncementIngestionService {
     private final CseApprovedAnnouncementClient client;
     private final RawMarketEventMapper mapper;
     private final RawMarketEventRepository repository;
     private final CompanySymbolResolver symbolResolver;
-    private final MarketEventFilterService filterService;
     private static final Logger log = LoggerFactory.getLogger(ApprovedAnnouncementIngestionService.class);
 
     public ApprovedAnnouncementIngestionService(
             CseApprovedAnnouncementClient client,
             RawMarketEventMapper mapper,
             RawMarketEventRepository repository,
-            CompanySymbolResolver symbolResolver,
-            MarketEventFilterService filterService
+            CompanySymbolResolver symbolResolver
     ) {
         this.client = client;
         this.mapper = mapper;
         this.repository = repository;
         this.symbolResolver = symbolResolver;
-        this.filterService = filterService;
     }
 
-    public void ingest() {
-        if (!filterService.isReady()) {
-
-            log.info(
-                    "Skipping ingestion because watchlist not initialized"
-            );
-
-            return;
-        }
-
+    public void ingest(Set<String> targetSymbols) {
         var response = client.fetch();
 
         if (response == null || response.approvedAnnouncements() == null) {
@@ -55,7 +44,7 @@ public class ApprovedAnnouncementIngestionService {
                 response.approvedAnnouncements()) {
 
             String symbol = symbolResolver.resolve(dto.company());
-            if (!filterService.isRelevant(symbol)) {
+            if (!targetSymbols.contains(symbol)) {
                 log.info(
                         "Skipping irrelevant company: {}",
                         dto.company()

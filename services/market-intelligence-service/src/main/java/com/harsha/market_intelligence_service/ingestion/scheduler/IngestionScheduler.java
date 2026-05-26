@@ -20,7 +20,7 @@ public class IngestionScheduler {
     public void ingestApprovedAnnouncements() {
         log.info("Starting approved announcement ingestion");
 
-        service.ingest();
+        //service.ingest();
 
         log.info("Completed approved announcement ingestion");
     }
