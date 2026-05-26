@@ -29,13 +29,12 @@ public class TrackedSymbolService {
     }
 
     public WatchlistSnapshot handleWatchlistUpdate(WatchlistUpdatedEvent event) {
-        Set<String> previous =
-                trackedSymbols;
+        Set<String> previous = trackedSymbols;
 
         Set<String> current =
                 Set.copyOf(event.symbols());
 
-        trackedSymbols = current;
+        this.trackedSymbols = current;
 
         WatchlistSnapshot snapshot = diffService.calculate(
                 previous,

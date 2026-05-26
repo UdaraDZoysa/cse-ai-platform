@@ -1,14 +1,14 @@
-package com.harsha.market_intelligence_service.ingestion.service;
+package com.harsha.market_intelligence_service.ingestion.announcement.service;
 
-import com.harsha.market_intelligence_service.ingestion.client.CseApprovedAnnouncementClient;
-import com.harsha.market_intelligence_service.ingestion.dto.CseApprovedAnnouncementDto;
-import com.harsha.market_intelligence_service.ingestion.dto.SourceType;
-import com.harsha.market_intelligence_service.ingestion.mapper.RawMarketEventMapper;
+import com.harsha.market_intelligence_service.ingestion.announcement.client.CseApprovedAnnouncementClient;
+import com.harsha.market_intelligence_service.ingestion.announcement.dto.CseApprovedAnnouncementDto;
+import com.harsha.market_intelligence_service.ingestion.announcement.mapper.RawMarketEventMapperAnnouncement;
 import com.harsha.market_intelligence_service.masterdata.service.CompanySymbolResolver;
 import com.harsha.market_intelligence_service.memory.entity.RawMarketEvent;
 import com.harsha.market_intelligence_service.memory.repository.RawMarketEventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -16,14 +16,14 @@ import java.util.Set;
 @Service
 public class ApprovedAnnouncementIngestionService {
     private final CseApprovedAnnouncementClient client;
-    private final RawMarketEventMapper mapper;
+    private final RawMarketEventMapperAnnouncement mapper;
     private final RawMarketEventRepository repository;
     private final CompanySymbolResolver symbolResolver;
     private static final Logger log = LoggerFactory.getLogger(ApprovedAnnouncementIngestionService.class);
 
     public ApprovedAnnouncementIngestionService(
             CseApprovedAnnouncementClient client,
-            RawMarketEventMapper mapper,
+            RawMarketEventMapperAnnouncement mapper,
             RawMarketEventRepository repository,
             CompanySymbolResolver symbolResolver
     ) {
@@ -46,31 +46,31 @@ public class ApprovedAnnouncementIngestionService {
             String symbol = symbolResolver.resolve(dto.company());
             if (!targetSymbols.contains(symbol)) {
                 log.info(
-                        "Skipping irrelevant company: {}",
+                        "Skipping irrelevant company: {}"+ " :From Approved Announcements",
                         dto.company()
                 );
                 continue;
             }
 
-            boolean exists =
-                    repository.existsByExternalIdAndSourceType(
-                            dto.id().toString(),
-                            SourceType.APPROVED_ANNOUNCEMENT.name()
-                    );
+            try {
+                RawMarketEvent event =
+                        mapper.fromApprovedAnnouncement(
+                                dto,
+                                symbol
+                        );
 
-            if (exists) {
-                continue;
+                repository.save(event);
+
+                log.info(
+                        "Saved approved announcement: {}",
+                        symbol
+                );
+            } catch (DataIntegrityViolationException ex) {
+                log.debug(
+                        "Duplicate Approved Announcement Event skipped: {}",
+                        dto.id()
+                );
             }
-
-            RawMarketEvent event =
-                    mapper.fromApprovedAnnouncement(dto);
-
-            repository.save(event);
-
-            log.info(
-                    "Saved approved announcement: {}",
-                    event.getCompany()
-            );
         }
     }
 }

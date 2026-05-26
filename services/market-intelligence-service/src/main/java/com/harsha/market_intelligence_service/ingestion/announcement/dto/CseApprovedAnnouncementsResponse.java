@@ -1,4 +1,4 @@
-package com.harsha.market_intelligence_service.ingestion.dto;
+package com.harsha.market_intelligence_service.ingestion.announcement.dto;
 
 import java.util.List;
 

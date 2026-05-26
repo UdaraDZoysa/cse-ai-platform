@@ -1,7 +1,6 @@
-package com.harsha.market_intelligence_service.ingestion.client;
+package com.harsha.market_intelligence_service.ingestion.announcement.client;
 
-import com.harsha.market_intelligence_service.ingestion.dto.CseApprovedAnnouncementsResponse;
-import lombok.RequiredArgsConstructor;
+import com.harsha.market_intelligence_service.ingestion.announcement.dto.CseApprovedAnnouncementsResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
