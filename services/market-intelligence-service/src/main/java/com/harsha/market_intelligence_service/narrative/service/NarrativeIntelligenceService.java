@@ -1,77 +1,97 @@
 package com.harsha.market_intelligence_service.narrative.service;
 
-import com.harsha.market_intelligence_service.narrative.agent.NarrativeAgentService;
+import com.harsha.market_intelligence_service.masterdata.service.CompanySymbolResolver;
 import com.harsha.market_intelligence_service.narrative.cache.NarrativeCacheService;
-import com.harsha.market_intelligence_service.narrative.entity.NarrativeIntelligence;
-import com.harsha.market_intelligence_service.narrative.repositoryy.NarrativeIntelligenceRepository;
+import com.harsha.market_intelligence_service.narrative.client.WebSearchClient;
+import com.harsha.market_intelligence_service.narrative.dto.NarrativeExtractionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class NarrativeIntelligenceService {
     private final NarrativeCacheService cacheService;
-    private final NarrativeAgentService agentService;
-    private final NarrativeIntelligenceRepository repository;
+    private final WebSearchClient webSearchClient;
+    private final CompanySymbolResolver companySymbolResolver;
+    private final NarrativeIntelligencePersistenceService persistIntelligence;
     private static final Logger log = LoggerFactory.getLogger(NarrativeIntelligenceService.class);
     private final Set<String> refreshingSymbols = ConcurrentHashMap.newKeySet();
 
     public NarrativeIntelligenceService(
             NarrativeCacheService cacheService,
-            NarrativeAgentService agentService,
-            NarrativeIntelligenceRepository repository) {
+            WebSearchClient webSearchClient,
+            CompanySymbolResolver companySymbolResolver,
+            NarrativeIntelligencePersistenceService persistIntelligence) {
         this.cacheService = cacheService;
-        this.agentService = agentService;
-        this.repository = repository;
+        this.webSearchClient = webSearchClient;
+        this.companySymbolResolver = companySymbolResolver;
+        this.persistIntelligence = persistIntelligence;
     }
 
     public void refreshIfNeeded(String symbol) {
         if (!refreshingSymbols.add(symbol)) {
-            log.info("Narrative refresh already in progress for {}", symbol);
+            log.debug("Narrative refresh already in progress for {}", symbol);
             return;
         }
 
         try {
+            String companyName =
+                    companySymbolResolver.resolveCompanyName(symbol);
+
             if (!cacheService.isStale(symbol)) {
-                log.info("Narrative cache still fresh for {}", symbol);
+                log.debug("Narrative cache still fresh for {} ({})", companyName, symbol);
                 return;
             }
 
-            log.info("Refreshing narrative intelligence for {}", symbol);
+            log.info("Refreshing narrative intelligence for {} ({})", companyName, symbol);
 
-            String summary = agentService.searchAndSummarize(symbol);
+            NarrativeExtractionResult result =
+                    webSearchClient.search(
+                            symbol,
+                            companyName
+                    );
 
-            NarrativeIntelligence intelligence =
-                    repository
-                            .findBySymbol(symbol)
-                            .orElse(
-                                    NarrativeIntelligence
-                                            .builder()
-                                            .symbol(symbol)
-                                            .build()
-                            );
+            if (isEmptyResult(result)) {
+                log.warn("No narrative intelligence generated for {} ({})", companyName, symbol);
+                return;
+            }
 
-            intelligence.setSummary(summary);
-
-            intelligence.setRawSearchResult(summary);
-
-            intelligence.setGeneratedAt(
-                    Instant.now()
+            persistIntelligence.persistIntelligence(
+                    symbol,
+                    result
             );
 
-            intelligence.setExpiresAt(
-                    Instant.now().plusSeconds(43200)
-            );
+            log.info("Narrative intelligence refreshed for {} ({})", companyName, symbol);
 
-            repository.save(intelligence);
+        } catch (Exception ex) {
+            log.error(
+                    """
+                    Failed to refresh narrative intelligence.
+                    symbol={}
+                    error={}
+                    """,
+                    symbol,
+                    ex.getMessage(),
+                    ex
+            );
 
         } finally {
 
             refreshingSymbols.remove(symbol);
         }
+    }
+    private boolean isEmptyResult(
+            NarrativeExtractionResult result
+    ) {
+        return result == null
+                || ((result.summary() == null
+                        || result.summary().isBlank())
+                && (result.sources() == null
+                        || result.sources().isEmpty())
+        );
     }
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -26,15 +28,23 @@ public class NarrativeIntelligence {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String symbol;
+
+    private String company;
 
     @Column(columnDefinition = "TEXT")
     private String summary;
 
-    @Column(columnDefinition = "TEXT")
-    private String rawSearchResult;
-
     private Instant generatedAt;
 
     private Instant expiresAt;
+
+    @OneToMany(
+            mappedBy = "intelligence",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    private List<NarrativeSource> sources = new ArrayList<>();
 }

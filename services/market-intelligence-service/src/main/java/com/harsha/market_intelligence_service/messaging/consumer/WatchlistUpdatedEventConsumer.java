@@ -33,18 +33,26 @@ public class WatchlistUpdatedEventConsumer {
             return;
         }
 
-        WatchlistUpdatedEvent event = objectMapper.convertValue(
-                envelope.payload(),
-                WatchlistUpdatedEvent.class
-        );
+        try {
+            WatchlistUpdatedEvent event = objectMapper.convertValue(
+                    envelope.payload(),
+                    WatchlistUpdatedEvent.class
+            );
 
-        var snapshot = trackedSymbolService.handleWatchlistUpdate(event);
+            var snapshot = trackedSymbolService.handleWatchlistUpdate(event);
 
-        orchestrator.handleWatchlistUpdate(snapshot);
+            orchestrator.handleWatchlistUpdate(snapshot);
 
-        log.info(
-                "Received watchlist update: {}",
-                event.symbols()
-        );
+            log.info(
+                    "Received watchlist update: {}",
+                    event.symbols()
+            );
+
+        } catch (Exception e) {
+            log.error(
+                    "Failed to process watchlist update event",
+                    e
+            );
+        }
     }
 }

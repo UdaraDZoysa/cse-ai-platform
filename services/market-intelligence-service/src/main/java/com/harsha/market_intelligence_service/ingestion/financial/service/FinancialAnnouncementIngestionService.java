@@ -35,15 +35,13 @@ public class FinancialAnnouncementIngestionService {
     public void ingest(Set<String> targetSymbols) {
         var response = client.fetch();
 
-        System.out.println("#################################### fin Response: " + response);
-
         if (response == null || response.financialAnnouncements() == null) {
             return;
         }
 
         for (CseFinancialAnnouncementDto dto :
                 response.financialAnnouncements()) {
-            String symbol = symbolResolver.resolve(dto.name());
+            String symbol = symbolResolver.resolveSymbol(dto.name());
 
             if (!targetSymbols.contains(symbol)) {
                 log.info(

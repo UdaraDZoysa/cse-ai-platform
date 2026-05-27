@@ -43,7 +43,7 @@ public class ApprovedAnnouncementIngestionService {
         for (CseApprovedAnnouncementDto dto :
                 response.approvedAnnouncements()) {
 
-            String symbol = symbolResolver.resolve(dto.company());
+            String symbol = symbolResolver.resolveSymbol(dto.company());
             if (!targetSymbols.contains(symbol)) {
                 log.info(
                         "Skipping irrelevant company: {}"+ " :From Approved Announcements",

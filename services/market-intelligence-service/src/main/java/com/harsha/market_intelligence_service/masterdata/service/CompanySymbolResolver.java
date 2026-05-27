@@ -15,8 +15,8 @@ import java.util.Map;
 @Service
 public class CompanySymbolResolver {
     private final CseAllSecurityCodeClient client;
-    private final Map<String, String> mappings = new HashMap<>();
-
+    private final Map<String, String> companyToSymbolMappings = new HashMap<>();
+    private final Map<String, String> symbolToCompanyMappings = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(CompanySymbolResolver.class);
 
     public CompanySymbolResolver(
@@ -42,19 +42,24 @@ public class CompanySymbolResolver {
                     securityCode.name()
             );
 
-            mappings.put(normalizedName, securityCode.symbol());
+            companyToSymbolMappings.put(normalizedName, securityCode.symbol());
+            symbolToCompanyMappings.put(securityCode.symbol(), securityCode.name());
         }
         log.info(
                 "Loaded {} company-symbol mappings",
-                mappings.size()
+                companyToSymbolMappings.size()
         );
     }
 
-    public String resolve(String companyName) {
+    public String resolveSymbol(String companyName) {
         String normalizedName = CompanyNameNormalizer.normalize(
                 companyName
         );
 
-        return mappings.get(normalizedName);
+        return companyToSymbolMappings.get(normalizedName);
+    }
+
+    public String resolveCompanyName(String symbol) {
+        return symbolToCompanyMappings.get(symbol);
     }
 }

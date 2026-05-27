@@ -21,12 +21,21 @@ public class NarrativeRefreshScheduler {
     }
 
     @Scheduled(
-            fixedDelay = 21600000,
-            initialDelay = 21600000
+            fixedDelayString = "PT24H",
+            initialDelayString = "PT24H"
     )
     public void refreshNarrative() {
         for (String symbol : trackedSymbolService.getTrackedSymbols()) {
-            narrativeService.refreshIfNeeded(symbol);
+            try {
+                narrativeService.refreshIfNeeded(symbol);
+
+            } catch (Exception ex) {
+                log.error(
+                        "Narrative refresh failed for symbol={}",
+                        symbol,
+                        ex
+                );
+            }
         }
     }
 }
