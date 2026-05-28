@@ -9,7 +9,7 @@ import java.time.Instant;
 @Table(
         name = "raw_market_event",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"externalId", "sourceType"})
+                @UniqueConstraint(columnNames = {"external_id", "source_type"})
         }
 )
 @Getter

@@ -1,10 +1,13 @@
 package com.harsha.market_intelligence_service.narrative.service;
 
+import com.harsha.market_intelligence_service.application.insight.trigger.MarketInsightTriggerService;
 import com.harsha.market_intelligence_service.narrative.dto.NarrativeExtractionResult;
 import com.harsha.market_intelligence_service.narrative.entity.NarrativeIntelligence;
 import com.harsha.market_intelligence_service.narrative.repositoryy.NarrativeIntelligenceRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
 
@@ -12,12 +15,15 @@ import java.time.Instant;
 public class NarrativeIntelligencePersistenceService {
     private final NarrativeIntelligenceRepository repository;
     private final NarrativeSourcePersistenceService sourcePersistenceService;
+    private final MarketInsightTriggerService triggerService;
 
     public NarrativeIntelligencePersistenceService(
             NarrativeIntelligenceRepository repository,
-            NarrativeSourcePersistenceService sourcePersistenceService) {
+            NarrativeSourcePersistenceService sourcePersistenceService,
+            MarketInsightTriggerService triggerService) {
         this.repository = repository;
         this.sourcePersistenceService = sourcePersistenceService;
+        this.triggerService = triggerService;
     }
 
     @Transactional
@@ -54,6 +60,15 @@ public class NarrativeIntelligencePersistenceService {
         sourcePersistenceService.persistSources(
                 saved,
                 result.sources()
+        );
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        triggerService.trigger(symbol);
+                    }
+                }
         );
     }
 }
