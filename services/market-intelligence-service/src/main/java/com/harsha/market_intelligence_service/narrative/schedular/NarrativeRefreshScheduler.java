@@ -27,7 +27,7 @@ public class NarrativeRefreshScheduler {
     public void refreshNarrative() {
         for (String symbol : trackedSymbolService.getTrackedSymbols()) {
             try {
-                narrativeService.refreshIfNeeded(symbol);
+                narrativeService.updateNarrativeIntelligence(symbol);
 
             } catch (Exception ex) {
                 log.error(

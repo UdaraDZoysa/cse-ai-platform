@@ -7,7 +7,6 @@ import com.harsha.market_intelligence_service.narrative.repositoryy.NarrativeSou
 import com.harsha.market_intelligence_service.shared.util.TimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -33,6 +32,23 @@ public class NarrativeSourcePersistenceService {
                 continue;
             }
 
+            NarrativeSource entity = sourceRepository
+                    .findBySourceUrl(
+                            source.sourceUrl()
+                    )
+                    .orElseGet(NarrativeSource::new);
+
+            entity.setTitle(source.title());
+
+            if(entity.getContent() == null
+                    || entity.getContent().isEmpty()
+                    || source.content().length() > entity.getContent().length())
+            {
+                entity.setContent(source.content());
+            }
+
+            entity.setSourceUrl(source.sourceUrl());
+
             Instant publishedAt = null;
             try {
                 publishedAt =
@@ -47,25 +63,11 @@ public class NarrativeSourcePersistenceService {
                         ex.getMessage()
                 );
             }
+            entity.setPublishedDate(publishedAt);
 
-            NarrativeSource entity =
-                    NarrativeSource.builder()
-                            .title(source.title())
-                            .content(source.content())
-                            .sourceUrl(source.sourceUrl())
-                            .publishedDate(publishedAt)
-                            .intelligence(intelligence)
-                            .build();
+            entity.setIntelligence(intelligence);
 
-            try {
-                sourceRepository.save(entity);
-            } catch (DataIntegrityViolationException ex) {
-                //Already Saved Source
-                log.debug(
-                        "Duplicate narrative source skipped. url={}",
-                        source.sourceUrl()
-                );
-            }
+            sourceRepository.save(entity);
         }
     }
 }

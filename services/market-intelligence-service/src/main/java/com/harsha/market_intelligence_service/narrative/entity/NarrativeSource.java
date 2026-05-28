@@ -11,7 +11,7 @@ import java.time.Instant;
         uniqueConstraints = {
                 @UniqueConstraint(
                         columnNames = {
-                                "sourceUrl"
+                                "source_url"
                         }
                 )
         }

@@ -7,7 +7,6 @@ import com.harsha.market_intelligence_service.narrative.dto.NarrativeExtractionR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +31,7 @@ public class NarrativeIntelligenceService {
         this.persistIntelligence = persistIntelligence;
     }
 
-    public void refreshIfNeeded(String symbol) {
+    public void updateNarrativeIntelligence(String symbol) {
         if (!refreshingSymbols.add(symbol)) {
             log.debug("Narrative refresh already in progress for {}", symbol);
             return;

@@ -46,7 +46,7 @@ public class WatchlistOrchestrator {
         // AI narrative enrichment
         for (String symbol : addedSymbols) {
             try {
-                narrativeService.refreshIfNeeded(symbol);
+                narrativeService.updateNarrativeIntelligence(symbol);
 
             } catch (Exception ex) {
                 log.error(
