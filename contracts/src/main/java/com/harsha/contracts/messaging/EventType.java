@@ -19,6 +19,10 @@ public enum EventType {
     WATCHLIST_UPDATED_EVENT(
             KafkaTopics.WATCHLIST_UPDATED_EVENT_V1,
             KafkaTopics.WATCHLIST_UPDATED_EVENT_DLT_V1
+    ),
+    INSIGHT_GENERATION_REQUEST_EVENT(
+            KafkaTopics.INSIGHT_GENERATION_REQUEST_EVENT_V1,
+            KafkaTopics.INSIGHT_GENERATION_REQUEST_EVENT_DLT_V1
     );
 
     private final String mainTopic;

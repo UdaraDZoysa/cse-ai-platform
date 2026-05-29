@@ -1,29 +1,37 @@
 package com.harsha.market_intelligence_service.narrative.service;
 
-import com.harsha.market_intelligence_service.application.insight.trigger.MarketInsightTriggerService;
+import com.harsha.market_intelligence_service.application.insight.service.InsightGenJobPersistenceService;
+import com.harsha.market_intelligence_service.domain.insight.entity.InsightGenerationJob;
+import com.harsha.market_intelligence_service.messaging.publisher.InsightGeneration.InsightGenJobProcessor;
 import com.harsha.market_intelligence_service.narrative.dto.NarrativeExtractionResult;
 import com.harsha.market_intelligence_service.narrative.entity.NarrativeIntelligence;
 import com.harsha.market_intelligence_service.narrative.repositoryy.NarrativeIntelligenceRepository;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
 
-@Component
+@Service
 public class NarrativeIntelligencePersistenceService {
     private final NarrativeIntelligenceRepository repository;
     private final NarrativeSourcePersistenceService sourcePersistenceService;
-    private final MarketInsightTriggerService triggerService;
+    private final InsightGenJobPersistenceService insightGenJobPersistenceService;
+    private final InsightGenJobProcessor insightGenJobProcessor;
+    private static final Logger log = LoggerFactory.getLogger(NarrativeIntelligencePersistenceService.class);
 
     public NarrativeIntelligencePersistenceService(
             NarrativeIntelligenceRepository repository,
             NarrativeSourcePersistenceService sourcePersistenceService,
-            MarketInsightTriggerService triggerService) {
+            InsightGenJobPersistenceService insightGenJobPersistenceService,
+            InsightGenJobProcessor insightGenJobProcessor) {
         this.repository = repository;
         this.sourcePersistenceService = sourcePersistenceService;
-        this.triggerService = triggerService;
+        this.insightGenJobPersistenceService = insightGenJobPersistenceService;
+        this.insightGenJobProcessor = insightGenJobProcessor;
     }
 
     @Transactional
@@ -66,7 +74,16 @@ public class NarrativeIntelligencePersistenceService {
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        triggerService.trigger(symbol);
+                        try {
+                            InsightGenerationJob saved =
+                                    insightGenJobPersistenceService
+                                            .persistInsightGenJob(symbol);
+                            if(saved != null) {
+                                insightGenJobProcessor.startInsightGenJob();
+                            }
+                        } catch (Exception ex) {
+                            log.debug("Error persisting insight gen job", ex);
+                        }
                     }
                 }
         );

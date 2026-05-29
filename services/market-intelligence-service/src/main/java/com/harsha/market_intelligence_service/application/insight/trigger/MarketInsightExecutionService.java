@@ -3,22 +3,22 @@ package com.harsha.market_intelligence_service.application.insight.trigger;
 import com.harsha.market_intelligence_service.application.insight.evaluator.InsightRefreshEvaluator;
 import com.harsha.market_intelligence_service.application.insight.orchestrator.MarketInsightOrchestrator;
 import com.harsha.market_intelligence_service.domain.insight.entity.MarketInsight;
+import com.harsha.market_intelligence_service.domain.insight.model.InsightExecutionResult;
 import com.harsha.market_intelligence_service.domain.insight.model.InsightRefreshDecision;
 import com.harsha.market_intelligence_service.domain.insight.repository.MarketInsightRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MarketInsightTriggerService {
+public class MarketInsightExecutionService {
     private final MarketInsightRepository repository;
     private final InsightRefreshEvaluator refreshEvaluator;
     private final MarketInsightOrchestrator orchestrator;
     private static final Logger log =
-            LoggerFactory.getLogger(MarketInsightTriggerService.class);
+            LoggerFactory.getLogger(MarketInsightExecutionService.class);
 
-    public MarketInsightTriggerService(
+    public MarketInsightExecutionService(
             MarketInsightRepository repository,
             InsightRefreshEvaluator refreshEvaluator,
             MarketInsightOrchestrator orchestrator
@@ -28,7 +28,7 @@ public class MarketInsightTriggerService {
         this.orchestrator = orchestrator;
     }
 
-    public void trigger(
+    public InsightExecutionResult trigger(
             String symbol
     ) {
         MarketInsight existing = repository
@@ -54,7 +54,9 @@ public class MarketInsightTriggerService {
         );
 
         if (!decision.refresh()) {
-            return;
+            return InsightExecutionResult.skipped(
+                    decision.reason()
+            );
         }
 
         log.info(
@@ -68,8 +70,8 @@ public class MarketInsightTriggerService {
                 symbol
         );
 
-        orchestrator.generate(
-                symbol
-        );
+        orchestrator.generate(symbol);
+
+        return InsightExecutionResult.insightGenerated();
     }
 }

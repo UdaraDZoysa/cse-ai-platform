@@ -65,7 +65,6 @@ public class InboxEventService {
                     event.getId(),
                     ex
             );
-            log.info("######################################################################Message: {}", ex.getMessage());
             queueToDlt(event, DltErrorType.NON_RETRYABLE, ex);
 
         } catch (Exception ex) {
