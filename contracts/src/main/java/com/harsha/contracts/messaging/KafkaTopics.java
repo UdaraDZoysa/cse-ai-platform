@@ -21,4 +21,10 @@ public final class KafkaTopics {
     public static final String WATCHLIST_UPDATED_EVENT_DLT_V1 =
             "market.watchlist-updated-event.dlt.v1";
 
+    public static final String INSIGHT_GENERATION_REQUEST_EVENT_V1 =
+            "market.insight-generation-request-event.v1";
+
+    public static final String INSIGHT_GENERATION_REQUEST_EVENT_DLT_V1 =
+            "market.insight-generation-request-event.dlt.v1";
+
 }
