@@ -1,12 +1,11 @@
 package com.harsha.market_intelligence_service.domain.insight.entity;
 
-import com.harsha.market_intelligence_service.domain.insight.model.AiProcessErrorType;
+import com.harsha.market_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.market_intelligence_service.domain.insight.model.InsightJobStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -37,29 +36,28 @@ public class InsightGenerationJob {
     private Instant nextAttemptAt;
 
     @Enumerated(EnumType.STRING)
-    private AiProcessErrorType errorType;
+    private ProcessingErrorType errorType;
 
     @Column(columnDefinition = "TEXT")
     private String failureReason;
 
     private Instant failedAt;
 
-    private Instant processingStartedAt;
-
     private Instant updatedAt;
 
     public void markProcessed() {
         this.status = InsightJobStatus.PROCESSED;
+        this.updatedAt = Instant.now();
     }
 
     public void markFailed() {
         this.status = InsightJobStatus.FAILED;
         this.failedAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void markProcessing() {
         this.status = InsightJobStatus.PROCESSING;
-        this.processingStartedAt = Instant.now();
         this.updatedAt = Instant.now();
     }
 
@@ -70,6 +68,7 @@ public class InsightGenerationJob {
 
     public void markSkipped() {
         this.status = InsightJobStatus.SKIPPED;
+        this.updatedAt = Instant.now();
     }
 
     public void markRetryScheduled() {
