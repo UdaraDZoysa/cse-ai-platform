@@ -1,6 +1,6 @@
 package com.harsha.market_intelligence_service.domain.insight.entity;
 
-import com.harsha.market_intelligence_service.domain.insight.model.NarrativeSentiment;
+import com.harsha.contracts.events.market_intelligence.NarrativeSentiment;
 import jakarta.persistence.*;
 import lombok.*;
 

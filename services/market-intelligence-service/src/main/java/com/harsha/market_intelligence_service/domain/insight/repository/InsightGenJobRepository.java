@@ -3,6 +3,7 @@ import com.harsha.market_intelligence_service.domain.insight.entity.InsightGener
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface InsightGenJobRepository extends JpaRepository<InsightGenerationJob, Long> {
@@ -20,5 +21,14 @@ public interface InsightGenJobRepository extends JpaRepository<InsightGeneration
             nativeQuery = true
     )
     List<InsightGenerationJob> lockNextBatch();
+
+    @Query(
+            """
+            SELECT e 
+            FROM InsightGenerationJob e 
+            WHERE e.status = 'PROCESSING'
+                AND e.updatedAt < :cutoff
+    """)
+    List<InsightGenerationJob> findStuckProcessingJobs(Instant cutoff);
 
 }
