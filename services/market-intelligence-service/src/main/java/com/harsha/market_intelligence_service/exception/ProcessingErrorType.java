@@ -1,6 +1,6 @@
-package com.harsha.market_intelligence_service.domain.insight.model;
+package com.harsha.market_intelligence_service.exception;
 
-public enum AiProcessErrorType {
+public enum ProcessingErrorType {
     RATE_LIMIT,
     PROVIDER_UNAVAILABLE,
     NETWORK_ERROR,
@@ -8,5 +8,7 @@ public enum AiProcessErrorType {
     VALIDATION_FAILED,
     NON_RETRYABLE,
     RETRY_EXHAUSTED,
-    UNKNOWN
+    DATABASE_ERROR,
+    UNKNOWN,
+    INVALID_EVENT
 }

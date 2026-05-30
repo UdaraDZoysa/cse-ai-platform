@@ -3,11 +3,11 @@ package com.harsha.market_intelligence_service.infrastructure.ai.groq;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.market_intelligence_service.application.insight.port.NarrativeSynthesisClient;
-import com.harsha.market_intelligence_service.domain.insight.exception.InsightValidationException;
-import com.harsha.market_intelligence_service.domain.insight.exception.InvalidAiResponseException;
-import com.harsha.market_intelligence_service.domain.insight.exception.NonRetryableAiException;
-import com.harsha.market_intelligence_service.domain.insight.exception.RetryableAiException;
-import com.harsha.market_intelligence_service.domain.insight.model.AiProcessErrorType;
+import com.harsha.market_intelligence_service.exception.InsightValidationException;
+import com.harsha.market_intelligence_service.exception.InvalidResponseException;
+import com.harsha.market_intelligence_service.exception.NonRetryableException;
+import com.harsha.market_intelligence_service.exception.RetryableException;
+import com.harsha.market_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.market_intelligence_service.domain.insight.model.MarketInsightResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,30 +93,30 @@ public class GroqNarrativeSynthesisClient implements NarrativeSynthesisClient {
             return result;
 
         } catch (HttpClientErrorException.TooManyRequests ex) {
-            throw new RetryableAiException(
+            throw new RetryableException(
                     "Groq rate limit exceeded",
-                    AiProcessErrorType.RATE_LIMIT,
+                    ProcessingErrorType.RATE_LIMIT,
                     ex
             );
 
         } catch (HttpServerErrorException ex) {
-            throw new RetryableAiException(
+            throw new RetryableException(
                     "Groq service unavailable",
-                    AiProcessErrorType.PROVIDER_UNAVAILABLE,
+                    ProcessingErrorType.PROVIDER_UNAVAILABLE,
                     ex
             );
 
         } catch (ResourceAccessException ex) {
-            throw new RetryableAiException(
+            throw new RetryableException(
                     "Network failure",
-                    AiProcessErrorType.NETWORK_ERROR,
+                    ProcessingErrorType.NETWORK_ERROR,
                     ex
             );
 
         } catch (JsonProcessingException ex) {
-            throw new InvalidAiResponseException(
+            throw new InvalidResponseException(
                     "Failed to parse AI response",
-                    AiProcessErrorType.INVALID_RESPONSE,
+                    ProcessingErrorType.INVALID_RESPONSE,
                     ex
             );
 
@@ -124,15 +124,15 @@ public class GroqNarrativeSynthesisClient implements NarrativeSynthesisClient {
             throw ex;
 
         } catch (HttpClientErrorException ex) {
-            throw new NonRetryableAiException(
+            throw new NonRetryableException(
                     "Invalid AI request",
-                    AiProcessErrorType.NON_RETRYABLE,
+                    ProcessingErrorType.NON_RETRYABLE,
                     ex
             );
         } catch (Exception ex) {
-            throw new RetryableAiException(
+            throw new RetryableException(
                     "Unexpected AI failure",
-                    AiProcessErrorType.UNKNOWN,
+                    ProcessingErrorType.UNKNOWN,
                     ex
             );
         }
