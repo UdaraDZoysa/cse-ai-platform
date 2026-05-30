@@ -104,7 +104,7 @@ public class OutboxEventService {
             );
 
             event.markDltQueued();
-            dltRepository.save(dltMessage);
+            outboxRepository.save(event);
 
             try {
                 dltRepository.save(dltMessage);
