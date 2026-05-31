@@ -44,8 +44,6 @@ public class OutboxEvent {
     @Enumerated(EnumType.STRING)
     private OutboxStatus status;
 
-    private Instant processingStartedAt;
-
     private Instant updatedAt;
 
     public void markProcessed() {
@@ -65,7 +63,6 @@ public class OutboxEvent {
 
     public void markProcessing() {
         this.status = OutboxStatus.PROCESSING;
-        this.processingStartedAt = Instant.now();
         this.updatedAt = Instant.now();
     }
 
