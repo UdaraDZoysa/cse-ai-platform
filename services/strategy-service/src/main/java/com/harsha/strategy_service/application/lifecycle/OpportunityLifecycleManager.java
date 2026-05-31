@@ -1,7 +1,7 @@
 package com.harsha.strategy_service.application.lifecycle;
 
 import com.harsha.strategy_service.domain.model.OpportunityState;
-import com.harsha.strategy_service.domain.model.OpportunityStatus;
+import com.harsha.contracts.events.strategy.OpportunityStatus;
 import org.springframework.stereotype.Component;
 
 @Component

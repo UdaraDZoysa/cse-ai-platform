@@ -1,5 +1,7 @@
 package com.harsha.contracts.messaging;
 
+import java.security.PublicKey;
+
 public final class KafkaTopics {
     private KafkaTopics() {}
 
@@ -27,4 +29,9 @@ public final class KafkaTopics {
     public static final String MARKET_INSIGHT_GENERATED_EVENT_DLT_V1 =
             "market.insight-generated-event.dlt.v1";
 
+    public static final String STRATEGY_EVALUATION_COMPLETED_EVENT_V1 =
+            "market.evaluation-completed-event.v1";
+
+    public static final String STRATEGY_EVALUATION_COMPLETED_EVENT_DLT_V1 =
+            "market.evaluation-completed-event.dlt.v1";
 }

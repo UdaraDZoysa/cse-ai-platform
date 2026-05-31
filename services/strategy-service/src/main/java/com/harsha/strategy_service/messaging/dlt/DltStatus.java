@@ -4,5 +4,6 @@ public enum DltStatus {
     PENDING,
     PROCESSING,
     PUBLISHED,
+    RETRY_SCHEDULED,
     FAILED
 }

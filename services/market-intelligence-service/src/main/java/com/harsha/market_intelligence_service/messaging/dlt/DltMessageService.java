@@ -104,9 +104,6 @@ public class DltMessageService {
                     message.getDltRetryCount()
             );
             return;
-
-        } else {
-            message.markPending();
         }
 
         long backoff = calculateBackoff(message.getDltRetryCount());

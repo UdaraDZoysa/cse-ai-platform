@@ -1,4 +1,4 @@
-package com.harsha.strategy_service.messaging.inbox;
+package com.harsha.strategy_service.messaging.outbox;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,14 +10,12 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-public class InboxRecoveryScheduler {
-    private final InboxRepository inboxRepository;
-    private static final Logger log = LoggerFactory.getLogger(InboxRecoveryScheduler.class);
+public class OutboxRecoveryScheduler {
+    private final OutboxRepository outboxRepository;
+    private static final Logger log = LoggerFactory.getLogger(OutboxRecoveryScheduler.class);
 
-    public InboxRecoveryScheduler(
-            InboxRepository inboxRepository
-    ) {
-        this.inboxRepository = inboxRepository;
+    public OutboxRecoveryScheduler(OutboxRepository outboxRepository) {
+        this.outboxRepository = outboxRepository;
     }
 
     @Scheduled(fixedRate = 60000)
@@ -25,10 +23,10 @@ public class InboxRecoveryScheduler {
     public void recoverStuckEvents() {
         Instant cutoff = Instant.now().minusSeconds(300);
 
-        List<InboxEvent> stuckEvents =
-                inboxRepository.findStuckProcessingEvents(cutoff);
+        List<OutboxEvent> stuckEvents =
+                outboxRepository.findStuckProcessingJobs(cutoff);
 
-        for (InboxEvent event : stuckEvents) {
+        for (OutboxEvent event : stuckEvents) {
             log.debug(
                     """
                     
@@ -45,7 +43,7 @@ public class InboxRecoveryScheduler {
             );
             event.setNextAttemptAt(Instant.now());
             event.markRetryScheduled();
-            inboxRepository.save(event);
+            outboxRepository.save(event);
         }
     }
 }

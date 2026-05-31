@@ -5,7 +5,7 @@ import com.harsha.contracts.events.analysis.TrendDirection;
 import com.harsha.contracts.events.analysis.VolatilityRegime;
 import com.harsha.strategy_service.domain.model.DetectorSignal;
 import com.harsha.strategy_service.domain.model.DetectorType;
-import com.harsha.strategy_service.domain.model.SignalDirection;
+import com.harsha.contracts.events.strategy.SignalDirection;
 import org.springframework.stereotype.Component;
 
 @Component

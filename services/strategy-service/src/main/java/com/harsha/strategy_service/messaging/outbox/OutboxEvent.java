@@ -1,4 +1,4 @@
-package com.harsha.market_intelligence_service.messaging.outbox;
+package com.harsha.strategy_service.messaging.outbox;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.harsha.contracts.messaging.EventType;

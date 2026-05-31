@@ -1,6 +1,6 @@
-package com.harsha.strategy_service.messaging.inbox;
+package com.harsha.strategy_service.messaging.outbox;
 
-public enum InboxStatus {
+public enum OutboxStatus {
     PENDING,
     PROCESSING,
     PROCESSED,

@@ -1,15 +1,16 @@
-package com.harsha.strategy_service.messaging.inbox;
+package com.harsha.strategy_service.messaging.outbox;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-public interface InboxRepository extends JpaRepository<InboxEvent, String> {
+public interface OutboxRepository extends JpaRepository<OutboxEvent, UUID> {
     @Query(value = """
          SELECT *
-            FROM inbox_events
+            FROM outbox_events
             WHERE status =  'PENDING' OR (
                         status = 'RETRY_SCHEDULED'
                         AND next_attempt_at <= NOW()
@@ -20,13 +21,14 @@ public interface InboxRepository extends JpaRepository<InboxEvent, String> {
         """,
             nativeQuery = true
     )
-    List<InboxEvent> lockNextBatch();
+    List<OutboxEvent> lockNextBatch();
 
-    @Query("""
-    SELECT e
-    FROM InboxEvent e
-    WHERE e.status = 'PROCESSING'
-    AND e.updatedAt < :cutoff
-""")
-    List<InboxEvent> findStuckProcessingEvents(Instant cutoff);
+    @Query(
+            """
+            SELECT e 
+            FROM OutboxEvent e 
+            WHERE e.status = 'PROCESSING'
+                AND e.updatedAt < :cutoff
+    """)
+    List<OutboxEvent> findStuckProcessingJobs(Instant cutoff);
 }

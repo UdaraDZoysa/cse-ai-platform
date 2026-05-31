@@ -1,5 +1,7 @@
 package com.harsha.strategy_service.messaging.inbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.strategy_service.dispatcher.EventDispatcher;
 import com.harsha.strategy_service.exception.DltErrorType;
 import com.harsha.strategy_service.exception.InvalidEventException;
@@ -63,52 +65,63 @@ public class InboxEventService {
         return (long) (baseDelay * jitter);
     }
 
-    private void queueToDlt(InboxEvent event, DltErrorType errorType, Exception ex) {
+    private void queueToDlt(
+            InboxEvent event,
+            DltErrorType errorType,
+            Exception ex
+    ) {
+        DltMessage dltMessage = new DltMessage(
+                event.getId(),
+                event.getAggregateId(),
+                event.getEventType(),
+                event.getEventType().dltTopic(),
+                event.getPayload(),
+                errorType,
+                ex.getMessage(),
+                event.getRetryCount(),
+                event.getCreatedAt()
+        );
+
+
+        event.markDltQueued();
+        inboxRepository.save(event);
+
         try {
-            DltMessage dltMessage = new DltMessage(
-                    event.getId(),
+            dltRepository.save(dltMessage);
+        } catch (DataIntegrityViolationException e) {
+            log.debug(
+                    """
+                    Error during dlt persisting.
+                    
+                    symbol: {}
+                    Reason: {}
+                    
+                    """,
                     event.getAggregateId(),
-                    event.getEventType(),
-                    event.getEventType().dltTopic(),
-                    event.getPayload(),
-                    errorType,
-                    ex.getMessage(),
-                    event.getRetryCount(),
-                    event.getCreatedAt()
-            );
-
-
-            event.markDltQueued();
-            inboxRepository.save(event);
-
-            try {
-                dltRepository.save(dltMessage);
-            } catch (DataIntegrityViolationException e) {
-                // duplicate --> ignore
-            }
-
-        } catch (Exception sendEx) {
-            log.error("Failed to save in DltMessage → id={}, reason={}",
-                    event.getId(),
-                    sendEx.getMessage());
+                    e.getMessage());
         }
     }
 
-    private void handleRetry(InboxEvent event, DltErrorType finalErrorType, Exception ex) {
-        long backoff = calculateBackoff(event.getRetryCount());
-
-        if (event.getLastAttemptAt() != null &&
-                Instant.now().isBefore(event.getLastAttemptAt().plusMillis(backoff))) {
+    private void handleRetry(
+            InboxEvent event,
+            DltErrorType finalErrorType,
+            Exception ex
+    ) {
+        event.markAttempt();
+        if (!event.shouldRetry()) {
+            queueToDlt(event, finalErrorType, ex);
             return;
         }
 
-        event.markAttempt();
+        long backoff = calculateBackoff(event.getRetryCount());
 
-        if (!event.shouldRetry()){
-            queueToDlt(event, finalErrorType, ex);
-        } else {
-            event.markPending();
-            inboxRepository.save(event);
-        }
+        event.setNextAttemptAt(
+                Instant.now().plusMillis(backoff)
+        );
+
+        event.markRetryScheduled();
+
+        inboxRepository.save(event);
+
     }
 }

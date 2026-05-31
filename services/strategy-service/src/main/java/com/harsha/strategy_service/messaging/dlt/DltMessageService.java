@@ -12,11 +12,11 @@ import java.time.Instant;
 @Service
 public class DltMessageService {
     private final DltRepository dltRepository;
-    private final KafkaTemplate<String, DltEventEnvelope> kafkaTemplate;
+    private final KafkaTemplate<String, DltEventEnvelope<String>> kafkaTemplate;
 
     public DltMessageService(
-            DltRepository dltRepository, KafkaTemplate<String,
-                    DltEventEnvelope> kafkaTemplate) {
+            DltRepository dltRepository,
+            KafkaTemplate<String, DltEventEnvelope<String>> kafkaTemplate) {
         this.dltRepository = dltRepository;
         this.kafkaTemplate = kafkaTemplate;
     }
@@ -27,7 +27,7 @@ public class DltMessageService {
             message.markProcessing();
             dltRepository.save(message);
 
-            DltEventEnvelope dltEnvelope = new DltEventEnvelope(
+            DltEventEnvelope<String> dltEnvelope = new DltEventEnvelope<>(
                     message.getId(),
                     message.getAggregateId(),
                     message.getEventType(),
@@ -40,14 +40,25 @@ public class DltMessageService {
                     message.getDltCreatedAt().toEpochMilli()
             );
 
-            kafkaTemplate.send(message.getTargetTopic(), message.getAggregateId(), dltEnvelope).
-                    get();
+            kafkaTemplate.send(
+                            message.getTargetTopic(),
+                            message.getAggregateId(),
+                            dltEnvelope
+                    ).get();
 
             message.markPublished();
             dltRepository.save(message);
             log.debug(
-                    "DLT published successfully -> messageId={}",
-                    message.getId()
+                    """
+                    
+                    DLT published successfully.
+                    
+                    messageId={}
+                    symbol={}
+                    
+                    """,
+                    message.getId(),
+                    message.getAggregateId()
             );
 
         } catch (Exception e) {
@@ -65,23 +76,35 @@ public class DltMessageService {
             DltMessage message,
             String errorMessage
     ) {
-        long backoff = calculateBackoff(message.getDltRetryCount());
-
-        if (message.getLastAttemptAt() != null
-                && Instant.now().isBefore(message.getLastAttemptAt().plusMillis(backoff))
-        ) {
-            return;
-        }
         message.markAttempt();
 
         if (!message.shouldRetry()) {
             message.markFailed(errorMessage);
-            log.error("Unexpected failure for event → id={}, reason={}",
+            dltRepository.save(message);
+            log.debug(
+                    """ 
+                    DLT failed to publish.
+                    
+                    Dlt messageId={}
+                    Symbol={}
+                    retryCount={}
+                    
+                    """,
                     message.getId(),
-                    errorMessage);
-        } else {
-            message.markPending();
+                    message.getAggregateId(),
+                    message.getDltRetryCount()
+            );
+            return;
         }
+
+        long backoff = calculateBackoff(message.getDltRetryCount());
+
+        message.setNextAttemptAt(
+                Instant.now().plusSeconds(backoff)
+        );
+
+        message.markRetryScheduled();
+
         dltRepository.save(message);
     }
 }
