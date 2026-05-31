@@ -20,9 +20,15 @@ public enum EventType {
             KafkaTopics.WATCHLIST_UPDATED_EVENT_V1,
             KafkaTopics.WATCHLIST_UPDATED_EVENT_DLT_V1
     ),
+
     MARKET_INSIGHT_GENERATED_EVENT(
             KafkaTopics.MARKET_INSIGHT_GENERATED_EVENT_V1,
             KafkaTopics.MARKET_INSIGHT_GENERATED_EVENT_DLT_V1
+    ),
+
+    STRATEGY_EVALUATION_COMPLETED_EVENT(
+            KafkaTopics.STRATEGY_EVALUATION_COMPLETED_EVENT_V1,
+            KafkaTopics.STRATEGY_EVALUATION_COMPLETED_EVENT_DLT_V1
     );
 
     private final String mainTopic;
