@@ -1,6 +1,7 @@
 package com.harsha.strategy_service.application.regime;
 
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
+import com.harsha.contracts.events.strategy.MarketRegime;
 import com.harsha.strategy_service.application.evaluator.FeatureNormalizer;
 import com.harsha.strategy_service.application.statistics.StatisticalReadinessEvaluator;
 import com.harsha.strategy_service.domain.model.*;
