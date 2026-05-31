@@ -4,6 +4,7 @@ import com.harsha.contracts.messaging.EventType;
 import com.harsha.strategy_service.exception.DltErrorType;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -13,10 +14,11 @@ import java.time.Instant;
 @Table(
         name = "dlt_messages",
         indexes = {
-                @Index(name = "idx_dlt_created", columnList = "status, dlt_created_at")
+                @Index(name = "idx_dlt_created_status_next_attempt", columnList = "status, dlt_created_at, next_attempt_at")
         }
 )
 @Getter
+@Setter
 public class DltMessage {
     @Id
     private String id;
@@ -51,16 +53,12 @@ public class DltMessage {
 
     private Instant dltCreatedAt;
 
-    private Instant lastAttemptAt;
-
-    private Instant publishedAt;
-
-    private Instant processingStartedAt;
+    private Instant nextAttemptAt;
 
     @Column(columnDefinition = "TEXT")
     private String dltFailureReason;
 
-    private Instant dltFailedAt;
+    private Instant updatedAt;
 
     protected DltMessage() {}
 
@@ -87,31 +85,34 @@ public class DltMessage {
         this.status = DltStatus.PENDING;
         this.dltRetryCount = 0;
         this.dltCreatedAt = Instant.now();
+        this.nextAttemptAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void markAttempt() {
         this.dltRetryCount++;
-        this.lastAttemptAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void markPublished() {
         this.status = DltStatus.PUBLISHED;
-        this.publishedAt = Instant.now();
-    }
-
-    public void markPending() {
-        this.status = DltStatus.PENDING;
+        this.updatedAt = Instant.now();
     }
 
     public void markProcessing() {
         this.status = DltStatus.PROCESSING;
-        this.processingStartedAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void markFailed(String reason) {
         this.status = DltStatus.FAILED;
-        this.dltFailedAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.dltFailureReason = reason;
+    }
+
+    public void markRetryScheduled() {
+        this.status = DltStatus.RETRY_SCHEDULED;
+        this.updatedAt = Instant.now();
     }
 
     public boolean shouldRetry() {

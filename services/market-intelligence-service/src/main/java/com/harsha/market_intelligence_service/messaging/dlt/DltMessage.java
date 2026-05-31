@@ -72,11 +72,6 @@ public class DltMessage {
         this.updatedAt = Instant.now();
     }
 
-    public void markPending() {
-        this.status = DltStatus.PENDING;
-        this.updatedAt = Instant.now();
-    }
-
     public void markProcessing() {
         this.status = DltStatus.PROCESSING;
         this.updatedAt = Instant.now();

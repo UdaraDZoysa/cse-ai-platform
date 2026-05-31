@@ -10,7 +10,10 @@ public interface InboxRepository extends JpaRepository<InboxEvent, String> {
     @Query(value = """
          SELECT *
             FROM inbox_events
-            WHERE status =  'PENDING'
+            WHERE status =  'PENDING' OR (
+                        status = 'RETRY_SCHEDULED'
+                        AND next_attempt_at <= NOW()
+                        )
             ORDER BY created_at ASC 
             LIMIT 20
             FOR UPDATE SKIP LOCKED
@@ -23,7 +26,7 @@ public interface InboxRepository extends JpaRepository<InboxEvent, String> {
     SELECT e
     FROM InboxEvent e
     WHERE e.status = 'PROCESSING'
-    AND e.processingStartedAt < :cutoff
+    AND e.updatedAt < :cutoff
 """)
     List<InboxEvent> findStuckProcessingEvents(Instant cutoff);
 }

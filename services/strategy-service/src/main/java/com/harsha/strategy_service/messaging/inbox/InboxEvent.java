@@ -3,19 +3,21 @@ package com.harsha.strategy_service.messaging.inbox;
 import com.harsha.contracts.messaging.EventType;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 
 @Entity
-@Getter
 @Table(
         name = "inbox_events",
         indexes = {
-                @Index(name = "idx_inbox_processed_created", columnList = "status, created_at")
+                @Index(name = "idx_inbox_status_created_next_attempt", columnList = "status, created_at, next_attempt_at")
         }
 )
+@Getter
+@Setter
 public class InboxEvent {
     @Id
     private String id;
@@ -37,12 +39,12 @@ public class InboxEvent {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    private Instant lastAttemptAt;
+    private Instant nextAttemptAt;
 
     @Enumerated(EnumType.STRING)
     private InboxStatus status;
 
-    private Instant processingStartedAt;
+    private Instant updatedAt;
 
     protected InboxEvent() {}
 
@@ -58,24 +60,27 @@ public class InboxEvent {
 
     public void markProcessed() {
         this.status = InboxStatus.PROCESSED;
+        this.updatedAt = Instant.now();
     }
 
     public void markDltQueued() {
         this.status = InboxStatus.DLT_QUEUED;
+        this.updatedAt = Instant.now();
     }
 
-    public void markPending() {
-        this.status = InboxStatus.PENDING;
+    public void markRetryScheduled() {
+        this.status = InboxStatus.RETRY_SCHEDULED;
+        this.updatedAt = Instant.now();
     }
 
     public void markProcessing() {
         this.status = InboxStatus.PROCESSING;
-        this.processingStartedAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void markAttempt() {
         this.retryCount++;
-        this.lastAttemptAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public boolean shouldRetry() {

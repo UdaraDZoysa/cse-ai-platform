@@ -29,12 +29,22 @@ public class InboxRecoveryScheduler {
                 inboxRepository.findStuckProcessingEvents(cutoff);
 
         for (InboxEvent event : stuckEvents) {
-            log.warn(
-                    "Recovering stuck event → id={}, processingStartedAt={}",
+            log.debug(
+                    """
+                    
+                    Recovering stuck event.
+                    
+                    id={}
+                    symbol={}
+                    processingStartedAt={}
+                    
+                    """,
                     event.getId(),
-                    event.getProcessingStartedAt()
+                    event.getAggregateId(),
+                    event.getUpdatedAt()
             );
-            event.markPending();
+            event.setNextAttemptAt(Instant.now());
+            event.markRetryScheduled();
             inboxRepository.save(event);
         }
     }
