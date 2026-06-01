@@ -236,6 +236,8 @@ public class StrategyOrchestrator {
                             previous.marketRegime(),
                             current.marketRegime(),
 
+                            state.getPersistenceCount(),
+
                             transition.reasons()
                     );
 

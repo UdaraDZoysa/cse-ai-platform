@@ -21,6 +21,8 @@ public record OpportunityTransitionEvent(
         MarketRegime previousRegime,
         MarketRegime currentRegime,
 
+        int persistenceCount,
+
         Set<TransitionReason> reasons
 ) implements DomainEvent {
     @Override
