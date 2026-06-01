@@ -32,7 +32,8 @@ public enum EventType {
     ),
 
     OPPORTUNITY_TRANSITION_EVENT(
-
+            KafkaTopics.OPPORTUNITY_TRANSITION_EVENT_V1,
+            KafkaTopics.OPPORTUNITY_TRANSITION_EVENT_DLT_V1
     );
 
     private final String mainTopic;
