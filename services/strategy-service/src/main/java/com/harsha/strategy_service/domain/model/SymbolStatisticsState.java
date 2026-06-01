@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class SymbolStatisticsState {
     private final String symbol;
-    private long sampleCount;
+    private int sampleCount;
     private double meanReturn;
     private double returnVariance;
     private double meanVolatility;
