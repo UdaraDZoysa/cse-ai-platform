@@ -1,5 +1,6 @@
 package com.harsha.strategy_service.domain.model;
 
+import com.harsha.contracts.events.strategy.MarketRegime;
 import com.harsha.contracts.events.strategy.OpportunityStatus;
 import com.harsha.contracts.events.strategy.SignalDirection;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class OpportunityState {
     private double confidence;
     private SignalDirection direction;
     private OpportunityStatus status;
+    private MarketRegime marketRegime;
     private double latestTrendStrength;
     private double latestMomentumStrength;
     private double latestVolatilityStrength;
@@ -27,7 +29,7 @@ public class OpportunityState {
         this.symbol = symbol;
         this.confidence = 0.0;
         this.direction = SignalDirection.NEUTRAL;
-        this.status = OpportunityStatus.OPENED;
+        this.status = OpportunityStatus.INVALIDATED;
         this.firstDetectedAt = Instant.now();
         this.lastUpdatedAt = Instant.now();
     }
@@ -38,5 +40,9 @@ public class OpportunityState {
 
     public void incrementPersistence() {
         this.persistenceCount++;
+    }
+
+    public void signalDetected() {
+        this.lastSignalAt = Instant.now();
     }
 }

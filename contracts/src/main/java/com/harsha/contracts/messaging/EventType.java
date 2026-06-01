@@ -29,6 +29,10 @@ public enum EventType {
     STRATEGY_EVALUATION_COMPLETED_EVENT(
             KafkaTopics.STRATEGY_EVALUATION_COMPLETED_EVENT_V1,
             KafkaTopics.STRATEGY_EVALUATION_COMPLETED_EVENT_DLT_V1
+    ),
+
+    OPPORTUNITY_TRANSITION_EVENT(
+
     );
 
     private final String mainTopic;

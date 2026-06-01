@@ -1,6 +1,6 @@
 package com.harsha.strategy_service.application.detector;
 
-import com.harsha.strategy_service.domain.model.DetectorSignal;
+import com.harsha.strategy_service.domain.model.detector.DetectorSignal;
 import org.springframework.stereotype.Component;
 
 @Component

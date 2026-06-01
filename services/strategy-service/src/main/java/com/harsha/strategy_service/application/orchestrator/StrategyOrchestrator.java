@@ -1,6 +1,7 @@
 package com.harsha.strategy_service.application.orchestrator;
 
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
+import com.harsha.contracts.events.strategy.OpportunityTransitionEvent;
 import com.harsha.contracts.events.strategy.SignalDirection;
 import com.harsha.contracts.events.strategy.StrategyEvaluationCompletedEvent;
 import com.harsha.contracts.messaging.EventType;
@@ -12,7 +13,10 @@ import com.harsha.strategy_service.application.lifecycle.OpportunityLifecycleMan
 import com.harsha.strategy_service.application.regime.RegimeContext;
 import com.harsha.strategy_service.application.regime.RegimeContextService;
 import com.harsha.strategy_service.application.statistics.SymbolStatisticsService;
+import com.harsha.strategy_service.application.transition.OpportunityTransitionEvaluator;
 import com.harsha.strategy_service.domain.model.*;
+import com.harsha.strategy_service.domain.model.detector.DetectorSignal;
+import com.harsha.strategy_service.domain.model.transition.TransitionResult;
 import com.harsha.strategy_service.domain.repository.OpportunityStateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +39,7 @@ public class StrategyOrchestrator {
     private final RegimeContextService regimeContextService;
     private final WeightApplier weightApplier;
     private final EventPublisher eventPublisher;
-
+    private final OpportunityTransitionEvaluator transitionEvaluator;
 
     public StrategyOrchestrator(
             OpportunityStateRepository repository,
@@ -49,7 +53,8 @@ public class StrategyOrchestrator {
             SymbolStatisticsService statisticsService,
             RegimeContextService regimeContextService,
             WeightApplier weightApplier,
-            EventPublisher eventPublisher
+            EventPublisher eventPublisher,
+            OpportunityTransitionEvaluator transitionEvaluator
     ) {
         this.repository = repository;
         this.trendDetector = trendDetector;
@@ -63,6 +68,7 @@ public class StrategyOrchestrator {
         this.regimeContextService = regimeContextService;
         this.weightApplier = weightApplier;
         this.eventPublisher = eventPublisher;
+        this.transitionEvaluator = transitionEvaluator;
     }
 
     public void process(
@@ -76,7 +82,11 @@ public class StrategyOrchestrator {
                         )
                 );
 
-        SymbolStatisticsState statistics = statisticsService.updateAndGet(event);
+        OpportunitySnapshot previous =
+                OpportunitySnapshot.from(state);
+
+        SymbolStatisticsState statistics =
+                statisticsService.updateAndGet(event);
 
         RegimeContext context =
                 regimeContextService.resolve(
@@ -131,22 +141,34 @@ public class StrategyOrchestrator {
 
         state.setDirection(direction);
 
+        state.setMarketRegime(
+                regimeEvaluation.regimeState().regime()
+        );
+
+        if (direction != SignalDirection.NEUTRAL) {
+            state.signalDetected();
+        }
+
         lifecycleManager.evaluate(state);
+
+        OpportunitySnapshot current =
+                OpportunitySnapshot.from(state);
 
         repository.save(state);
 
-        StrategyEvaluationCompletedEvent completedEvent = new StrategyEvaluationCompletedEvent(
-                event.symbol(),
-                Instant.now().toEpochMilli(),
-                regimeEvaluation.regimeState().regime(),
-                regimeEvaluation.regimeState().confidence(),
-                state.getConfidence(),
-                state.getDirection(),
-                state.getStatus(),
-                state.getPersistenceCount(),
-                context.statisticalReady(),
-                statistics.getSampleCount()
-        );
+        StrategyEvaluationCompletedEvent completedEvent =
+                new StrategyEvaluationCompletedEvent(
+                        event.symbol(),
+                        Instant.now().toEpochMilli(),
+                        regimeEvaluation.regimeState().regime(),
+                        regimeEvaluation.regimeState().confidence(),
+                        state.getConfidence(),
+                        state.getDirection(),
+                        state.getStatus(),
+                        state.getPersistenceCount(),
+                        context.statisticalReady(),
+                        statistics.getSampleCount()
+                );
 
         log.info(
                 """
@@ -189,5 +211,93 @@ public class StrategyOrchestrator {
                 EventType.STRATEGY_EVALUATION_COMPLETED_EVENT,
                 completedEvent
         );
+
+        TransitionResult transition =
+                transitionEvaluator.evaluate(
+                        previous,
+                        current
+                );
+
+        if (transition.detected()) {
+            OpportunityTransitionEvent transitionEvent =
+                    new OpportunityTransitionEvent(
+                            state.getSymbol(),
+                            Instant.now().toEpochMilli(),
+
+                            previous.status(),
+                            current.status(),
+
+                            previous.confidence(),
+                            current.confidence(),
+
+                            previous.direction(),
+                            current.direction(),
+
+                            previous.marketRegime(),
+                            current.marketRegime(),
+
+                            transition.reasons()
+                    );
+
+            String transitionSummary =
+                    String.format(
+                            "%s | %s -> %s | %.2f -> %.2f",
+                            transitionEvent.symbol(),
+                            transitionEvent.previousStatus(),
+                            transitionEvent.currentStatus(),
+                            transitionEvent.previousConfidence(),
+                            transitionEvent.currentConfidence()
+                    );
+
+            log.info(
+                    """
+                    ========================================
+            
+                    OPPORTUNITY TRANSITION DETECTED
+            
+                    ========================================
+            
+                    symbol={}
+                    transitionSummary={}
+                    transitionReasons={}
+            
+                    status:
+                        {} -> {}
+            
+                    confidence:
+                        {} -> {}
+            
+                    direction:
+                        {} -> {}
+            
+                    regime:
+                        {} -> {}
+            
+                    ========================================
+                    """,
+
+                    transitionEvent.symbol(),
+                    transitionSummary,
+                    transitionEvent.reasons(),
+
+                    transitionEvent.previousStatus(),
+                    transitionEvent.currentStatus(),
+
+                    transitionEvent.previousConfidence(),
+                    transitionEvent.currentConfidence(),
+
+                    transitionEvent.previousDirection(),
+                    transitionEvent.currentDirection(),
+
+                    transitionEvent.previousRegime(),
+                    transitionEvent.currentRegime()
+            );
+
+            eventPublisher.publish(
+                    transitionEvent.symbol(),
+                    EventType.OPPORTUNITY_TRANSITION_EVENT,
+                    transitionEvent
+            );
+        }
     }
 }

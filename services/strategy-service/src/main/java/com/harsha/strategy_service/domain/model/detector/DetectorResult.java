@@ -1,4 +1,4 @@
-package com.harsha.strategy_service.domain.model;
+package com.harsha.strategy_service.domain.model.detector;
 
 import com.harsha.contracts.events.strategy.SignalDirection;
 
