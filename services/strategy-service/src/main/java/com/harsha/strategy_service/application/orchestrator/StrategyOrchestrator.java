@@ -2,9 +2,12 @@ package com.harsha.strategy_service.application.orchestrator;
 
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
 import com.harsha.contracts.events.strategy.SignalDirection;
+import com.harsha.contracts.events.strategy.StrategyEvaluationCompletedEvent;
+import com.harsha.contracts.messaging.EventType;
 import com.harsha.strategy_service.application.detector.*;
 import com.harsha.strategy_service.application.evaluator.ConfidenceEngine;
 import com.harsha.strategy_service.application.evaluator.SignalFusionEngine;
+import com.harsha.strategy_service.application.events.EventPublisher;
 import com.harsha.strategy_service.application.lifecycle.OpportunityLifecycleManager;
 import com.harsha.strategy_service.application.regime.RegimeContext;
 import com.harsha.strategy_service.application.regime.RegimeContextService;
@@ -14,6 +17,7 @@ import com.harsha.strategy_service.domain.repository.OpportunityStateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +34,7 @@ public class StrategyOrchestrator {
     private final SymbolStatisticsService statisticsService;
     private final RegimeContextService regimeContextService;
     private final WeightApplier weightApplier;
+    private final EventPublisher eventPublisher;
 
 
     public StrategyOrchestrator(
@@ -43,8 +48,8 @@ public class StrategyOrchestrator {
             OpportunityLifecycleManager lifecycleManager,
             SymbolStatisticsService statisticsService,
             RegimeContextService regimeContextService,
-            WeightApplier weightApplier
-
+            WeightApplier weightApplier,
+            EventPublisher eventPublisher
     ) {
         this.repository = repository;
         this.trendDetector = trendDetector;
@@ -57,6 +62,7 @@ public class StrategyOrchestrator {
         this.statisticsService = statisticsService;
         this.regimeContextService = regimeContextService;
         this.weightApplier = weightApplier;
+        this.eventPublisher = eventPublisher;
     }
 
     public void process(
@@ -129,11 +135,24 @@ public class StrategyOrchestrator {
 
         repository.save(state);
 
+        StrategyEvaluationCompletedEvent completedEvent = new StrategyEvaluationCompletedEvent(
+                event.symbol(),
+                Instant.now().toEpochMilli(),
+                regimeEvaluation.regimeState().regime(),
+                regimeEvaluation.regimeState().confidence(),
+                state.getConfidence(),
+                state.getDirection(),
+                state.getStatus(),
+                state.getPersistenceCount(),
+                context.statisticalReady(),
+                statistics.getSampleCount()
+        );
+
         log.info(
                 """
                 ========================================
 
-                STRATEGY EVALUATION
+                STRATEGY EVALUATION COMPLETED
 
                 ========================================
 
@@ -152,21 +171,23 @@ public class StrategyOrchestrator {
                 ========================================
                 """,
 
-                event.symbol(),
-                context.statisticalReady(),
-                statistics.getSampleCount(),
-                regimeEvaluation
-                        .regimeState()
-                        .regime(),
+                completedEvent.symbol(),
+                completedEvent.statisticalReady(),
+                completedEvent.sampleCount(),
 
-                regimeEvaluation
-                        .regimeState()
-                        .confidence(),
+                completedEvent.marketRegime(),
+                completedEvent.regimeConfidence(),
 
-                state.getConfidence(),
-                state.getDirection(),
-                state.getStatus(),
-                state.getPersistenceCount()
+                completedEvent.confidence(),
+                completedEvent.direction(),
+                completedEvent.status(),
+                completedEvent.persistence()
+        );
+
+        eventPublisher.publish(
+                completedEvent.symbol(),
+                EventType.STRATEGY_EVALUATION_COMPLETED_EVENT,
+                completedEvent
         );
     }
 }
