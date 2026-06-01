@@ -21,7 +21,7 @@ public class TrendDetector implements Detector {
         }
 
         double imbalance = Math.abs(
-                trend.downwardRatio() - trend.downwardRatio()
+                trend.upwardRatio() - trend.downwardRatio()
         );
 
         double strength = imbalance * trend.persistence();

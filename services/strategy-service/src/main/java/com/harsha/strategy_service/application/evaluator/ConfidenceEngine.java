@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConfidenceEngine {
+    private static final double DECA_FACTOR = 0.97;
     public void update(
             OpportunityState state,
             double incomingConfidence
@@ -12,7 +13,7 @@ public class ConfidenceEngine {
 
         double current = state.getConfidence();
 
-        current *= 0.97;
+        current *= DECA_FACTOR;
 
         current += incomingConfidence;
 

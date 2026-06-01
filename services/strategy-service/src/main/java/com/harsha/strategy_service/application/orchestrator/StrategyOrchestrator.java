@@ -76,7 +76,8 @@ public class StrategyOrchestrator {
                         )
                 );
 
-        SymbolStatisticsState statistics = statisticsService.updateAndGet(event);
+        SymbolStatisticsState statistics =
+                statisticsService.updateAndGet(event);
 
         RegimeContext context =
                 regimeContextService.resolve(
@@ -130,6 +131,14 @@ public class StrategyOrchestrator {
         );
 
         state.setDirection(direction);
+
+        state.setMarketRegime(
+                regimeEvaluation.regimeState().regime()
+        );
+
+        if (direction != SignalDirection.NEUTRAL) {
+            state.signalDetected();
+        }
 
         lifecycleManager.evaluate(state);
 
