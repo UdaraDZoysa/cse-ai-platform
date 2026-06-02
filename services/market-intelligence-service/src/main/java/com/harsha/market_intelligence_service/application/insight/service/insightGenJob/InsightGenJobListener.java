@@ -6,6 +6,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Component
 public class InsightGenJobListener {
     private final InsightGenJobProcessor insightGenJobProcessor;
@@ -22,7 +24,10 @@ public class InsightGenJobListener {
 
     @EventListener
     public void onProcessingRequested(InsightGenJobProcessingRequested event) {
-        insightGenJobProcessor.process();
+        taskScheduler.schedule(
+                insightGenJobProcessor::process,
+                Instant.now().plusMillis(100)
+        );
     }
 
     @EventListener

@@ -15,6 +15,25 @@ public class MarketInsightPersistenceService {
     public MarketInsight save(
             MarketInsight insight
     ) {
-        return repository.save(insight);
+        MarketInsight existing = repository
+                .findBySymbol(insight.getSymbol())
+                .orElse(null);
+
+        if (existing == null) {
+            return repository.save(insight);
+        }
+
+        existing.setCompany(insight.getCompany());
+        existing.setSummary(insight.getSummary());
+        existing.setReasoning(insight.getReasoning());
+        existing.setSentiment(insight.getSentiment());
+        existing.setImportanceScore(insight.getImportanceScore());
+        existing.setPersistenceScore(insight.getPersistenceScore());
+        existing.setConfidenceScore(insight.getConfidenceScore());
+        existing.setGeneratedAt(insight.getGeneratedAt());
+        existing.setExpiresAt(insight.getExpiresAt());
+        existing.setGeneratedBy(insight.getGeneratedBy());
+
+        return repository.save(existing);
     }
 }

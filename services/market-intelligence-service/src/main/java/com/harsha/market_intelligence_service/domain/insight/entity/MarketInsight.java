@@ -9,6 +9,9 @@ import java.time.Instant;
 @Entity
 @Table(
         name = "market_insight",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_market_insight_symbol", columnNames = "symbol")
+        },
         indexes = {
                 @Index(name = "idx_market_insight_symbol", columnList = "symbol")
         }
