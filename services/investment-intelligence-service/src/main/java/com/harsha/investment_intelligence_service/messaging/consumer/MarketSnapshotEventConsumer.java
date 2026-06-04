@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class StockFeatureEventConsumer {
+public class MarketSnapshotEventConsumer {
     private final ObjectMapper objectMapper;
     private final InboxRepository inboxRepository;
 
-    public StockFeatureEventConsumer(
+    public MarketSnapshotEventConsumer(
             ObjectMapper objectMapper,
             InboxRepository inboxRepository
     ) {
@@ -25,7 +25,7 @@ public class StockFeatureEventConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = KafkaTopics.STOCK_FEATURES_V1, groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = KafkaTopics.MARKET_SNAPSHOT_EVENT_V1, groupId = "${spring.kafka.consumer.group-id}")
     public void handle(EventEnvelope<StockFeatureEvent> envelope) {
         String payload;
         try {
