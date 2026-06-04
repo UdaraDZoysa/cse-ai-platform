@@ -40,4 +40,10 @@ public final class KafkaTopics {
 
     public static final String OPPORTUNITY_TRANSITION_EVENT_DLT_V1 =
             "market.opportunity-transition-event.dlt.v1";
+
+    public static final String MARKET_SNAPSHOT_EVENT_V1 =
+            "market.snapshot-event.v1";
+
+    public static final String MARKET_SNAPSHOT_EVENT_DLT_V1 =
+            "market.snapshot-event.dlt.v1";
 }

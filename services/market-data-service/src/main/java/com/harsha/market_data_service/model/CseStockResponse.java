@@ -10,5 +10,14 @@ public record CseStockResponse(
         long shareVolume,
         double high,
         double low,
-        long lastTradedTime
+        long lastTradedTime,
+
+        //Add new Fields to generate MarketSnapshotEvent
+        double percentageChange,
+        double previousClose,
+        double open,
+        @JsonProperty("tradevolume")
+        long tradeVolume,
+        double turnover,
+        double marketCap
 ) {}

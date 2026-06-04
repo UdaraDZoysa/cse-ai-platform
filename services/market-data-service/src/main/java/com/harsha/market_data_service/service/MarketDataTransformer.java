@@ -1,5 +1,6 @@
 package com.harsha.market_data_service.service;
 
+import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.market_data_service.filter.StockFilter;
 import com.harsha.market_data_service.model.TradeSummaryResponse;
@@ -16,7 +17,7 @@ public class MarketDataTransformer {
         this.stockFilter = stockFilter;
     }
 
-    public List<StockTickEvent> toEvents(TradeSummaryResponse response) {
+    public List<StockTickEvent> toStockTickEvents(TradeSummaryResponse response) {
 
         if (response == null || response.reqTradeSummery() == null) {
             return List.of();
@@ -33,6 +34,32 @@ public class MarketDataTransformer {
                         s.shareVolume(),
                         s.high(),
                         s.low(),
+                        s.lastTradedTime()
+                ))
+                .toList();
+    }
+
+    public List<MarketSnapshotEvent> toMarketSnapshotEvents(TradeSummaryResponse response) {
+        if (response == null || response.reqTradeSummery() == null) {
+            return List.of();
+        }
+
+        return response.reqTradeSummery()
+                .stream()
+                .filter(s -> stockFilter.isWatched(s.symbol()))
+                .map(s -> new MarketSnapshotEvent(
+                        s.symbol(),
+                        Instant.now().toEpochMilli(),
+                        s.price(),
+                        s.percentageChange(),
+                        s.previousClose(),
+                        s.open(),
+                        s.high(),
+                        s.low(),
+                        s.shareVolume(),
+                        s.tradeVolume(),
+                        s.turnover(),
+                        s.marketCap(),
                         s.lastTradedTime()
                 ))
                 .toList();
