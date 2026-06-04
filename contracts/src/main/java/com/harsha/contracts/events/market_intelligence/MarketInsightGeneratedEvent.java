@@ -12,6 +12,7 @@ public record MarketInsightGeneratedEvent(
         NarrativeSentiment sentiment,
         double importanceScore,
         double confidenceScore,
+        double persistenceScore,
         long expiresAt,
         String generatedBy
 

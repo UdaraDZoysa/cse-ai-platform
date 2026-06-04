@@ -2,15 +2,26 @@ package com.harsha.investment_intelligence_service.handler;
 
 import com.harsha.contracts.events.strategy.OpportunityTransitionEvent;
 import com.harsha.contracts.messaging.EventType;
+import com.harsha.investment_intelligence_service.application.context.updater.TransitionContextUpdater;
 import com.harsha.investment_intelligence_service.application.idempotency.IdempotencyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
 
 @Component
 public class OpportunityTransEventHandler implements EventHandler<OpportunityTransitionEvent> {
     private final IdempotencyService idempotencyService;
+    private final TransitionContextUpdater transitionContextUpdater;
+    private static final Logger log = LoggerFactory.getLogger(OpportunityTransEventHandler.class);
 
-    public OpportunityTransEventHandler(IdempotencyService idempotencyService) {
+    public OpportunityTransEventHandler(
+            IdempotencyService idempotencyService,
+            TransitionContextUpdater transitionContextUpdater
+    ) {
         this.idempotencyService = idempotencyService;
+        this.transitionContextUpdater = transitionContextUpdater;
     }
 
     @Override
@@ -28,7 +39,19 @@ public class OpportunityTransEventHandler implements EventHandler<OpportunityTra
         if (idempotencyService.alreadyProcessed(eventId)) {
             return;
         }
-        //For now
-        System.out.println("In OpportunityTransEvent Handler");
+
+        transitionContextUpdater.update(event);
+
+        log.info(
+                """
+                Opportunity Transition context updated.
+                
+                Symbol: {}
+                Timestamp: {}
+                
+                """,
+                event.symbol(),
+                Instant.now()
+        );
     }
 }

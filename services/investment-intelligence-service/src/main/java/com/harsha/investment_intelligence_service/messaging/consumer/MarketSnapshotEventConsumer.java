@@ -2,6 +2,7 @@ package com.harsha.investment_intelligence_service.messaging.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
+import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.contracts.messaging.EventEnvelope;
 import com.harsha.contracts.messaging.KafkaTopics;
 import com.harsha.investment_intelligence_service.messaging.inbox.InboxEvent;
@@ -26,7 +27,7 @@ public class MarketSnapshotEventConsumer {
 
     @Transactional
     @KafkaListener(topics = KafkaTopics.MARKET_SNAPSHOT_EVENT_V1, groupId = "${spring.kafka.consumer.group-id}")
-    public void handle(EventEnvelope<StockFeatureEvent> envelope) {
+    public void handle(EventEnvelope<MarketSnapshotEvent> envelope) {
         String payload;
         try {
             payload = objectMapper.writeValueAsString(envelope.payload());

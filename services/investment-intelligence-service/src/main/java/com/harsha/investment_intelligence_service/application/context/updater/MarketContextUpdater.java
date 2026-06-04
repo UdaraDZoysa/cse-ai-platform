@@ -1,6 +1,5 @@
 package com.harsha.investment_intelligence_service.application.context.updater;
 
-import com.harsha.contracts.events.analysis.StockFeatureEvent;
 import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.investment_intelligence_service.domain.model.context.SymbolContext;
 import com.harsha.investment_intelligence_service.domain.repository.SymbolContextRepository;

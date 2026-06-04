@@ -1,16 +1,63 @@
 package com.harsha.market_intelligence_service.application.insight.prompt;
 
 import com.harsha.market_intelligence_service.domain.insight.model.InsightGenerationContext;
+import com.harsha.market_intelligence_service.narrative.entity.NarrativeSource;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
 
 @Component
 public class MarketInsightPromptBuilder {
+    private static final int MAX_PROMPT_CHARS = 12_000;
+    private static final Comparator<NarrativeSource> SOURCE_FRESHNESS_COMPARATOR =
+            Comparator.comparing(
+                    (NarrativeSource source) ->
+                            source.getIntelligence() == null
+                                    ? null
+                                    : source.getIntelligence().getGeneratedAt(),
+                    Comparator.nullsLast(
+                            Comparator.reverseOrder()
+                    )
+            ).thenComparing(
+                    NarrativeSource::getPublishedDate,
+                    Comparator.nullsLast(
+                            Comparator.reverseOrder()
+                    )
+            );
+
     public String build(
             InsightGenerationContext context
     ) {
 
         StringBuilder builder =
                 new StringBuilder();
+
+        appendHeader(builder, context);
+
+        List<NarrativeSource> sortedSources = context.sources()
+                .stream()
+                .sorted(SOURCE_FRESHNESS_COMPARATOR)
+                .toList();
+
+        for (NarrativeSource source : sortedSources) {
+            String sourceBlock = buildSourceBlock(source);
+
+            int projectedLength = builder.length() + sourceBlock.length();
+
+            if (projectedLength > MAX_PROMPT_CHARS) {
+                break;
+            }
+            builder.append(sourceBlock);
+        }
+        return builder.toString();
+    }
+
+    private void appendHeader(
+            StringBuilder builder,
+            InsightGenerationContext context
+    ) {
 
         builder.append("""
                 You are a financial market intelligence analyst.
@@ -54,25 +101,42 @@ public class MarketInsightPromptBuilder {
         builder.append("""
                 SOURCES:
                 """);
+    }
 
-        for (var source : context.sources()) {
+    private String buildSourceBlock(
+            NarrativeSource source
+    ) {
 
-            builder.append("""
-                    
-                    TITLE:
-                    """);
+        return """
+                
+                TITLE:
+                %s
+                PUBLISHED_AT:
+                %s
+                CONTENT:
+                %s
+                
+                """
+                .formatted(
+                        nullToBlank(source.getTitle()),
+                        formatPublishedDate(source.getPublishedDate()),
+                        nullToBlank(source.getContent())
+                );
+    }
 
-            builder.append(source.getTitle())
-                    .append("\n");
+    private String nullToBlank(
+            String value
+    ) {
+        return value == null
+                ? ""
+                : value;
+    }
 
-            builder.append("""
-                    CONTENT:
-                    """);
-
-            builder.append(source.getContent())
-                    .append("\n");
-        }
-
-        return builder.toString();
+    private String formatPublishedDate(
+            Instant publishedDate
+    ) {
+        return publishedDate == null
+                ? ""
+                : publishedDate.toString();
     }
 }
