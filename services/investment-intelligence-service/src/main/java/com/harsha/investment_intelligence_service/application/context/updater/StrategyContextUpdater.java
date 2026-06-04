@@ -1,6 +1,7 @@
-package com.harsha.investment_intelligence_service.application.context;
+package com.harsha.investment_intelligence_service.application.context.updater;
 
 import com.harsha.contracts.events.strategy.StrategyEvaluationCompletedEvent;
+import com.harsha.investment_intelligence_service.application.context.ContextLimits;
 import com.harsha.investment_intelligence_service.domain.model.context.SymbolContext;
 import com.harsha.investment_intelligence_service.domain.repository.SymbolContextRepository;
 import org.springframework.stereotype.Component;

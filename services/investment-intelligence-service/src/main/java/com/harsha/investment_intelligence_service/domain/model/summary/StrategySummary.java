@@ -7,8 +7,9 @@ public record StrategySummary(
         double currentConfidence,
         double averageConfidence,
         double confidenceTrend,
+        double confidenceVolatility,
+        int persistence,
         OpportunityStatus status,
-        MarketRegime regime,
-        int persistence
+        MarketRegime regime
 ) {
 }
