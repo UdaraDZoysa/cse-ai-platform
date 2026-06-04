@@ -1,6 +1,7 @@
 package com.harsha.investment_intelligence_service.application.context;
 
 import com.harsha.contracts.events.analysis.StockFeatureEvent;
+import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.investment_intelligence_service.domain.model.context.SymbolContext;
 import com.harsha.investment_intelligence_service.domain.repository.SymbolContextRepository;
 import org.springframework.stereotype.Component;
@@ -13,12 +14,12 @@ public class MarketContextUpdater {
         this.repository = repository;
     }
 
-    public void update(StockFeatureEvent event) {
+    public void update(MarketSnapshotEvent event) {
         SymbolContext context = repository.getOrCreate(
                 event.symbol()
         );
 
-        context.updateFeature(event);
+        context.updateCurrentMarketSnapshot(event);
 
         repository.save(context);
     }

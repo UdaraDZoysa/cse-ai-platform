@@ -1,6 +1,6 @@
 package com.harsha.investment_intelligence_service.domain.model.context;
 
-import com.harsha.contracts.events.analysis.StockFeatureEvent;
+import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.contracts.events.market_intelligence.MarketInsightGeneratedEvent;
 import com.harsha.contracts.events.strategy.OpportunityTransitionEvent;
 import com.harsha.contracts.events.strategy.StrategyEvaluationCompletedEvent;
@@ -12,7 +12,8 @@ import java.util.List;
 
 public class SymbolContext {
     private final String symbol;
-    private StockFeatureEvent latestFeature;
+
+    private MarketSnapshotEvent currentMarketSnapshot;
 
     private final Deque<StrategyEvaluationCompletedEvent>
             strategyHistory = new ArrayDeque<>();
@@ -31,12 +32,12 @@ public class SymbolContext {
         return symbol;
     }
 
-    public StockFeatureEvent latestFeature() {
-        return latestFeature;
+    public MarketSnapshotEvent currentMarketSnapshot() {
+        return currentMarketSnapshot;
     }
 
-    public void updateFeature(StockFeatureEvent event) {
-        this.latestFeature = event;
+    public void updateCurrentMarketSnapshot(MarketSnapshotEvent event) {
+        this.currentMarketSnapshot = event;
     }
 
     public Deque<StrategyEvaluationCompletedEvent> strategyHistory() {
