@@ -2,15 +2,26 @@ package com.harsha.investment_intelligence_service.handler;
 
 import com.harsha.contracts.events.market_intelligence.MarketInsightGeneratedEvent;
 import com.harsha.contracts.messaging.EventType;
+import com.harsha.investment_intelligence_service.application.context.updater.InsightContextUpdater;
 import com.harsha.investment_intelligence_service.application.idempotency.IdempotencyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
 
 @Component
 public class MarketInsightGenEventHandler implements EventHandler<MarketInsightGeneratedEvent>{
     private final IdempotencyService idempotencyService;
+    private final InsightContextUpdater insightContextUpdater;
+    private static final Logger log = LoggerFactory.getLogger(MarketInsightGenEventHandler.class);
 
-    public MarketInsightGenEventHandler(IdempotencyService idempotencyService) {
+    public MarketInsightGenEventHandler(
+            IdempotencyService idempotencyService,
+            InsightContextUpdater insightContextUpdater
+    ) {
         this.idempotencyService = idempotencyService;
+        this.insightContextUpdater = insightContextUpdater;
     }
 
     @Override
@@ -28,7 +39,19 @@ public class MarketInsightGenEventHandler implements EventHandler<MarketInsightG
         if (idempotencyService.alreadyProcessed(eventId)) {
             return;
         }
-        //For now
-        System.out.println("In MarketInsightGenEvent Handler");
+
+        insightContextUpdater.update(event);
+
+        log.info(
+                """
+                Market Insight context updated.
+                
+                Symbol: {}
+                Timestamp: {}
+                
+                """,
+                event.symbol(),
+                Instant.now()
+        );
     }
 }

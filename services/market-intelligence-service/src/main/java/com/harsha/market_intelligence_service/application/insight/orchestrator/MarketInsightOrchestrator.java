@@ -57,6 +57,7 @@ public class MarketInsightOrchestrator {
                         savedInsight.getSentiment(),
                         savedInsight.getImportanceScore(),
                         savedInsight.getConfidenceScore(),
+                        savedInsight.getPersistenceScore(),
                         savedInsight.getExpiresAt().toEpochMilli(),
                         savedInsight.getGeneratedBy()
                 );
