@@ -298,7 +298,22 @@ public class PromptBuilder {
         - Confidence deterioration
 
         Do not assign very high confidence scores when strategy confidence is low or strategy status is INVALIDATED.
-        
+        Confidence Score Rules:
+       
+        The confidence.score field should generally remain close to the Current Confidence Score.
+       
+        Do not significantly increase confidence based solely on narrative signals when Current Confidence Score is very low.
+
+        When Current Confidence Score is 0:
+       
+        - confidence.score should normally be 0.
+        - Do not increase confidence based solely on narrative sentiment.
+        - Only assign a value above 0 when:
+        - Current Confidence Trend is positive AND
+        - Bullish Transitions exceed Bearish Transitions.
+                
+        Do not exceed 20.
+
         Current Confidence Score is produced by the strategy engine and represents the overall strength of the detected opportunity after combining multiple market signals.
         Treat it as one of the strongest indicators of opportunity quality.
 
@@ -307,16 +322,50 @@ public class PromptBuilder {
         ========================
 
         Recommended Action should generally align with Market Assessment.
-
+        
+        The action should not be more aggressive than the market assessment.
+                
+        Examples:
+                
         STRONG_BULLISH -> STRONG_BUY or BUY
-
         BULLISH -> BUY or ACCUMULATE
-
         NEUTRAL -> HOLD
-
         BEARISH -> REDUCE
-
         STRONG_BEARISH -> SELL
+        
+        ==========================
+        INVALIDATED INTERPRETATION
+        ==========================
+                    
+       INVALIDATED means the strategy engine does not currently detect an actionable opportunity.
+                
+       INVALIDATED does NOT automatically imply the company is fundamentally weak.
+                
+       INVALIDATED should generally be interpreted as:
+                
+            - NEUTRAL market assessment when narrative signals remain positive.
+            - BEARISH market assessment when additional negative signals are present.
+            
+       Additional negative signals typically require one or more of:
+                
+        - Bearish Transitions > Bullish Transitions
+        - Bearish Narrative Sentiment
+        - Persistent confidence deterioration
+        - Expected Market Behavior = LOWER 
+        
+        with MODERATE or SIGNIFICANT magnitude
+                
+       Do not classify as BEARISH solely because Status = INVALIDATED.
+                
+            - HOLD recommendation when narrative signals remain positive.
+            - REDUCE recommendation when additional negative signals are present.
+                
+       Use STRONG_BEARISH or SELL only when additional negative signals are present, such as:
+                
+            - Multiple bearish transitions
+            - Persistent confidence deterioration
+            - Bearish narrative sentiment
+            - Strong negative market behavior signals
 
         """);
 
@@ -364,8 +413,24 @@ public class PromptBuilder {
                    - Only include limitations directly observable from the provided context.
                 
                 9. Invalidation Conditions
-                   - Only include conditions explicitly supported by the provided context.
-                   - Otherwise return an empty list.
+                    Only include conditions explicitly present in:
+                    - Strategy Summary
+                    - Transition Summary
+                    - Active Insights
+                
+                    Do not treat current observations as invalidation conditions.
+                
+                    Examples of invalid values:
+                    - INVALIDATED status
+                    - Low confidence score
+                    - Sideways regime
+                
+                    If no explicit future invalidation conditions are present in the supplied context,
+                    return an empty list.
+                
+                    Do not reuse examples from instructional sections unless they are present in the actual context.
+                
+                    Otherwise return an empty list.
                 
                 10. Risk Level
                     - LOW / MEDIUM / HIGH

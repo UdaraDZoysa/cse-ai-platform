@@ -1,7 +1,7 @@
 package com.harsha.investment_intelligence_service.messaging.inbox;
 
 import com.harsha.investment_intelligence_service.dispatcher.EventDispatcher;
-import com.harsha.investment_intelligence_service.exception.DltErrorType;
+import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.investment_intelligence_service.exception.InvalidEventException;
 import com.harsha.investment_intelligence_service.exception.NonRetryableProcessingException;
 import com.harsha.investment_intelligence_service.exception.RetryableProcessingException;
@@ -51,16 +51,16 @@ public class InboxEventService {
             inboxRepository.save(event);
 
         } catch (InvalidEventException ex) {
-            queueToDlt(event, DltErrorType.INVALID_EVENT, ex);
+            queueToDlt(event, ProcessingErrorType.INVALID_EVENT, ex);
 
         } catch (RetryableProcessingException ex) {
-            handleRetry(event, DltErrorType.RETRY_EXHAUSTED, ex);
+            handleRetry(event, ProcessingErrorType.RETRY_EXHAUSTED, ex);
 
         } catch (NonRetryableProcessingException ex) {
-            queueToDlt(event, DltErrorType.NON_RETRYABLE, ex);
+            queueToDlt(event, ProcessingErrorType.NON_RETRYABLE, ex);
 
         } catch (Exception ex) {
-            handleRetry(event, DltErrorType.UNKNOWN, ex);
+            handleRetry(event, ProcessingErrorType.UNKNOWN, ex);
         }
     }
 
@@ -72,7 +72,7 @@ public class InboxEventService {
 
     private void queueToDlt(
             InboxEvent event,
-            DltErrorType errorType,
+            ProcessingErrorType errorType,
             Exception ex
     ) {
         DltMessage dltMessage = new DltMessage(
@@ -113,7 +113,7 @@ public class InboxEventService {
 
     private void handleRetry(
             InboxEvent event,
-            DltErrorType finalErrorType,
+            ProcessingErrorType finalErrorType,
             Exception ex
     ) {
         event.markAttempt();
