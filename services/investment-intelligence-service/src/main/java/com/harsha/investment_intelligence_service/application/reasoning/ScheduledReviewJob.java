@@ -17,8 +17,8 @@ public class ScheduledReviewJob {
     }
 
     @Scheduled(
-            fixedDelay = 30,
-            timeUnit = TimeUnit.SECONDS
+            fixedDelay = 15,
+            timeUnit = TimeUnit.MINUTES
     )
     public void run() {
         reviewService.reviewAllSymbols();

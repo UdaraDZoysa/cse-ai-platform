@@ -1,7 +1,7 @@
 package com.harsha.investment_intelligence_service.messaging.dlt;
 
 import com.harsha.contracts.messaging.EventType;
-import com.harsha.investment_intelligence_service.exception.DltErrorType;
+import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +35,7 @@ public class DltMessage {
     private String payload;
 
     @Enumerated(EnumType.STRING)
-    private DltErrorType errorType;
+    private ProcessingErrorType errorType;
 
     @Column(columnDefinition = "TEXT")
     private String errorMessage;
@@ -68,7 +68,7 @@ public class DltMessage {
             EventType eventType,
             String targetTopic,
             String payload,
-            DltErrorType errorType,
+            ProcessingErrorType errorType,
             String errorMessage,
             int originRetryCount,
             Instant originCreatedAt
