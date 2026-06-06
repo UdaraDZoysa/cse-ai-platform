@@ -2,6 +2,7 @@ package com.harsha.investment_intelligence_service.domain.entity;
 
 import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.ReviewType;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ProviderType;
 import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,28 +45,31 @@ public class AiReasoningJob {
     @Column(nullable = false)
     private String model;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProviderType providerType;
+
     @Enumerated(EnumType.STRING)
     private ReviewType reviewType;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String prompt;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String reasoningContext;
 
     @Column(name = "context_hash", nullable = false, unique = true, length = 64)
     private String contextHash;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
-    private String response;
+    private String rawResponse;
+
+    @Column(columnDefinition = "TEXT")
+    private String parsedReview;
 
     @Enumerated(EnumType.STRING)
     private ProcessingErrorType errorType;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String errorMessage;
 
@@ -93,6 +97,11 @@ public class AiReasoningJob {
 
     public void markRetryScheduled() {
         this.status = AIReasoningJobStatus.RETRY_SCHEDULED;
+        this.updatedAt = Instant.now();
+    }
+
+    public void markPartiallyProcessed() {
+        this.status = AIReasoningJobStatus.PARTIALLY_PROCESSED;
         this.updatedAt = Instant.now();
     }
 

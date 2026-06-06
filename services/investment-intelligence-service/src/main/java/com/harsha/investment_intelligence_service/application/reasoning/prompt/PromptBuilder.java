@@ -1,15 +1,15 @@
-package com.harsha.investment_intelligence_service.application.reasoning;
+package com.harsha.investment_intelligence_service.application.reasoning.prompt;
 
 import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.contracts.events.market_intelligence.MarketInsightGeneratedEvent;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningContext;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.ReasoningRequest;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.ReasoningPromptRequest;
 import com.harsha.investment_intelligence_service.util.NumberFormatter;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PromptBuilder {
-    public ReasoningRequest build(
+    public ReasoningPromptRequest build(
             AIReasoningContext context
     ) {
 
@@ -529,7 +529,7 @@ public class PromptBuilder {
 
                 """);
 
-        return new ReasoningRequest(
+        return new ReasoningPromptRequest(
                 context.symbol(),
                 prompt.toString()
         );

@@ -1,7 +1,7 @@
 package com.harsha.investment_intelligence_service.application.reasoning.AiReasoningJob;
 
-import com.harsha.investment_intelligence_service.domain.model.reasoning.AiReasoningJobProcessingRequest;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.AiReasoningJobRetryScheduled;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobProcessingRequest;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobRetryScheduled;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;

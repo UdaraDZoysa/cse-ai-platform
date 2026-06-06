@@ -53,5 +53,7 @@ public class StrategyEvlCompEventHandler implements EventHandler<StrategyEvaluat
                 event.symbol(),
                 Instant.now()
         );
+
+        idempotencyService.markProcessed(eventId);
     }
 }
