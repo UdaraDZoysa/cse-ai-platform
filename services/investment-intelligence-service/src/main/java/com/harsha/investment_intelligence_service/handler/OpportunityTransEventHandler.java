@@ -53,5 +53,7 @@ public class OpportunityTransEventHandler implements EventHandler<OpportunityTra
                 event.symbol(),
                 Instant.now()
         );
+
+        idempotencyService.markProcessed(eventId);
     }
 }

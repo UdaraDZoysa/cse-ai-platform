@@ -1,4 +1,4 @@
-package com.harsha.investment_intelligence_service.domain.model.reasoning;
+package com.harsha.investment_intelligence_service.domain.model.reasoning.job;
 
 import java.time.Instant;
 

@@ -5,7 +5,7 @@ import com.harsha.market_intelligence_service.domain.insight.repository.MarketIn
 import org.springframework.stereotype.Service;
 
 @Service
-public class MarketInsightPersistenceService {
+public class  MarketInsightPersistenceService {
     private final MarketInsightRepository repository;
 
     public MarketInsightPersistenceService(MarketInsightRepository repository) {

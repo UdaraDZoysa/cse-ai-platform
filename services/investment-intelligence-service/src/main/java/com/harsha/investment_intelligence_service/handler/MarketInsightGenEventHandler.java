@@ -53,5 +53,7 @@ public class MarketInsightGenEventHandler implements EventHandler<MarketInsightG
                 event.symbol(),
                 Instant.now()
         );
+
+        idempotencyService.markProcessed(eventId);
     }
 }

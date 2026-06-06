@@ -1,7 +1,7 @@
 package com.harsha.investment_intelligence_service.application.reasoning.AiReasoningJob;
 
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.AiReasoningJobProcessingRequest;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobProcessingRequest;
 import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

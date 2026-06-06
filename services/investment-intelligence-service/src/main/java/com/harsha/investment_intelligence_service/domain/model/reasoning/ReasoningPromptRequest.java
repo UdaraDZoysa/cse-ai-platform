@@ -1,6 +1,6 @@
 package com.harsha.investment_intelligence_service.domain.model.reasoning;
 
-public record ReasoningRequest(
+public record ReasoningPromptRequest(
         String symbol,
         String prompt
 ) {

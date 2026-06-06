@@ -54,5 +54,7 @@ public class MarketSnapshotEventHandler implements EventHandler<MarketSnapshotEv
                 event.symbol(),
                 Instant.now()
         );
+
+        idempotencyService.markProcessed(eventId);
     }
 }

@@ -1,6 +1,5 @@
-package com.harsha.investment_intelligence_service.application.reasoning;
+package com.harsha.investment_intelligence_service.application.review;
 
-import com.harsha.investment_intelligence_service.application.review.SymbolReviewService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,7 @@ public class ScheduledReviewJob {
     }
 
     @Scheduled(
-            fixedDelay = 15,
+            fixedDelay = 5,
             timeUnit = TimeUnit.MINUTES
     )
     public void run() {

@@ -5,6 +5,7 @@ public enum AIReasoningJobStatus {
     PROCESSING,
     RETRY_SCHEDULED,
     PROCESSED,
+    PARTIALLY_PROCESSED,
     FAILED,
     DLT_QUEUED
 }

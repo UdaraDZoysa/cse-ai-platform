@@ -1,7 +1,12 @@
 package com.harsha.investment_intelligence_service.application.reasoning.AiReasoningJob;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.harsha.investment_intelligence_service.application.reasoning.orchestrator.ReasoningOrchestrator;
+import com.harsha.investment_intelligence_service.application.reasoning.parser.InvestmentReviewParser;
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.AiReasoningJobRetryScheduled;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobRetryScheduled;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReview;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.ReasoningResponse;
 import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
 import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.investment_intelligence_service.exception.ai.NonRetryableAIException;
@@ -20,14 +25,22 @@ import java.time.Instant;
 public class AiReasoningJobService {
     private final AiReasoningJobRepository aiReasoningJobRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ReasoningOrchestrator orchestrator;
+    private final InvestmentReviewParser reviewParser;
     private static final Logger log = LoggerFactory.getLogger(AiReasoningJobService.class);
+    private final ObjectMapper objectMapper;
 
     public AiReasoningJobService(
             AiReasoningJobRepository aiReasoningJobRepository,
-            ApplicationEventPublisher eventPublisher
-    ) {
+            ApplicationEventPublisher eventPublisher,
+            ReasoningOrchestrator orchestrator,
+            InvestmentReviewParser reviewParser,
+            ObjectMapper objectMapper) {
         this.aiReasoningJobRepository = aiReasoningJobRepository;
         this.eventPublisher = eventPublisher;
+        this.orchestrator = orchestrator;
+        this.reviewParser = reviewParser;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
@@ -36,8 +49,39 @@ public class AiReasoningJobService {
             job.markProcessing();
             aiReasoningJobRepository.save(job);
 
-            System.out.println("Job processed: " + job);
+            ReasoningResponse result =
+                    orchestrator.generateResponse(
+                            job.getSymbol(),
+                            job.getPrompt(),
+                            job.getModel(),
+                            job.getProviderType()
+                    );
 
+            job.setRawResponse(result.rawResponse());
+            job.markPartiallyProcessed();
+            aiReasoningJobRepository.save(job);
+
+            log.info(
+                    """
+                    AI reasoning completed.
+            
+                    symbol={}
+                    provider={}
+                    model={}
+                    """,
+                    job.getSymbol(),
+                    job.getProviderType(),
+                    job.getModel()
+            );
+
+            InvestmentReview review =
+                    reviewParser.parseInvestmentReview(result.rawResponse());
+
+            job.setParsedReview(
+                    objectMapper
+                            .writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(review)
+            );
             job.markProcessed();
             aiReasoningJobRepository.save(job);
 

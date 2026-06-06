@@ -3,9 +3,9 @@ package com.harsha.investment_intelligence_service.application.review;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.investment_intelligence_service.application.context.ContextAssembler;
-import com.harsha.investment_intelligence_service.application.reasoning.AIReasoningContextValidator;
+import com.harsha.investment_intelligence_service.application.reasoning.validation.AIReasoningContextValidator;
 import com.harsha.investment_intelligence_service.application.reasoning.AiReasoningJob.AiReasoningJobPersistenceService;
-import com.harsha.investment_intelligence_service.application.reasoning.PromptBuilder;
+import com.harsha.investment_intelligence_service.application.reasoning.prompt.PromptBuilder;
 import com.harsha.investment_intelligence_service.domain.model.context.SymbolContext;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.ReviewType;
 import com.harsha.investment_intelligence_service.domain.repository.SymbolContextRepository;
@@ -77,6 +77,8 @@ public class SymbolReviewService {
             String strReasoningContext = objectMapper.writeValueAsString(
                     reasoningContext
             );
+
+            System.out.println("Reviewing symbol: " + strReasoningContext);
 
             persistenceService.persistAiReasoningJob(
                     request.symbol(),
