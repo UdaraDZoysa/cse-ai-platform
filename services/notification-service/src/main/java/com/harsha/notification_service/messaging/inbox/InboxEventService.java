@@ -1,19 +1,17 @@
-package com.harsha.investment_intelligence_service.messaging.outbox;
+package com.harsha.notification_service.messaging.inbox;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.harsha.contracts.messaging.EventEnvelope;
-import com.harsha.contracts.versions.EventVersions;
-import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
-import com.harsha.investment_intelligence_service.messaging.dlt.DltMessage;
-import com.harsha.investment_intelligence_service.messaging.dlt.DltProcessingRequested;
-import com.harsha.investment_intelligence_service.messaging.dlt.DltRepository;
-import org.apache.kafka.common.errors.SerializationException;
+import com.harsha.notification_service.dispatcher.EventDispatcher;
+import com.harsha.notification_service.exception.InvalidEventException;
+import com.harsha.notification_service.exception.NonRetryableProcessingException;
+import com.harsha.notification_service.exception.ProcessingErrorType;
+import com.harsha.notification_service.exception.RetryableProcessingException;
+import com.harsha.notification_service.messaging.dlt.DltMessage;
+import com.harsha.notification_service.messaging.dlt.DltProcessingRequested;
+import com.harsha.notification_service.messaging.dlt.DltRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -22,61 +20,47 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.Instant;
 
 @Service
-public class OutboxEventService {
-    private final KafkaTemplate<String, EventEnvelope<JsonNode>> kafkaTemplate;
+public class InboxEventService {
+    private final EventDispatcher eventDispatcher;
     private final DltRepository dltRepository;
-    private final OutboxRepository outboxRepository;
+    private final InboxRepository inboxRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
-    private static final Logger log = LoggerFactory.getLogger(OutboxEventService.class);
+    private static final Logger log = LoggerFactory.getLogger(InboxEventService.class);
 
-    public OutboxEventService(
-            KafkaTemplate<String, EventEnvelope<JsonNode>> kafkaTemplate,
-            DltRepository dltRepository, OutboxRepository outboxRepository,
-            ApplicationEventPublisher eventPublisher,
-            ObjectMapper objectMapper
+    public InboxEventService(
+            EventDispatcher eventDispatcher,
+            DltRepository dltRepository,
+            InboxRepository inboxRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
-        this.kafkaTemplate = kafkaTemplate;
+        this.eventDispatcher = eventDispatcher;
         this.dltRepository = dltRepository;
-        this.outboxRepository = outboxRepository;
+        this.inboxRepository = inboxRepository;
         this.eventPublisher = eventPublisher;
-        this.objectMapper = objectMapper;
     }
 
     @Transactional
-    public void publishSingleEvent(OutboxEvent event) {
+    public void processSingleEvent(InboxEvent event) {
         try {
             event.markProcessing();
-            outboxRepository.save(event);
+            inboxRepository.save(event);
 
-            EventEnvelope<JsonNode> envelope = new EventEnvelope<>(
-                    event.getId().toString(),
-                    event.getAggregateId(),
-                    event.getEventType(),
-                    EventVersions.V1,
-                    "investment-intelligence-service",
-                    Instant.now().toEpochMilli(),
-                    event.getPayload()
-            );
-            kafkaTemplate.send(
-                    event.getEventType().mainTopic(),
-                    envelope.aggregateId(),
-                    envelope
-            );
+            eventDispatcher.dispatch(event);
 
             event.markProcessed();
-            outboxRepository.save(event);
+            inboxRepository.save(event);
 
-            log.debug(
-                    "Outbox event published successfully -> id={}, aggregateId={}",
-                    event.getId(),
-                    event.getAggregateId()
-            );
-        } catch (SerializationException ex) {
+        } catch (InvalidEventException ex) {
             queueToDlt(event, ProcessingErrorType.INVALID_EVENT, ex);
 
+        } catch (RetryableProcessingException ex) {
+            handleRetry(event, ProcessingErrorType.RETRY_EXHAUSTED, ex);
+
+        } catch (NonRetryableProcessingException ex) {
+            queueToDlt(event, ProcessingErrorType.NON_RETRYABLE, ex);
+
         } catch (Exception ex) {
-            handleRetry(event, ex);
+            handleRetry(event, ProcessingErrorType.UNKNOWN, ex);
         }
     }
 
@@ -87,23 +71,16 @@ public class OutboxEventService {
     }
 
     private void queueToDlt(
-            OutboxEvent event,
+            InboxEvent event,
             ProcessingErrorType errorType,
             Exception ex
     ) {
-        String payload;
-        try {
-            payload = objectMapper.writeValueAsString(event.getPayload());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize payload", e);
-        }
-
         DltMessage dltMessage = new DltMessage(
-                event.getId().toString(),
+                event.getId(),
                 event.getAggregateId(),
                 event.getEventType(),
                 event.getEventType().dltTopic(),
-                payload,
+                event.getPayload(),
                 errorType,
                 ex.getMessage(),
                 event.getRetryCount(),
@@ -111,7 +88,7 @@ public class OutboxEventService {
         );
 
         event.markDltQueued();
-        outboxRepository.save(event);
+        inboxRepository.save(event);
 
         try {
             dltRepository.save(dltMessage);
@@ -135,32 +112,37 @@ public class OutboxEventService {
     }
 
     private void handleRetry(
-            OutboxEvent event,
+            InboxEvent event,
+            ProcessingErrorType finalErrorType,
             Exception ex
     ) {
         event.markAttempt();
         if (!event.shouldRetry()) {
-            queueToDlt(event, ProcessingErrorType.RETRY_EXHAUSTED, ex);
+            queueToDlt(event, finalErrorType, ex);
             return;
         }
 
         long backoff = calculateBackoff(event.getRetryCount());
 
-        Instant nextAttemptAt = Instant.now().plusMillis(backoff);
+        Instant nextAttempt = Instant.now().plusMillis(backoff);
 
-        event.setNextAttemptAt(nextAttemptAt);
+        event.setNextAttemptAt(nextAttempt);
 
         event.markRetryScheduled();
 
-        outboxRepository.save(event);
+        inboxRepository.save(event);
 
         afterCommitOrNow(() ->
-                eventPublisher.publishEvent(new OutboxRetryScheduled(nextAttemptAt))
+                eventPublisher.publishEvent(
+                        new InboxRetryScheduled(
+                                nextAttempt
+                        )
+                )
         );
 
         log.warn(
                 """
-                Scheduling retry Outbox Event.
+                Scheduling retry Inbox Event.
     
                 symbol={}
                 retryCount={}
