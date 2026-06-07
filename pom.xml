@@ -24,6 +24,7 @@
         <module>services/strategy-service</module>
         <module>services/market-intelligence-service</module>
         <module>services/investment-intelligence-service</module>
+        <module>services/notification-service</module>
     </modules>
 
 </project>
