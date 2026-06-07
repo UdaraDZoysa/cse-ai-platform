@@ -39,6 +39,11 @@ public enum EventType {
     MARKET_SNAPSHOT_EVENT(
             KafkaTopics.MARKET_SNAPSHOT_EVENT_V1,
             KafkaTopics.MARKET_SNAPSHOT_EVENT_DLT_V1
+    ),
+
+    INVESTMENT_INSIGHT_GENERATED_EVENT(
+            KafkaTopics.INVESTMENT_INSIGHT_GENERATED_EVENT_V1,
+            KafkaTopics.INVESTMENT_INSIGHT_GENERATED_EVENT_DLT_V1
     );
 
     private final String mainTopic;

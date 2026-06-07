@@ -31,4 +31,15 @@ public interface InsightGenJobRepository extends JpaRepository<InsightGeneration
     """)
     List<InsightGenerationJob> findStuckProcessingJobs(Instant cutoff);
 
+    @Query("""
+            SELECT COUNT(i)
+                FROM InsightGenerationJob i
+                    WHERE i.status = 'PENDING'
+                        OR(
+                            i.status = 'RETRY_SCHEDULED'
+                                AND i.nextAttemptAt <= :now
+                            )
+    """)
+    long existsByPendingJob(Instant now);
+
 }

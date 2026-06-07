@@ -30,4 +30,15 @@ public interface AiReasoningJobRepository extends JpaRepository<AiReasoningJob, 
     AND e.updatedAt < :cutoff
 """)
     List<AiReasoningJob> findStuckProcessingEvents(Instant cutoff);
+
+    @Query("""
+            SELECT COUNT(a)
+                FROM AiReasoningJob a
+                    WHERE a.status = 'PENDING'
+                        OR(
+                            a.status = 'RETRY_SCHEDULED'
+                                AND a.nextAttemptAt <= :now
+                            )
+    """)
+    long existsByPendingJob(Instant now);
 }

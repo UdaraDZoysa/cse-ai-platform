@@ -1,10 +1,15 @@
-package com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto;
+package com.harsha.contracts.events.investment_intelligence;
 
+import com.harsha.contracts.events.DomainEvent;
 import com.harsha.contracts.events.investment_intelligence.enums.*;
+import com.harsha.contracts.messaging.EventType;
 
 import java.util.List;
 
-public record InvestmentReview(
+public record InvestmentInsightGeneratedEvent(
+        String symbol,
+        long occurredAt,
+
         String executiveSummary,
 
         MarketSentiment sentiment,
@@ -28,6 +33,14 @@ public record InvestmentReview(
         String riskJustification,
 
         int confidenceScore,
-        String confidenceReasoning
-) {
+        String confidenceReasoning,
+
+        String generatedBy,
+        String model
+
+) implements DomainEvent {
+    @Override
+    public EventType eventType() {
+        return EventType.INVESTMENT_INSIGHT_GENERATED_EVENT;
+    }
 }

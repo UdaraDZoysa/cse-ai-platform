@@ -1,23 +1,12 @@
 package com.harsha.investment_intelligence_service.exception;
 
-public class RetryableProcessingException extends RuntimeException {
-
-    public RetryableProcessingException(
-            String message
-    ) {
-        super(message);
-    }
-
-    public RetryableProcessingException(
-            Throwable cause
-    ) {
-        super(cause);
-    }
+public class RetryableProcessingException extends ProcessingException {
 
     public RetryableProcessingException(
             String message,
+            ProcessingErrorType errorType,
             Throwable cause
     ) {
-        super(message, cause);
+        super(message,errorType, cause);
     }
 }

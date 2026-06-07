@@ -1,4 +1,4 @@
-package com.harsha.market_intelligence_service.messaging.outbox;
+package com.harsha.investment_intelligence_service.messaging.outbox;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class OutboxProcessor {
             return;
         }
         try {
-            while(true) {
+            while (true) {
                 List<OutboxEvent> events = outboxRepository.lockNextBatch();
 
                 if (events.isEmpty()) {

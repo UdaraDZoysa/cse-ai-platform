@@ -46,4 +46,11 @@ public final class KafkaTopics {
 
     public static final String MARKET_SNAPSHOT_EVENT_DLT_V1 =
             "market.snapshot-event.dlt.v1";
+
+    public static final String INVESTMENT_INSIGHT_GENERATED_EVENT_V1 =
+            "investment.insight-generated-event.v1";
+
+    public static final String INVESTMENT_INSIGHT_GENERATED_EVENT_DLT_V1 =
+            "investment.insight-generated-event.dlt.v1";
 }
+

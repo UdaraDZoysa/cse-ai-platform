@@ -31,4 +31,15 @@ public interface OutboxRepository extends JpaRepository<OutboxEvent, UUID> {
                 AND e.updatedAt < :cutoff
     """)
     List<OutboxEvent> findStuckProcessingJobs(Instant cutoff);
+
+    @Query("""
+            SELECT COUNT(e)
+                FROM OutboxEvent e
+                    WHERE e.status = 'PENDING'
+                        OR(
+                            e.status = 'RETRY_SCHEDULED'
+                                AND e.nextAttemptAt <= :now
+                            )
+    """)
+    long existsByPendingEvents(Instant now);
 }

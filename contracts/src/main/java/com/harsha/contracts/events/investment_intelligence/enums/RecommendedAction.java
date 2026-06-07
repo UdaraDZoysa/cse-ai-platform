@@ -1,4 +1,4 @@
-package com.harsha.investment_intelligence_service.domain.model.reasoning.response.enums;
+package com.harsha.contracts.events.investment_intelligence.enums;
 
 public enum RecommendedAction {
     STRONG_BUY,

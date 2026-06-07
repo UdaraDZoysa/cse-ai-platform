@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.contracts.messaging.EventType;
 import com.harsha.investment_intelligence_service.exception.InvalidEventException;
 import com.harsha.investment_intelligence_service.exception.NonRetryableProcessingException;
+import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.investment_intelligence_service.exception.RetryableProcessingException;
 import com.harsha.investment_intelligence_service.messaging.inbox.InboxEvent;
 
@@ -48,12 +49,16 @@ public interface EventHandler<T> {
         } catch (RuntimeException e) {
             throw new RetryableProcessingException(
                     "Unexpected runtime failure. eventId="
-                            + inboxEvent.getId(), e
+                            + inboxEvent.getId(),
+                    ProcessingErrorType.UNKNOWN,
+                    e
             );
         } catch (Exception e) {
             throw new NonRetryableProcessingException(
                     "Unexpected checked exception. eventId="
-                            + inboxEvent.getId(), e
+                            + inboxEvent.getId(),
+                    ProcessingErrorType.NON_RETRYABLE,
+                    e
             );
         }
     }
