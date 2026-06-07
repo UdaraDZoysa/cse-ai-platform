@@ -3,6 +3,7 @@ package com.harsha.investment_intelligence_service.dispatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsha.contracts.messaging.EventType;
 import com.harsha.investment_intelligence_service.exception.NonRetryableProcessingException;
+import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.investment_intelligence_service.handler.EventHandler;
 import com.harsha.investment_intelligence_service.messaging.inbox.InboxEvent;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,9 @@ public class EventDispatcher {
         if (handler == null) {
             throw new NonRetryableProcessingException(
                     "No handler registered for event type: "
-                            + inboxEvent.getEventType()
+                            + inboxEvent.getEventType(),
+                    ProcessingErrorType.HANDLER_NOT_FOUND,
+                    null
             );
         }
         handler.handle(inboxEvent, objectMapper);

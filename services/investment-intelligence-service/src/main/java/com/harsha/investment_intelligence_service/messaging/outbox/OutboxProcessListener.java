@@ -1,4 +1,4 @@
-package com.harsha.market_intelligence_service.messaging.dlt;
+package com.harsha.investment_intelligence_service.messaging.outbox;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
@@ -7,30 +7,30 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 
 @Component
-public class DltProcessListener {
-    private final DltProcessor dltProcessor;
+public class OutboxProcessListener {
+    private final OutboxProcessor outboxProcessor;
     private final TaskScheduler taskScheduler;
 
-    public DltProcessListener(
-            DltProcessor dltProcessor,
+    public OutboxProcessListener(
+            OutboxProcessor outboxProcessor,
             TaskScheduler taskScheduler
     ) {
-        this.dltProcessor = dltProcessor;
+        this.outboxProcessor = outboxProcessor;
         this.taskScheduler = taskScheduler;
     }
 
     @EventListener
-    public void onProcessingRequested(DltProcessingRequested event) {
+    public void onProcessingRequested(OutboxProcessingRequested event) {
         taskScheduler.schedule(
-                dltProcessor::process,
+                outboxProcessor::process,
                 Instant.now().plusMillis(10)
         );
     }
 
     @EventListener
-    public void onRetryScheduled(DltRetryScheduled event) {
+    public void onRetryScheduled(OutboxRetryScheduled event) {
         taskScheduler.schedule(
-                dltProcessor::process,
+                outboxProcessor::process,
                 event.nextAttemptAt().plusSeconds(1)
         );
     }

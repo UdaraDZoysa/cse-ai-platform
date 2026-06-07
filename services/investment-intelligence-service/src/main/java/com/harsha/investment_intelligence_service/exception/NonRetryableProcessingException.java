@@ -1,22 +1,11 @@
 package com.harsha.investment_intelligence_service.exception;
 
-public class NonRetryableProcessingException extends RuntimeException {
-    public NonRetryableProcessingException(
-            String message
-    ) {
-        super(message);
-    }
-
-    public NonRetryableProcessingException(
-            Throwable cause
-    ) {
-        super(cause);
-    }
-
+public class NonRetryableProcessingException extends ProcessingException {
     public NonRetryableProcessingException(
             String message,
+            ProcessingErrorType errorType,
             Throwable cause
     ) {
-        super(message, cause);
+        super(message, errorType, cause);
     }
 }

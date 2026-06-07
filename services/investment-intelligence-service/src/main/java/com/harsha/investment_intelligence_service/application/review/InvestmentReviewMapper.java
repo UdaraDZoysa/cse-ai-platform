@@ -1,9 +1,9 @@
 package com.harsha.investment_intelligence_service.application.review;
 
+import com.harsha.contracts.events.investment_intelligence.enums.*;
 import com.harsha.investment_intelligence_service.application.reasoning.response.EnumNormalizer;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReview;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReviewRaw;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.response.enums.*;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -4,6 +4,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Component
 public class OutboxProcessListener {
     private final OutboxProcessor outboxProcessor;
@@ -19,7 +21,10 @@ public class OutboxProcessListener {
 
     @EventListener
     public void onProcessingRequested(OutboxProcessingRequested event) {
-        outboxProcessor.process();
+        taskScheduler.schedule(
+                outboxProcessor::process,
+                Instant.now().plusMillis(10)
+        );
     }
 
     @EventListener

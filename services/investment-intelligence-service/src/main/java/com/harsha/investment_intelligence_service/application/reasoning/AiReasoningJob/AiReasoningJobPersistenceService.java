@@ -4,13 +4,12 @@ import com.harsha.investment_intelligence_service.config.LlmProperties;
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobProcessingRequest;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.ReviewType;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ProviderType;
 import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
+import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import com.harsha.investment_intelligence_service.exception.RetryableProcessingException;
 import com.harsha.investment_intelligence_service.util.HashUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -95,6 +94,7 @@ public class AiReasoningJobPersistenceService {
 
             throw new RetryableProcessingException(
                     "Failed to persist AI Reasoning job",
+                    ProcessingErrorType.DATABASE_ERROR,
                     ex
             );
         }

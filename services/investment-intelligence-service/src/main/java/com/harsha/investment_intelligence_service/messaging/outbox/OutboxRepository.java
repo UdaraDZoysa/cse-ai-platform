@@ -1,44 +1,45 @@
-package com.harsha.market_intelligence_service.messaging.dlt;
+package com.harsha.investment_intelligence_service.messaging.outbox;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-public interface DltRepository extends JpaRepository<DltMessage, String> {
+public interface OutboxRepository extends JpaRepository<OutboxEvent, UUID> {
     @Query(value = """
          SELECT *
-            FROM dlt_messages
+            FROM outbox_events
             WHERE status =  'PENDING' OR (
                         status = 'RETRY_SCHEDULED'
                         AND next_attempt_at <= NOW()
                         )
-            ORDER BY dlt_created_at ASC 
+            ORDER BY created_at ASC 
             LIMIT 20
             FOR UPDATE SKIP LOCKED
         """,
             nativeQuery = true
     )
-    List<DltMessage> lockNextBatch();
+    List<OutboxEvent> lockNextBatch();
 
     @Query(
             """
             SELECT e 
-            FROM DltMessage e 
+            FROM OutboxEvent e 
             WHERE e.status = 'PROCESSING'
                 AND e.updatedAt < :cutoff
     """)
-    List<DltMessage> findStuckProcessingJobs(Instant cutoff);
+    List<OutboxEvent> findStuckProcessingJobs(Instant cutoff);
 
     @Query("""
-            SELECT COUNT(d)
-                FROM DltMessage d
-                    WHERE d.status = 'PENDING'
+            SELECT COUNT(e)
+                FROM OutboxEvent e
+                    WHERE e.status = 'PENDING'
                         OR(
-                            d.status = 'RETRY_SCHEDULED'
-                                AND d.nextAttemptAt <= :now
+                            e.status = 'RETRY_SCHEDULED'
+                                AND e.nextAttemptAt <= :now
                             )
     """)
-    long existsByPendingMessage(Instant now);
+    long existsByPendingEvents(Instant now);
 }

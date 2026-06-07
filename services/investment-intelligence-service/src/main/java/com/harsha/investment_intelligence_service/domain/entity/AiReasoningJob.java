@@ -3,9 +3,12 @@ package com.harsha.investment_intelligence_service.domain.entity;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.ReviewType;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ProviderType;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReview;
 import com.harsha.investment_intelligence_service.exception.ProcessingErrorType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 
@@ -64,8 +67,9 @@ public class AiReasoningJob {
     @Column(columnDefinition = "TEXT")
     private String rawResponse;
 
-    @Column(columnDefinition = "TEXT")
-    private String parsedReview;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private InvestmentReview parsedReview;
 
     @Enumerated(EnumType.STRING)
     private ProcessingErrorType errorType;

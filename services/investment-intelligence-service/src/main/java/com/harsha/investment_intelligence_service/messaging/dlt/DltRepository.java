@@ -30,4 +30,15 @@ public interface DltRepository extends JpaRepository<DltMessage, String> {
                 AND e.updatedAt < :cutoff
     """)
     List<DltMessage> findStuckProcessingJobs(Instant cutoff);
+
+    @Query("""
+            SELECT COUNT(d)
+                FROM DltMessage d
+                    WHERE d.status = 'PENDING'
+                        OR(
+                            d.status = 'RETRY_SCHEDULED'
+                                AND d.nextAttemptAt <= :now
+                            )
+    """)
+    long existsByPendingMessage(Instant now);
 }
