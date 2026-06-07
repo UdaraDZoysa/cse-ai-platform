@@ -1,0 +1,65 @@
+package com.harsha.notification_service.handler;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.harsha.contracts.messaging.EventType;
+import com.harsha.notification_service.exception.InvalidEventException;
+import com.harsha.notification_service.exception.NonRetryableProcessingException;
+import com.harsha.notification_service.exception.ProcessingErrorType;
+import com.harsha.notification_service.exception.RetryableProcessingException;
+import com.harsha.notification_service.messaging.inbox.InboxEvent;
+
+public interface EventHandler<T> {
+    EventType eventType();
+
+    Class<T> eventClass();
+
+    void handle(
+            String eventId,
+            T event
+    );
+
+    default void handle(InboxEvent inboxEvent, ObjectMapper objectMapper) {
+        try {
+            T event = objectMapper.readValue(inboxEvent.getPayload(), eventClass());
+            handle(inboxEvent.getId(), event);
+
+        } catch (JsonProcessingException e) {
+            throw new InvalidEventException(
+                    """
+                    Failed to deserialize event payload.
+                    eventId=%s
+                    payload=%s
+                    targetClass=%s
+                    """
+                            .formatted(
+                                    inboxEvent.getId(),
+                                    inboxEvent.getPayload(),
+                                    eventClass().getName()
+                            ),
+                    e
+            );
+
+        } catch (InvalidEventException |
+                 RetryableProcessingException |
+                 NonRetryableProcessingException e
+        ) {
+            throw e;
+
+        } catch (RuntimeException e) {
+            throw new RetryableProcessingException(
+                    "Unexpected runtime failure. eventId="
+                            + inboxEvent.getId(),
+                    ProcessingErrorType.UNKNOWN,
+                    e
+            );
+        } catch (Exception e) {
+            throw new NonRetryableProcessingException(
+                    "Unexpected checked exception. eventId="
+                            + inboxEvent.getId(),
+                    ProcessingErrorType.NON_RETRYABLE,
+                    e
+            );
+        }
+    }
+}
