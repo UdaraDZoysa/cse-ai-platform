@@ -2,7 +2,8 @@ package com.harsha.notification_service.handler;
 
 import com.harsha.contracts.events.investment_intelligence.InvestmentInsightGeneratedEvent;
 import com.harsha.contracts.messaging.EventType;
-import com.harsha.notification_service.application.idempotency.IdempotencyService;
+import com.harsha.notification_service.application.service.idempotency.IdempotencyService;
+import com.harsha.notification_service.application.service.orchestrator.NotificationOrchestrator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -10,12 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvestmentInsightGenEventHandler implements EventHandler<InvestmentInsightGeneratedEvent>{
     private final IdempotencyService idempotencyService;
+    private final NotificationOrchestrator notificationOrchestrator;
     private static final Logger log = LoggerFactory.getLogger(InvestmentInsightGenEventHandler.class);
 
     public InvestmentInsightGenEventHandler(
-            IdempotencyService idempotencyService
+            IdempotencyService idempotencyService,
+            NotificationOrchestrator notificationOrchestrator
     ) {
         this.idempotencyService = idempotencyService;
+        this.notificationOrchestrator = notificationOrchestrator;
     }
 
     @Override
@@ -34,7 +38,7 @@ public class InvestmentInsightGenEventHandler implements EventHandler<Investment
             return;
         }
 
-        System.out.println("Inside Investment Insight Generation Event handler");
+        notificationOrchestrator.process(event);
 
         idempotencyService.markProcessed(eventId);
     }

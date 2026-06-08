@@ -1,4 +1,4 @@
-package com.harsha.notification_service.application.idempotency;
+package com.harsha.notification_service.application.service.idempotency;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -32,7 +32,7 @@ public class InvestmentInsightGenEventConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = KafkaTopics.INVESTMENT_INSIGHT_GENERATED_EVENT_DLT_V1, groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = KafkaTopics.INVESTMENT_INSIGHT_GENERATED_EVENT_V1, groupId = "${spring.kafka.consumer.group-id}")
     public void handle(EventEnvelope<InvestmentInsightGeneratedEvent> envelope) {
         String payload;
         try {
