@@ -2,6 +2,7 @@ package com.harsha.investment_intelligence_service.application.reasoning.provide
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.harsha.investment_intelligence_service.application.reasoning.AiReasoningJob.ProviderRateLimitState;
 import com.harsha.investment_intelligence_service.config.LlmProperties;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ProviderType;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ReasoningRequest;
@@ -27,12 +28,18 @@ import java.util.Map;
 public class GroqReasoningProvider implements ReasoningProvider{
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
+    private final ProviderRateLimitState rateLimitState;
     private static final Logger log = LoggerFactory.getLogger(GroqReasoningProvider.class);
 
 
     public GroqReasoningProvider(
-            ObjectMapper objectMapper, LlmProperties llmProperties) {
+            ObjectMapper objectMapper,
+            LlmProperties llmProperties,
+            ProviderRateLimitState rateLimitState
+    ) {
         this.objectMapper = objectMapper;
+        this.rateLimitState = rateLimitState;
+
         this.restClient = RestClient.builder()
                 .baseUrl(llmProperties.baseUrl())
                 .defaultHeader(
@@ -53,6 +60,18 @@ public class GroqReasoningProvider implements ReasoningProvider{
 
     @Override
     public ReasoningResponse generate(ReasoningRequest request) {
+        if (rateLimitState.isBlocked()) {
+
+            throw new RetryableAIException(
+                    """
+                    Groq provider temporarily blocked due to previous
+                    rate limit response.
+                    """,
+                    ProcessingErrorType.RATE_LIMIT,
+                    null
+            );
+        }
+
         try {
             Map<String, Object> aiRequest =
                     Map.of(
@@ -99,11 +118,14 @@ public class GroqReasoningProvider implements ReasoningProvider{
             );
 
         } catch (HttpClientErrorException.TooManyRequests ex) {
+            rateLimitState.blockForMinutes(1);
+
             throw new RetryableAIException(
                     "Groq rate limit exceeded",
                     ProcessingErrorType.RATE_LIMIT,
                     ex
             );
+
         } catch (HttpServerErrorException ex) {
             throw new RetryableAIException(
                     "Groq service unavailable",

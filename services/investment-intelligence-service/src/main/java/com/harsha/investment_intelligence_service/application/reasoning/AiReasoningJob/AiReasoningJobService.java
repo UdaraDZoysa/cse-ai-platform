@@ -20,6 +20,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class AiReasoningJobService {
@@ -27,18 +28,21 @@ public class AiReasoningJobService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ReasoningOrchestrator orchestrator;
     private final ReviewPublisherRegistry reviewPublisherRegistry;
+    private final ProviderRateLimitState rateLimitState;
     private static final Logger log = LoggerFactory.getLogger(AiReasoningJobService.class);
 
     public AiReasoningJobService(
             AiReasoningJobRepository aiReasoningJobRepository,
             ApplicationEventPublisher applicationEventPublisher,
             ReasoningOrchestrator orchestrator,
-            ReviewPublisherRegistry reviewPublisherRegistry
+            ReviewPublisherRegistry reviewPublisherRegistry,
+            ProviderRateLimitState rateLimitState
     ) {
         this.aiReasoningJobRepository = aiReasoningJobRepository;
         this.applicationEventPublisher = applicationEventPublisher;
         this.orchestrator = orchestrator;
         this.reviewPublisherRegistry = reviewPublisherRegistry;
+        this.rateLimitState = rateLimitState;
     }
 
     @Transactional
@@ -101,9 +105,25 @@ public class AiReasoningJobService {
         }
     }
 
-    private long calculateBackoff(int retryCount) {
-        long baseDelay = (long) Math.min(60000, Math.pow(2, retryCount) * 1000);
+    private long calculateBackoff(
+            int retryCount,
+            ProcessingErrorType errorType
+    ) {
+
+        if (errorType == ProcessingErrorType.RATE_LIMIT) {
+
+            long baseDelay = Math.max(60_000, rateLimitState.remainingMillis());
+
+            return baseDelay +
+                    ThreadLocalRandom
+                            .current()
+                            .nextLong(0, 30_000);
+        }
+
+        long baseDelay = (long) Math.min(60_000, Math.pow(2, retryCount) * 1000);
+
         double jitter = 0.5 + Math.random();
+
         return (long) (baseDelay * jitter);
     }
 
@@ -142,12 +162,19 @@ public class AiReasoningJobService {
 
         job.markAttempt();
 
-        if (!job.shouldRetry()) {
-            markProcessFailed(job, ProcessingErrorType.RETRY_EXHAUSTED, ex);
+        if (!shouldRetry(job, errorType)) {
+            markProcessFailed(
+                    job,
+                    ProcessingErrorType.RETRY_EXHAUSTED,
+                    ex
+            );
             return;
         }
 
-        long backoff = calculateBackoff(job.getRetryCount());
+        long backoff = calculateBackoff(
+                job.getRetryCount(),
+                errorType
+        );
 
         Instant nextAttemptAt = Instant.now().plusMillis(backoff);
 
@@ -194,5 +221,17 @@ public class AiReasoningJobService {
         } else {
             action.run();
         }
+    }
+
+    private boolean shouldRetry(
+            AiReasoningJob job,
+            ProcessingErrorType errorType
+    ) {
+
+        if (errorType == ProcessingErrorType.RATE_LIMIT) {
+            return job.getRetryCount() < 5;
+        }
+
+        return job.shouldRetry();
     }
 }
