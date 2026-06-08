@@ -1,9 +1,9 @@
-package com.harsha.investment_intelligence_service.application.reasoning.AiReasoningJob;
+package com.harsha.notification_service.application.service.notification;
 
-import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobProcessingRequest;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobRetryScheduled;
-import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
+import com.harsha.notification_service.domain.entity.NotificationJob;
+import com.harsha.notification_service.domain.model.NotificationJobProcessingRequested;
+import com.harsha.notification_service.domain.model.NotificationJobRetryScheduled;
+import com.harsha.notification_service.domain.repository.NotificationJobRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,16 +17,16 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-public class AiReasoningJobRecoveryScheduler {
-    private final AiReasoningJobRepository aiReasoningJobRepository;
+public class NotificationJobRecoveryScheduler {
+    private final NotificationJobRepository notificationJobRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private static final Logger log = LoggerFactory.getLogger(AiReasoningJobRecoveryScheduler.class);
+    private static final Logger log = LoggerFactory.getLogger(NotificationJobRecoveryScheduler.class);
 
-    public AiReasoningJobRecoveryScheduler(
-            AiReasoningJobRepository aiReasoningJobRepository,
+    public NotificationJobRecoveryScheduler(
+            NotificationJobRepository notificationJobRepository,
             ApplicationEventPublisher eventPublisher
     ) {
-        this.aiReasoningJobRepository = aiReasoningJobRepository;
+        this.notificationJobRepository = notificationJobRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -35,10 +35,10 @@ public class AiReasoningJobRecoveryScheduler {
     public void recoverStuckEvents() {
         Instant cutoff = Instant.now().minusSeconds(300);
 
-        List<AiReasoningJob> stuckJobs =
-                aiReasoningJobRepository.findStuckProcessingEvents(cutoff);
+        List<NotificationJob> stuckJobs =
+                notificationJobRepository.findStuckProcessingEvents(cutoff);
 
-        for (AiReasoningJob stuckJob : stuckJobs) {
+        for (NotificationJob stuckJob : stuckJobs) {
             log.info(
                     "Recovering stuck job → id={}, processingStartedAt={}",
                     stuckJob.getId(),
@@ -48,18 +48,22 @@ public class AiReasoningJobRecoveryScheduler {
             stuckJob.markRetryScheduled();
             stuckJob.setErrorMessage(null);
             stuckJob.setErrorType(null);
-            aiReasoningJobRepository.save(stuckJob);
+            notificationJobRepository.save(stuckJob);
         }
         if (!stuckJobs.isEmpty()) {
             afterCommitOrNow(() ->
-                    eventPublisher.publishEvent(new AiReasoningJobRetryScheduled(Instant.now()))
+                    eventPublisher.publishEvent(
+                            new NotificationJobRetryScheduled(Instant.now())
+                    )
             );
         }
     }
 
     @Scheduled(fixedDelay = 300000)
     public void recover() {
-        eventPublisher.publishEvent(new AiReasoningJobProcessingRequest());
+        eventPublisher.publishEvent(
+                new NotificationJobProcessingRequested()
+        );
     }
 
     private void afterCommitOrNow(Runnable action) {

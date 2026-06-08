@@ -1,4 +1,4 @@
-package com.harsha.notification_service.application.idempotency;
+package com.harsha.notification_service.application.service.idempotency;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
