@@ -12,6 +12,7 @@ import com.harsha.strategy_service.application.events.EventPublisher;
 import com.harsha.strategy_service.application.lifecycle.OpportunityLifecycleManager;
 import com.harsha.strategy_service.application.regime.RegimeContext;
 import com.harsha.strategy_service.application.regime.RegimeContextService;
+import com.harsha.strategy_service.application.service.StrategySnapshotService;
 import com.harsha.strategy_service.application.statistics.SymbolStatisticsService;
 import com.harsha.strategy_service.application.transition.OpportunityTransitionEvaluator;
 import com.harsha.strategy_service.domain.model.*;
@@ -40,6 +41,7 @@ public class StrategyOrchestrator {
     private final WeightApplier weightApplier;
     private final EventPublisher eventPublisher;
     private final OpportunityTransitionEvaluator transitionEvaluator;
+    private final StrategySnapshotService strategySnapshotService;
 
     public StrategyOrchestrator(
             OpportunityStateRepository repository,
@@ -54,7 +56,8 @@ public class StrategyOrchestrator {
             RegimeContextService regimeContextService,
             WeightApplier weightApplier,
             EventPublisher eventPublisher,
-            OpportunityTransitionEvaluator transitionEvaluator
+            OpportunityTransitionEvaluator transitionEvaluator,
+            StrategySnapshotService strategySnapshotService
     ) {
         this.repository = repository;
         this.trendDetector = trendDetector;
@@ -69,6 +72,7 @@ public class StrategyOrchestrator {
         this.weightApplier = weightApplier;
         this.eventPublisher = eventPublisher;
         this.transitionEvaluator = transitionEvaluator;
+        this.strategySnapshotService = strategySnapshotService;
     }
 
     public void process(
@@ -155,6 +159,8 @@ public class StrategyOrchestrator {
                 OpportunitySnapshot.from(state);
 
         repository.save(state);
+
+        strategySnapshotService.createSnapshot(state);
 
         StrategyEvaluationCompletedEvent completedEvent =
                 new StrategyEvaluationCompletedEvent(
