@@ -22,8 +22,8 @@ public class SymbolStatisticsService {
             StockFeatureEvent event
     ) {
         SymbolStatisticsState state =
-                repository.findBySymbol(
-                        event.symbol())
+                repository
+                        .findBySymbol(event.symbol())
                         .orElseGet(() -> new SymbolStatisticsState(
                                         event.symbol()
                                 )
