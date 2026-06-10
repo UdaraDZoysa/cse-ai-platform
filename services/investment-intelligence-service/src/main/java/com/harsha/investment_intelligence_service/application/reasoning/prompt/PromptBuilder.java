@@ -127,6 +127,11 @@ public class PromptBuilder {
             );
         }
 
+        appendStrategyHistory(
+                prompt,
+                context
+        );
+
         if (context.transitionSummary() != null) {
 
             prompt.append("""
@@ -189,6 +194,11 @@ public class PromptBuilder {
                     """
             );
         }
+
+        appendTransitionHistory(
+                prompt,
+                context
+        );
 
         if (!context.activeInsights().isEmpty()) {
 
@@ -533,5 +543,117 @@ public class PromptBuilder {
                 context.symbol(),
                 prompt.toString()
         );
+    }
+
+    private void appendStrategyHistory(
+            StringBuilder prompt,
+            AIReasoningContext context
+    ) {
+
+        if (context.recentEvaluations() == null
+                || context.recentEvaluations().isEmpty()
+                || context.recentEvaluations().size() < 3) {
+            return;
+        }
+
+        prompt.append("""
+            ========================
+            STRATEGY HISTORY
+            ========================
+            
+            Recent Strategy Evaluations:
+            
+            """);
+
+        for (var evaluation : context.recentEvaluations()) {
+
+            prompt.append(
+                    """
+                    Confidence: %.0f
+                    Status: %s
+                    Regime: %s
+                    Direction: %s
+                    Persistence: %d
+                    
+                    """
+                            .formatted(
+                                    evaluation.confidence(),
+                                    evaluation.status(),
+                                    evaluation.marketRegime(),
+                                    evaluation.direction(),
+                                    evaluation.persistence()
+                            )
+            );
+        }
+
+        prompt.append("""
+            
+            Interpretation Guidance:
+            
+            - Consistently increasing confidence indicates strengthening opportunity quality.
+            - Consistently decreasing confidence indicates deteriorating opportunity quality.
+            - Stable regimes generally indicate stronger conviction.
+            - Frequent regime changes may indicate instability.
+            - Increasing persistence indicates opportunity durability.
+            
+            """);
+    }
+
+    private void appendTransitionHistory(
+            StringBuilder prompt,
+            AIReasoningContext context
+    ) {
+
+        if (context.recentTransitions() == null
+                || context.recentTransitions().isEmpty()
+                || context.recentTransitions().size() < 3) {
+            return;
+        }
+
+        prompt.append("""
+            ========================
+            RECENT TRANSITIONS
+            ========================
+            
+            Opportunity Evolution:
+            
+            """);
+
+        for (var transition : context.recentTransitions()) {
+
+            prompt.append(
+                    """
+                    Previous Status: %s
+                    Current Status: %s
+                    Previous Confidence: %.0f
+                    Current Confidence: %.0f
+                    Previous Regime: %s
+                    Current Regime: %s
+                    Reasons: %s
+                    
+                    """
+                            .formatted(
+                                    transition.previousStatus(),
+                                    transition.currentStatus(),
+                                    transition.previousConfidence(),
+                                    transition.currentConfidence(),
+                                    transition.previousRegime(),
+                                    transition.currentRegime(),
+                                    transition.reasons()
+                            )
+            );
+        }
+
+        prompt.append("""
+            
+            Interpretation Guidance:
+            
+            - Bullish transitions indicate improving opportunity quality.
+            - Bearish transitions indicate deteriorating opportunity quality.
+            - Multiple confidence increases indicate strengthening conviction.
+            - Multiple confidence decreases indicate weakening conviction.
+            - Frequent reversals indicate unstable market conditions.
+            
+            """);
     }
 }

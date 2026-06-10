@@ -2,8 +2,8 @@ package com.harsha.investment_intelligence_service.handler;
 
 import com.harsha.contracts.events.market.MarketSnapshotEvent;
 import com.harsha.contracts.messaging.EventType;
-import com.harsha.investment_intelligence_service.application.context.updater.MarketContextUpdater;
 import com.harsha.investment_intelligence_service.application.idempotency.IdempotencyService;
+import com.harsha.investment_intelligence_service.domain.repository.MarketSnapshotHistoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,16 +13,16 @@ import java.time.Instant;
 @Component
 public class MarketSnapshotEventHandler implements EventHandler<MarketSnapshotEvent>{
     private final IdempotencyService idempotencyService;
-    private final MarketContextUpdater marketContextUpdater;
+    private final MarketSnapshotHistoryRepository repository;
     private static final Logger log = LoggerFactory.getLogger(MarketSnapshotEventHandler.class);
 
 
     public MarketSnapshotEventHandler(
             IdempotencyService idempotencyService,
-            MarketContextUpdater marketContextUpdater
+            MarketSnapshotHistoryRepository repository
     ) {
         this.idempotencyService = idempotencyService;
-        this.marketContextUpdater = marketContextUpdater;
+        this.repository = repository;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class MarketSnapshotEventHandler implements EventHandler<MarketSnapshotEv
             return;
         }
 
-        marketContextUpdater.update(event);
+        repository.save(event);
 
         log.info(
                 """
