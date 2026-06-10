@@ -1,6 +1,9 @@
 package com.harsha.investment_intelligence_service.domain.repository;
 
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
+import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -41,4 +44,9 @@ public interface AiReasoningJobRepository extends JpaRepository<AiReasoningJob, 
                             )
     """)
     long existsByPendingJob(Instant now);
+
+    Page<AiReasoningJob> findByStatusOrderByCreatedAtDesc(
+            AIReasoningJobStatus status,
+            Pageable pageable
+    );
 }
