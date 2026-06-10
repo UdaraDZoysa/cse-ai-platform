@@ -1,4 +1,4 @@
-package com.harsha.investment_intelligence_service.application.context.updater;
+package com.harsha.investment_intelligence_service.application.context;
 
 import com.harsha.contracts.events.market_intelligence.MarketInsightGeneratedEvent;
 import com.harsha.investment_intelligence_service.util.InsightScoring;

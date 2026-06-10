@@ -1,9 +1,9 @@
 package com.harsha.investment_intelligence_service.handler;
 
-import com.harsha.contracts.events.strategy.StrategyEvaluationCompletedEvent;
+import com.harsha.contracts.events.common.WatchlistUpdatedEvent;
 import com.harsha.contracts.messaging.EventType;
 import com.harsha.investment_intelligence_service.application.idempotency.IdempotencyService;
-import com.harsha.investment_intelligence_service.domain.repository.StrategyEvaluationHistoryRepository;
+import com.harsha.investment_intelligence_service.domain.repository.WatchlistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 
 @Component
-public class StrategyEvlCompEventHandler implements EventHandler<StrategyEvaluationCompletedEvent>{
+public class WatchlistUpdatedEventHandler implements EventHandler<WatchlistUpdatedEvent> {
     private final IdempotencyService idempotencyService;
-    private final StrategyEvaluationHistoryRepository repository;
-    private static final Logger log = LoggerFactory.getLogger(StrategyEvlCompEventHandler.class);
+    private final WatchlistRepository repository;
+    private static final Logger log = LoggerFactory.getLogger(WatchlistUpdatedEventHandler.class);
 
-    public StrategyEvlCompEventHandler(
+    public WatchlistUpdatedEventHandler(
             IdempotencyService idempotencyService,
-            StrategyEvaluationHistoryRepository repository
+            WatchlistRepository repository
     ) {
         this.idempotencyService = idempotencyService;
         this.repository = repository;
@@ -26,16 +26,16 @@ public class StrategyEvlCompEventHandler implements EventHandler<StrategyEvaluat
 
     @Override
     public EventType eventType() {
-        return EventType.STRATEGY_EVALUATION_COMPLETED_EVENT;
+        return EventType.WATCHLIST_UPDATED_EVENT;
     }
 
     @Override
-    public Class<StrategyEvaluationCompletedEvent> eventClass() {
-        return StrategyEvaluationCompletedEvent.class;
+    public Class<WatchlistUpdatedEvent> eventClass() {
+        return WatchlistUpdatedEvent.class;
     }
 
     @Override
-    public void handle(String eventId, StrategyEvaluationCompletedEvent event) {
+    public void handle(String eventId, WatchlistUpdatedEvent event) {
         if (idempotencyService.alreadyProcessed(eventId)) {
             return;
         }
@@ -44,13 +44,13 @@ public class StrategyEvlCompEventHandler implements EventHandler<StrategyEvaluat
 
         log.info(
                 """
-                Strategy Evaluation Completed context updated.
+                Watchlist updated.
                 
-                Symbol: {}
+                Symbols: {}
                 Timestamp: {}
                 
                 """,
-                event.symbol(),
+                event.symbols(),
                 Instant.now()
         );
 
