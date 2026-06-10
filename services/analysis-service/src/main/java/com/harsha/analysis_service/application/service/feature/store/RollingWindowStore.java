@@ -17,7 +17,7 @@ public class RollingWindowStore {
             new ConcurrentHashMap<>();
 
     public RollingWindowStore(
-            @Value("${feature.window.size:50}")
+            @Value("${feature.window.size:100}")
             int windowSize
     ) {
         this.windowSize = windowSize;
@@ -53,5 +53,19 @@ public class RollingWindowStore {
         }
 
         return new ArrayDeque<>(window);
+    }
+
+    public void restore(
+            StockTickEvent tick
+    ) {
+        Deque<StockTickEvent> window = windows.computeIfAbsent(
+                tick.symbol(),
+                ignored -> new ArrayDeque<>()
+        );
+
+        if (window.size() >= windowSize) {
+            window.removeFirst();
+        }
+        window.addLast(tick);
     }
 }
