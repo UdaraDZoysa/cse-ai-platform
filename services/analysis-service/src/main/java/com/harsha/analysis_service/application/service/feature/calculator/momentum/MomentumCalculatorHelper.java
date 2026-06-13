@@ -146,6 +146,6 @@ public class MomentumCalculatorHelper {
             previousDirection = currentDirection;
         }
 
-        return (double) longestSequence / returns.size();
+        return Math.min(1.0, (double) longestSequence / 10.0);
     }
 }

@@ -2,12 +2,15 @@ package com.harsha.strategy_service.application.evaluator;
 
 import com.harsha.strategy_service.domain.model.detector.DetectorSignal;
 import com.harsha.contracts.events.strategy.SignalDirection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class SignalFusionEngine {
+    private static final Logger log = LoggerFactory.getLogger(SignalFusionEngine.class);
     public double calculateConfidence(
             List<DetectorSignal> signals
     ) {
@@ -22,6 +25,15 @@ public class SignalFusionEngine {
 
             double weightedStrength =
                     signal.strength() * signal.reliability();
+
+            log.info(
+                    "$$$$$$$$$$$$$$$$$$$$$$$$$source={} direction={} strength={} reliability={} weighted={}",
+                    signal.source(),
+                    signal.direction(),
+                    signal.strength(),
+                    signal.reliability(),
+                    weightedStrength
+            );
 
             if (signal.direction() == SignalDirection.BULLISH) {
                 bullish += weightedStrength;

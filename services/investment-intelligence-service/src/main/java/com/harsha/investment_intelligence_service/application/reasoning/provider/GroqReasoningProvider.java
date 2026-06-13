@@ -118,6 +118,19 @@ public class GroqReasoningProvider implements ReasoningProvider{
             );
 
         } catch (HttpClientErrorException.TooManyRequests ex) {
+            log.error(
+                    """
+                    GROQ RATE LIMIT
+                    
+                    Status: {}
+                    Headers: {}
+                    Body: {}
+                    """,
+                    ex.getStatusCode(),
+                    ex.getResponseHeaders(),
+                    ex.getResponseBodyAsString()
+            );
+
             rateLimitState.blockForMinutes(1);
 
             throw new RetryableAIException(

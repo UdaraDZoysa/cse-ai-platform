@@ -11,21 +11,21 @@ public class OpportunityLifecycleManager {
     ) {
         double confidence = state.getConfidence();
 
-        if (confidence >= 70) {
+        if (confidence >= 0.70) {
             state.setStatus(
                     OpportunityStatus.STRENGTHENED
             );
             return;
         }
 
-        if (confidence >= 35) {
+        if (confidence >= 0.35) {
             state.setStatus(
                     OpportunityStatus.OPENED
             );
             return;
         }
 
-        if (confidence >= 10) {
+        if (confidence >= 0.10) {
             state.setStatus(
                     OpportunityStatus.WEAKENED
             );

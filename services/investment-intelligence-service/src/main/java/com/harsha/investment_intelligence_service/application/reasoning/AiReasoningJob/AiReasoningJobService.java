@@ -3,6 +3,7 @@ package com.harsha.investment_intelligence_service.application.reasoning.AiReaso
 import com.harsha.investment_intelligence_service.application.reasoning.orchestrator.ReasoningOrchestrator;
 import com.harsha.investment_intelligence_service.application.review.publisher.ReviewPublisher;
 import com.harsha.investment_intelligence_service.application.review.publisher.ReviewPublisherRegistry;
+import com.harsha.investment_intelligence_service.config.LlmProperties;
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.job.AiReasoningJobRetryScheduled;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReview;
@@ -29,6 +30,7 @@ public class AiReasoningJobService {
     private final ReasoningOrchestrator orchestrator;
     private final ReviewPublisherRegistry reviewPublisherRegistry;
     private final ProviderRateLimitState rateLimitState;
+    private final LlmProperties llmProperties;
     private static final Logger log = LoggerFactory.getLogger(AiReasoningJobService.class);
 
     public AiReasoningJobService(
@@ -36,13 +38,15 @@ public class AiReasoningJobService {
             ApplicationEventPublisher applicationEventPublisher,
             ReasoningOrchestrator orchestrator,
             ReviewPublisherRegistry reviewPublisherRegistry,
-            ProviderRateLimitState rateLimitState
+            ProviderRateLimitState rateLimitState,
+            LlmProperties llmProperties
     ) {
         this.aiReasoningJobRepository = aiReasoningJobRepository;
         this.applicationEventPublisher = applicationEventPublisher;
         this.orchestrator = orchestrator;
         this.reviewPublisherRegistry = reviewPublisherRegistry;
         this.rateLimitState = rateLimitState;
+        this.llmProperties = llmProperties;
     }
 
     @Transactional
@@ -54,12 +58,12 @@ public class AiReasoningJobService {
             ReasoningResponse result =
                     orchestrator.generateResponse(
                             job.getSymbol(),
-                            job.getPrompt(),
-                            job.getModel(),
-                            job.getProviderType()
+                            job.getPrompt()
                     );
 
             job.setRawResponse(result.rawResponse());
+            job.setModel(llmProperties.model());
+            job.setProviderType(llmProperties.providerType());
             job.markPartiallyProcessed();
             aiReasoningJobRepository.save(job);
 

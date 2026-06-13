@@ -69,10 +69,10 @@ public class PromptBuilder {
 
             prompt.append(
                     """
-                    Current Confidence Score: %.0f / 100
-                    Average Confidence Score: %.0f / 100
-                    Confidence Trend: %.2f
-                    Confidence Volatility: %.2f
+                    Current Strategy Confidence Score: %.0f / 100
+                    Average Strategy Confidence Score: %.0f / 100
+                    Strategy Confidence Trend: %.2f
+                    Strategy Confidence Volatility: %.2f
                     Persistence: %d
                     Status: %s
                     Regime: %s
@@ -80,10 +80,10 @@ public class PromptBuilder {
                     """
                             .formatted(
                                     context.strategySummary()
-                                            .currentConfidence(),
+                                            .currentConfidence() * 100,
 
                                     context.strategySummary()
-                                            .averageConfidence(),
+                                            .averageConfidence() * 100,
 
                                     context.strategySummary()
                                             .confidenceTrend(),
@@ -286,6 +286,9 @@ public class PromptBuilder {
           - Very low confidence
           - Multiple bearish transitions
           - Persistent confidence deterioration
+          
+        - Persistent confidence deterioration requires explicit evidence of declining confidence.
+        - Do not treat stable low confidence as confidence deterioration.
 
         ========================
         CONFIDENCE SCORING GUIDANCE
@@ -306,26 +309,44 @@ public class PromptBuilder {
         - Conflicting signals
         - Bearish transitions
         - Confidence deterioration
+        
+        Confidence Deterioration Interpretation:
+                
+        - Confidence deterioration requires explicit evidence of declining confidence.
+        - Use Confidence Decreases and Confidence Trend as the primary indicators.
+        - Stable low confidence is NOT confidence deterioration.
+        - Do not infer confidence deterioration solely because confidence is low.
 
         Do not assign very high confidence scores when strategy confidence is low or strategy status is INVALIDATED.
         Confidence Score Rules:
        
-        The confidence.score field should generally remain close to the Current Confidence Score.
-       
-        Do not significantly increase confidence based solely on narrative signals when Current Confidence Score is very low.
+        The Current Strategy Confidence Score is an important input produced by the strategy engine.
 
-        When Current Confidence Score is 0:
-       
-        - confidence.score should normally be 0.
-        - Do not increase confidence based solely on narrative sentiment.
-        - Only assign a value above 0 when:
-        - Current Confidence Trend is positive AND
-        - Bullish Transitions exceed Bearish Transitions.
+        The final confidence.score should represent the overall conviction after considering:
+        
+         - Strategy Summary
+         - Transition Summary
+         - Strategy History
+         - Transition History
+         - Active Insights
+         - Market Snapshot
                 
-        Do not exceed 20.
+         The final confidence.score may be higher or lower than the Current Strategy Confidence Score when additional evidence supports that conclusion.
+                
+         Explain clearly which factors increased or decreased the final confidence.
+       
+        Do not significantly increase confidence based solely on narrative signals when Current Strategy Confidence Score is very low unless multiple independent signals support the same conclusion.
 
-        Current Confidence Score is produced by the strategy engine and represents the overall strength of the detected opportunity after combining multiple market signals.
-        Treat it as one of the strongest indicators of opportunity quality.
+        When Current Strategy Confidence Score is 0:
+       
+        - Do not increase confidence based solely on narrative sentiment.
+        - Only assign a value above 0 when multiple independent signals support the same conclusion, such as:
+          - Positive Confidence Trend
+          - Bullish Transitions exceed Bearish Transitions
+          - Strong supporting insights
+
+        Current Strategy Confidence Score is produced by the strategy engine and represents the overall strength of the detected opportunity after combining multiple market signals.
+        Treat it as an important indicator of opportunity quality, but consider all available evidence before determining the final confidence score.
 
         ========================
         ACTION CONSISTENCY RULES
@@ -362,6 +383,10 @@ public class PromptBuilder {
         - Bearish Narrative Sentiment
         - Persistent confidence deterioration
         - Expected Market Behavior = LOWER 
+        
+        Persistent confidence deterioration requires explicit evidence of declining confidence.
+                
+        Do not treat stable low confidence as confidence deterioration.
         
         with MODERATE or SIGNIFICANT magnitude
                 
@@ -419,28 +444,50 @@ public class PromptBuilder {
                    - Examples:
                      - No earnings information provided.
                      - No valuation information provided.
-                     - No historical trend information provided.
                    - Only include limitations directly observable from the provided context.
                 
                 9. Invalidation Conditions
-                    Only include conditions explicitly present in:
-                    - Strategy Summary
-                    - Transition Summary
-                    - Active Insights
                 
-                    Do not treat current observations as invalidation conditions.
+                   - Only include explicit FUTURE conditions that would invalidate the opportunity.
                 
-                    Examples of invalid values:
-                    - INVALIDATED status
-                    - Low confidence score
-                    - Sideways regime
+                   - Do NOT include:
                 
-                    If no explicit future invalidation conditions are present in the supplied context,
-                    return an empty list.
+                     - Current Status
+                     - Current Strategy Confidence Score
+                     - Current Regime
+                     - Current Market Assessment
+                     - Current Direction
+                     - Current Observations
                 
-                    Do not reuse examples from instructional sections unless they are present in the actual context.
+                   - Examples of values that MUST NOT appear:
                 
-                    Otherwise return an empty list.
+                     - INVALIDATED status
+                     - Low confidence score
+                     - Sideways regime
+                     - Bearish transitions
+                     - Current market weakness
+                
+                   - If the supplied context does not explicitly define future invalidation conditions,
+                   - return an empty list.
+                
+                   - Return an empty list by default unless explicit future invalidation conditions are present.
+                   
+                   IMPORTANT:
+                
+                   Current observations are NOT invalidation conditions.
+                
+                   The following are never valid invalidation conditions:
+                
+                   - Current Status
+                   - Current Strategy Confidence Score
+                   - Current Regime
+                   - Current Direction
+                   - Current Market Assessment
+                   - Current Observations
+                
+                   Only return invalidation conditions when the supplied context explicitly describes future events or thresholds that would invalidate the thesis.
+                
+                   If none exist, return [].
                 
                 10. Risk Level
                     - LOW / MEDIUM / HIGH
@@ -557,6 +604,18 @@ public class PromptBuilder {
         }
 
         prompt.append("""
+            IMPORTANT:
+            
+            - The Strategy Summary contains the authoritative current state.
+            
+            - Current Strategy Confidence Score in Strategy Summary is the current opportunity confidence.
+                
+            - Strategy History contains historical observations only and must not replace or override the current values in Strategy Summary.
+                
+            - When discussing current confidence, current status, current regime, or current conviction, always use values from Strategy Summary.
+                
+            - Use Strategy History only to identify trends, stability, persistence, and historical evolution.
+                
             ========================
             STRATEGY HISTORY
             ========================
@@ -569,7 +628,7 @@ public class PromptBuilder {
 
             prompt.append(
                     """
-                    Confidence: %.0f
+                    Confidence: %.0f / 100
                     Status: %s
                     Regime: %s
                     Direction: %s
@@ -577,7 +636,7 @@ public class PromptBuilder {
                     
                     """
                             .formatted(
-                                    evaluation.confidence(),
+                                    evaluation.confidence() * 100,
                                     evaluation.status(),
                                     evaluation.marketRegime(),
                                     evaluation.direction(),
@@ -595,6 +654,9 @@ public class PromptBuilder {
             - Stable regimes generally indicate stronger conviction.
             - Frequent regime changes may indicate instability.
             - Increasing persistence indicates opportunity durability.
+            - Recent Strategy Evaluations are historical observations only.
+            - For current opportunity assessment, use the Current Strategy Confidence Score from the Strategy Summary as the authoritative current value.
+            - Do not replace the Current Strategy Confidence Score with historical confidence values from Strategy History.
             
             """);
     }
@@ -625,8 +687,8 @@ public class PromptBuilder {
                     """
                     Previous Status: %s
                     Current Status: %s
-                    Previous Confidence: %.0f
-                    Current Confidence: %.0f
+                    Previous Strategy Confidence: %.0f /100
+                    Current Strategy Confidence: %.0f /100
                     Previous Regime: %s
                     Current Regime: %s
                     Reasons: %s
@@ -635,8 +697,8 @@ public class PromptBuilder {
                             .formatted(
                                     transition.previousStatus(),
                                     transition.currentStatus(),
-                                    transition.previousConfidence(),
-                                    transition.currentConfidence(),
+                                    transition.previousConfidence() * 100,
+                                    transition.currentConfidence() * 100,
                                     transition.previousRegime(),
                                     transition.currentRegime(),
                                     transition.reasons()

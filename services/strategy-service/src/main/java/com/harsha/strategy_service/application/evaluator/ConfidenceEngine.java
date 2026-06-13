@@ -17,7 +17,7 @@ public class ConfidenceEngine {
 
         current += incomingConfidence;
 
-        current = Math.min(current, 100);
+        current = Math.min(current, 1.0);
 
         if (current < 0) {
             current = 0;
