@@ -4,12 +4,16 @@ import com.harsha.analysis_service.application.service.feature.model.MoveDirecti
 import com.harsha.contracts.events.analysis.TrendDirection;
 import com.harsha.contracts.events.market.StockTickEvent;
 import com.harsha.contracts.events.analysis.TrendFeatures;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
 
 @Component
 public class TrendCalculator {
+    private static final Logger log = LoggerFactory.getLogger(TrendCalculator.class);
+
 
     public TrendFeatures calculate(
             Deque<StockTickEvent> window
@@ -78,13 +82,20 @@ public class TrendCalculator {
 
 
         TrendDirection direction;
-        if (imbalance < 0.15) {
+
+        if (imbalance < 0.05) {
             direction = TrendDirection.SIDEWAYS;
         } else if (upwardRatio > downwardRatio) {
             direction = TrendDirection.BULLISH;
         } else {
             direction = TrendDirection.BEARISH;
         }
+
+        log.info(
+                "TREND CALCULATOR imbalance={} direction={}",
+                imbalance,
+                direction
+        );
 
         return new TrendFeatures(
                 upwardRatio,

@@ -7,6 +7,7 @@ import com.harsha.investment_intelligence_service.application.reasoning.provider
 import com.harsha.investment_intelligence_service.application.reasoning.provider.ReasoningProviderRegistry;
 import com.harsha.investment_intelligence_service.application.reasoning.validation.ReviewValidationService;
 import com.harsha.investment_intelligence_service.application.review.InvestmentReviewMapper;
+import com.harsha.investment_intelligence_service.config.LlmProperties;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ProviderType;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.provider.ReasoningRequest;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReview;
@@ -24,6 +25,7 @@ public class ReasoningOrchestrator {
     private final JsonResponseCleaner jsonResponseCleaner;
     private final InvestmentReviewMapper investmentReviewMapper;
     private final ReviewValidationService reviewValidationService;
+    private final LlmProperties llmProperties;
     private static final Logger log = LoggerFactory.getLogger(ReasoningOrchestrator.class);
 
     public ReasoningOrchestrator(
@@ -31,30 +33,30 @@ public class ReasoningOrchestrator {
             ObjectMapper objectMapper,
             JsonResponseCleaner jsonResponseCleaner,
             InvestmentReviewMapper investmentReviewMapper,
-            ReviewValidationService reviewValidationService
+            ReviewValidationService reviewValidationService,
+            LlmProperties llmProperties
     ) {
         this.reasoningProviderRegistry = reasoningProviderRegistry;
         this.objectMapper = objectMapper;
         this.jsonResponseCleaner = jsonResponseCleaner;
         this.investmentReviewMapper = investmentReviewMapper;
         this.reviewValidationService = reviewValidationService;
+        this.llmProperties = llmProperties;
     }
 
     public ReasoningResponse generateResponse(
             String symbol,
-            String prompt,
-            String model,
-            ProviderType providerType
+            String prompt
     ) {
         ReasoningProvider provider = reasoningProviderRegistry.get(
-                providerType
+                llmProperties.providerType()
         );
 
         return provider.generate(
                 new ReasoningRequest(
                         symbol,
                         prompt,
-                        model
+                        llmProperties.model()
                 )
         );
     }

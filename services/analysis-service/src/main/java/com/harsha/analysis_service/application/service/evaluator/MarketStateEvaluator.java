@@ -22,16 +22,6 @@ public class MarketStateEvaluator {
         //Efficiency Ratio
         score += snapshot.momentum().efficiencyRatio() * 20.0;
 
-        //Volatility Regime
-//        score += switch (
-//                snapshot.volatility().regime()
-//                ) {
-//            case  -> 5;
-//            case "MEDIUM" -> 15;
-//            case "HIGH" -> 25;
-//            default -> 0;
-//        };
-
         //Acceleration
         double acceleration = Math.abs(snapshot.momentum().acceleration());
 

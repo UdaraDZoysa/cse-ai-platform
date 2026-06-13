@@ -36,9 +36,11 @@ public class RollingWindowInitializer {
                 repository.findTrackedSymbols();
 
         for (String symbol : symbols) {
-            List<StockTickEvent> ticks = repository.findLatestBySymbol(
-                    symbol,
-                    windowSize
+            List<StockTickEvent> ticks = new java.util.ArrayList<>(
+                    repository.findLatestBySymbol(
+                            symbol,
+                            windowSize
+                    )
             );
 
             Collections.reverse(ticks);

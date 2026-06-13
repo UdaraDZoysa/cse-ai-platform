@@ -6,10 +6,15 @@ import com.harsha.contracts.events.analysis.VolatilityRegime;
 import com.harsha.strategy_service.domain.model.detector.DetectorSignal;
 import com.harsha.strategy_service.domain.model.detector.DetectorType;
 import com.harsha.contracts.events.strategy.SignalDirection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BreakoutDetector implements Detector {
+
+    private static final Logger log = LoggerFactory.getLogger(BreakoutDetector.class);
+
     @Override
     public DetectorSignal detect(
             StockFeatureEvent event
@@ -73,6 +78,28 @@ public class BreakoutDetector implements Detector {
                 trend.direction() == TrendDirection.BULLISH &&
                     momentum.cumulativeReturn() > 0
         ) {
+            log.info(
+                    """
+                    BREAKOUT DEBUG
+                    symbol={}
+                    bullishStructure={}
+                    bearishStructure={}
+                    emaSpread={}
+                    momentumStrength={}
+                    persistenceBoost={}
+                    breakoutStrength={}
+                    direction={}
+                    """,
+                    event.symbol(),
+                    bullishStructure,
+                    bearishStructure,
+                    emaSpread,
+                    momentumStrength,
+                    persistenceBoost,
+                    breakoutStrength,
+                    trend.direction()
+            );
+
             return new DetectorSignal(
                     DetectorType.BREAKOUT,
                     breakoutStrength,
@@ -90,6 +117,28 @@ public class BreakoutDetector implements Detector {
                 trend.direction() == TrendDirection.BEARISH &&
                     momentum.cumulativeReturn() < 0
         ) {
+            log.info(
+                    """
+                    BREAKOUT DEBUG
+                    symbol={}
+                    bullishStructure={}
+                    bearishStructure={}
+                    emaSpread={}
+                    momentumStrength={}
+                    persistenceBoost={}
+                    breakoutStrength={}
+                    direction={}
+                    """,
+                    event.symbol(),
+                    bullishStructure,
+                    bearishStructure,
+                    emaSpread,
+                    momentumStrength,
+                    persistenceBoost,
+                    breakoutStrength,
+                    trend.direction()
+            );
+
             return new DetectorSignal(
                     DetectorType.BREAKOUT,
                     breakoutStrength,
@@ -98,10 +147,31 @@ public class BreakoutDetector implements Detector {
                     true
             );
         }
+        log.info(
+                """
+                BREAKOUT DEBUG
+                symbol={}
+                bullishStructure={}
+                bearishStructure={}
+                emaSpread={}
+                momentumStrength={}
+                persistenceBoost={}
+                breakoutStrength={}
+                direction={}
+                """,
+                event.symbol(),
+                bullishStructure,
+                bearishStructure,
+                emaSpread,
+                momentumStrength,
+                persistenceBoost,
+                breakoutStrength,
+                trend.direction()
+        );
 
         return new DetectorSignal(
                 DetectorType.BREAKOUT,
-                0,
+                breakoutStrength,
                 0.4,
                 SignalDirection.NEUTRAL,
                 true

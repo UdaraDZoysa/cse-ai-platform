@@ -135,6 +135,11 @@ public class StrategyOrchestrator {
         double confidence =
                 fusionEngine.calculateConfidence(signals);
 
+        log.info(
+                "@@@@@@@@@@@@Fusion confidence={}",
+                confidence
+        );
+
         SignalDirection direction =
                 fusionEngine.determineDirection(signals);
 
