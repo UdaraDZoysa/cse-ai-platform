@@ -1,6 +1,7 @@
 export interface InvestmentInsightSummary {
     id: string;
     symbol: string;
+    companyName: string;        
     action: string;
     opportunityScore: number;
     riskLevel: string;
@@ -17,3 +18,4 @@ export interface PageResponse<T> {
     last: boolean;
     empty: boolean;
 }
+

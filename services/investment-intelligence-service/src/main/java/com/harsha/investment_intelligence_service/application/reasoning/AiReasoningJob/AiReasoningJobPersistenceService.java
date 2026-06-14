@@ -37,15 +37,19 @@ public class AiReasoningJobPersistenceService {
 
     public void persistAiReasoningJob(
             String symbol,
+            String companyName,
             ReviewType reviewType,
             String prompt,
             String reasoningContext
     ) {
         String contextHash = HashUtil.sha256(reasoningContext);
 
+        System.out.println("#############company:"+companyName);
+
         AiReasoningJob reasoningJob = AiReasoningJob.builder()
                 .id(UUID.randomUUID().toString())
                 .symbol(symbol)
+                .companyName(companyName)
                 .model(llmProperties.model())
                 .providerType(llmProperties.providerType())
                 .reviewType(reviewType)
@@ -55,7 +59,9 @@ public class AiReasoningJobPersistenceService {
                 .build();
 
         try {
-            reasoningJobRepository.save(reasoningJob);
+            AiReasoningJob result = reasoningJobRepository.save(reasoningJob);
+
+            System.out.println("#############result_Company:"+result.getCompanyName());
 
             afterCommitOrNow(() ->
                     eventPublisher.publishEvent(new AiReasoningJobProcessingRequest())

@@ -61,6 +61,7 @@ public class NarrativeIntelligenceService {
 
             persistIntelligence.persistIntelligence(
                     symbol,
+                    companyName,
                     result
             );
 

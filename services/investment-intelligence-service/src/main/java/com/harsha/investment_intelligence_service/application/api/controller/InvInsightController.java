@@ -1,13 +1,11 @@
 package com.harsha.investment_intelligence_service.application.api.controller;
 
 import com.harsha.investment_intelligence_service.application.api.dto.InvInsightSummaryResponse;
+import com.harsha.investment_intelligence_service.application.api.dto.InvestmentInsightDetailResponse;
 import com.harsha.investment_intelligence_service.application.api.service.InvInsightQueryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/investment-insights")
@@ -21,10 +19,17 @@ public class InvInsightController {
         this.service = service;
     }
 
-    @GetMapping("/get-all")
+    @GetMapping
     public Page<InvInsightSummaryResponse> getInvInsights(
             Pageable pageable
     ) {
         return service.getInvInsights(pageable);
+    }
+
+    @GetMapping("/{id}")
+    public InvestmentInsightDetailResponse getInvInsight(
+            @PathVariable String id
+    ) {
+        return service.getDetailedInvInsight(id);
     }
 }

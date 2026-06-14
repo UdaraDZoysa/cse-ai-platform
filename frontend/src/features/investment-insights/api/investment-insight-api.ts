@@ -13,7 +13,7 @@ export async function getInvestmentInsights(
   size: number
 ): Promise<PageResponse<InvestmentInsightSummary>> {
   const response = await api.get(
-    `/api/investment-insights/get-all?page=${page}&size=${size}`
+    `/api/investment-insights?page=${page}&size=${size}`
   );
 
   return response.data;

@@ -11,6 +11,7 @@ import java.util.List;
 
 public record AIReasoningContext(
         String symbol,
+        String companyName,
         MarketSnapshotEvent marketSnapshot,
         StrategySummary strategySummary,
         TransitionSummary transitionSummary,
