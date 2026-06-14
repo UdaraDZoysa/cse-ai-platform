@@ -13,6 +13,8 @@ public record CseStockResponse(
         long lastTradedTime,
 
         //Add new Fields to generate MarketSnapshotEvent
+        @JsonProperty("name")
+        String company,
         double percentageChange,
         double previousClose,
         double open,

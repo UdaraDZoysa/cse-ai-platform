@@ -49,6 +49,7 @@ public class MarketDataTransformer {
                 .filter(s -> stockFilter.isWatched(s.symbol()))
                 .map(s -> new MarketSnapshotEvent(
                         s.symbol(),
+                        s.company(),
                         Instant.now().toEpochMilli(),
                         s.price(),
                         s.percentageChange(),
