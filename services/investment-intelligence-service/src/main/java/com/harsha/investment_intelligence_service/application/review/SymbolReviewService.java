@@ -98,6 +98,7 @@ public class SymbolReviewService {
 
             persistenceService.persistAiReasoningJob(
                     request.symbol(),
+                    reasoningContext.companyName(),
                     ReviewType.PERIODIC_REVIEW,
                     request.prompt(),
                     strReasoningContext

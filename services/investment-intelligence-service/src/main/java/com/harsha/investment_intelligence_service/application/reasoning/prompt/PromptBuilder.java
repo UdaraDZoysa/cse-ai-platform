@@ -32,6 +32,7 @@ public class PromptBuilder {
         prompt.append(
                 """
                 Symbol: %s
+                Company: %s
                 Price: LKR %.2f
                 Percentage Change: %.2f%%
                 Previous Close: LKR %.2f
@@ -46,6 +47,7 @@ public class PromptBuilder {
                 """
                         .formatted(
                                 market.symbol(),
+                                context.companyName(),
                                 market.price(),
                                 market.percentageChange(),
                                 market.previousClose(),

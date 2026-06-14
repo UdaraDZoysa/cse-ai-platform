@@ -39,6 +39,7 @@ public class NarrativeIntelligencePersistenceService {
     @Transactional
     public void persistIntelligence(
             String symbol,
+            String companyName,
             NarrativeExtractionResult result
     ) {
 
@@ -54,6 +55,10 @@ public class NarrativeIntelligencePersistenceService {
 
         intelligence.setSummary(
                 result.summary()
+        );
+
+        intelligence.setCompany(
+                companyName
         );
 
         intelligence.setGeneratedAt(

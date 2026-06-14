@@ -65,8 +65,15 @@ public class ContextAssembler {
                         .limit(5)
                         .toList();
 
+        String company = insights.isEmpty()
+                ? null
+                : insights.get(0).company();
+
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Company: " + company);
+
         return new AIReasoningContext(
                 context.symbol(),
+                company,
                 context.currentMarketSnapshot(),
                 strategySummary,
                 transitionSummary,

@@ -1,7 +1,9 @@
 package com.harsha.investment_intelligence_service.application.api.service;
 
 import com.harsha.investment_intelligence_service.application.api.dto.InvInsightSummaryResponse;
+import com.harsha.investment_intelligence_service.application.api.dto.InvestmentInsightDetailResponse;
 import com.harsha.investment_intelligence_service.application.api.mapper.InvInsightMapper;
+import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;
 import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
 import org.springframework.data.domain.Page;
@@ -29,7 +31,23 @@ public class InvInsightQueryService {
                 AIReasoningJobStatus.PROCESSED,
                 pageable
         ).map(
-                mapper::toResponse
+                mapper::toSummaryResponse
         );
     }
+
+    public InvestmentInsightDetailResponse getDetailedInvInsight(
+            String id
+    ) {
+        AiReasoningJob job =
+                repository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Insight not found"
+                                )
+                        );
+
+        return mapper.toDetailedResponse(job);
+    }
+
 }

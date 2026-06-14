@@ -39,6 +39,8 @@ public class AiReasoningJob {
     @Column(nullable = false)
     private String symbol;
 
+    private String companyName;
+
     @Enumerated(EnumType.STRING)
     private AIReasoningJobStatus status;
 

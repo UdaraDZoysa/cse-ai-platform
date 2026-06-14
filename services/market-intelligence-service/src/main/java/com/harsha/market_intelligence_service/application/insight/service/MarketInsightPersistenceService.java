@@ -23,6 +23,8 @@ public class  MarketInsightPersistenceService {
             return repository.save(insight);
         }
 
+        System.out.println("!!!!!!!!!!!!!!!!!Company: " + insight.getCompany());
+
         existing.setCompany(insight.getCompany());
         existing.setSummary(insight.getSummary());
         existing.setReasoning(insight.getReasoning());

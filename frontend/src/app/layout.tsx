@@ -18,12 +18,10 @@ export const metadata: Metadata = {
   description: "Created by UDZ",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
+export default function RootLayout(
+  {children,} : Readonly<{children: React.ReactNode;}>) {
+    
+return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}

@@ -16,7 +16,7 @@ public class ScheduledReviewJob {
     }
 
     @Scheduled(
-            fixedDelay = 15,
+            fixedDelay = 3,
             timeUnit = TimeUnit.MINUTES
     )
     public void run() {
