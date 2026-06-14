@@ -5,6 +5,7 @@ import com.harsha.contracts.messaging.EventType;
 
 public record MarketSnapshotEvent(
         String symbol,
+        String company,
         long occurredAt,
         double price,
         double percentageChange,

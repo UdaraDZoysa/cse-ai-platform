@@ -22,6 +22,8 @@ public class MarketSnapshotHistoryEntity {
 
     private String symbol;
 
+    private String company;
+
     private long occurredAt;
 
     private double price;

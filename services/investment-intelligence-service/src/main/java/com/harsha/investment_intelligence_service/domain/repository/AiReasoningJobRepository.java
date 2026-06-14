@@ -50,4 +50,10 @@ public interface AiReasoningJobRepository extends JpaRepository<AiReasoningJob, 
             AIReasoningJobStatus status,
             Pageable pageable
     );
+
+    Page<AiReasoningJob> findBySymbolAndStatusOrderByCreatedAtDesc(
+            String symbol,
+            AIReasoningJobStatus status,
+            Pageable pageable
+    );
 }

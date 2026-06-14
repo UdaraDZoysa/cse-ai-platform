@@ -1,4 +1,4 @@
-package com.harsha.investment_intelligence_service.application.api.dto;
+package com.harsha.investment_intelligence_service.application.api.dto.invinsight;
 
 import java.time.Instant;
 import java.util.List;

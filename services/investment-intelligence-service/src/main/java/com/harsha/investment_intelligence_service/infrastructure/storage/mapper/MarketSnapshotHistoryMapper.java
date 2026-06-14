@@ -11,6 +11,7 @@ public class MarketSnapshotHistoryMapper {
     ) {
         return MarketSnapshotHistoryEntity.builder()
                 .symbol(event.symbol())
+                .company(event.company())
                 .occurredAt(event.occurredAt())
                 .price(event.price())
                 .percentageChange(event.percentageChange())
@@ -30,6 +31,7 @@ public class MarketSnapshotHistoryMapper {
     ) {
         return new MarketSnapshotEvent(
                 entity.getSymbol(),
+                entity.getCompany(),
                 entity.getOccurredAt(),
                 entity.getPrice(),
                 entity.getPercentageChange(),

@@ -1,8 +1,9 @@
 package com.harsha.investment_intelligence_service.application.api.service;
 
-import com.harsha.investment_intelligence_service.application.api.dto.InvInsightSummaryResponse;
-import com.harsha.investment_intelligence_service.application.api.dto.InvestmentInsightDetailResponse;
-import com.harsha.investment_intelligence_service.application.api.mapper.InvInsightMapper;
+import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvInsightSummaryResponse;
+import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvestmentInsightDetailResponse;
+import com.harsha.investment_intelligence_service.application.api.mapper.invinsight.InvInsightMapper;
+import com.harsha.investment_intelligence_service.application.api.repository.invinsight.InvInsightReadRepository;
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;
 import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
@@ -12,42 +13,25 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InvInsightQueryService {
-    private final AiReasoningJobRepository repository;
-    private final InvInsightMapper mapper;
+    private final InvInsightReadRepository readRepository;
 
 
     public InvInsightQueryService(
-            AiReasoningJobRepository repository,
-            InvInsightMapper mapper
+            InvInsightReadRepository readRepository
     ) {
-        this.repository = repository;
-        this.mapper = mapper;
+        this.readRepository = readRepository;
     }
 
     public Page<InvInsightSummaryResponse> getInvInsights(
             Pageable pageable
     ) {
-        return repository.findByStatusOrderByCreatedAtDesc(
-                AIReasoningJobStatus.PROCESSED,
-                pageable
-        ).map(
-                mapper::toSummaryResponse
-        );
+        return readRepository.findInsights(pageable);
     }
 
     public InvestmentInsightDetailResponse getDetailedInvInsight(
             String id
     ) {
-        AiReasoningJob job =
-                repository
-                        .findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Insight not found"
-                                )
-                        );
-
-        return mapper.toDetailedResponse(job);
+        return readRepository.findInsight(id);
     }
 
 }
