@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useInvestmentInsightDetails } from "@/features/investment-insights/hooks/useInvestmentInsightDetails";
 import {
   TrendingUp,
@@ -129,7 +129,6 @@ function InfoCard({
 
 export default function InvestmentInsightDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params.id as string;
   const { data, isLoading, error } = useInvestmentInsightDetails(id);
 
@@ -194,18 +193,22 @@ export default function InvestmentInsightDetailPage() {
         }}
       >
         <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm transition-colors"
-            style={{ color: "#6B7FA3" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#E8EEF8")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#6B7FA3")}
-          >
-            <ChevronLeft size={14} />
-            Back
-          </button>
-
-          <div
+          <Link
+          href="/investment-insights"
+          className="flex items-center gap-2 text-sm transition-colors"
+          style={{ color: "#6B7FA3" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.color = "#E8EEF8")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.color = "#6B7FA3")
+          }
+        >
+          <ChevronLeft size={14} />
+          Back to Insights
+        </Link>
+ 
+        <div
           className="flex items-center gap-2 text-xs"
           style={{
             fontFamily: "'JetBrains Mono', monospace",

@@ -9,10 +9,14 @@ import {
 } from "../types/stock-overview";
 
 interface Props {
+  symbol: string;
   data: PageResponse<InvestmentInsightSummary>;
 }
 
-export default function RecentInvestmentInsights({ data }: Props) {
+export default function RecentInvestmentInsights({ 
+  symbol, 
+  data 
+}: Props) {
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -29,7 +33,7 @@ export default function RecentInvestmentInsights({ data }: Props) {
         </div>
 
         <Link
-          href="/investment-insights"
+          href={`/stocks/${symbol}/investment-insights`}
           className="flex items-center gap-1 text-xs transition-colors"
           style={{ color: "#00D4FF" }}
         >

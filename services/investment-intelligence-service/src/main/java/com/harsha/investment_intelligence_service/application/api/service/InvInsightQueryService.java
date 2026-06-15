@@ -1,12 +1,8 @@
 package com.harsha.investment_intelligence_service.application.api.service;
 
-import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvInsightSummaryResponse;
-import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvestmentInsightDetailResponse;
-import com.harsha.investment_intelligence_service.application.api.mapper.invinsight.InvInsightMapper;
+import com.harsha.contracts.dto.invinsight.InvInsightSummaryResponse;
+import com.harsha.contracts.dto.invinsight.InvestmentInsightDetailResponse;
 import com.harsha.investment_intelligence_service.application.api.repository.invinsight.InvInsightReadRepository;
-import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
-import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;
-import com.harsha.investment_intelligence_service.domain.repository.AiReasoningJobRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
