@@ -1,9 +1,9 @@
 package com.harsha.investment_intelligence_service.application.api.mapper.stock;
 
-import com.harsha.investment_intelligence_service.application.api.dto.stock.MarketInsightHistoryResponse;
-import com.harsha.investment_intelligence_service.application.api.dto.stock.PriceHistoryPoint;
+import com.harsha.contracts.dto.stock.MarketInsightHistoryResponse;
+import com.harsha.contracts.dto.stock.PriceHistoryPoint;
 import com.harsha.investment_intelligence_service.application.api.dto.stock.PriceHistoryProjection;
-import com.harsha.investment_intelligence_service.application.api.dto.stock.StockOverviewResponse;
+import com.harsha.contracts.dto.stock.StockOverviewResponse;
 import com.harsha.investment_intelligence_service.infrastructure.storage.entity.MarketInsightHistoryEntity;
 import com.harsha.investment_intelligence_service.infrastructure.storage.entity.MarketSnapshotHistoryEntity;
 import org.springframework.stereotype.Component;

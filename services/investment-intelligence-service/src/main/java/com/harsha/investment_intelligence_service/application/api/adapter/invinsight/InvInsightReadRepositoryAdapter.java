@@ -1,7 +1,7 @@
 package com.harsha.investment_intelligence_service.application.api.adapter.invinsight;
 
-import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvInsightSummaryResponse;
-import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvestmentInsightDetailResponse;
+import com.harsha.contracts.dto.invinsight.InvInsightSummaryResponse;
+import com.harsha.contracts.dto.invinsight.InvestmentInsightDetailResponse;
 import com.harsha.investment_intelligence_service.application.api.mapper.invinsight.InvInsightMapper;
 import com.harsha.investment_intelligence_service.application.api.repository.invinsight.InvInsightReadRepository;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.AIReasoningJobStatus;

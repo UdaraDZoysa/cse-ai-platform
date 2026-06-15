@@ -25,6 +25,7 @@
         <module>services/market-intelligence-service</module>
         <module>services/investment-intelligence-service</module>
         <module>services/notification-service</module>
+        <module>services/frontend-bff-service</module>
     </modules>
 
 </project>

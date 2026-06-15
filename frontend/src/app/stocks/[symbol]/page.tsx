@@ -2,7 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { ChevronLeft, Activity } from "lucide-react";
+import { ChevronLeft, Activity, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 import {
   useStockOverview,
@@ -75,16 +76,16 @@ export default function StockPage() {
         }}
       >
         <div className="max-w-6xl mx-auto">
-          <button
-            onClick={() => router.back()}
+          <Link
+            href="/investment-insights"
             className="flex items-center gap-2 text-sm transition-colors"
             style={{ color: "#6B7FA3" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#E8EEF8")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "#6B7FA3")}
           >
             <ChevronLeft size={14} />
-            Back
-          </button>
+            Back to Insights
+          </Link>
         </div>
       </div>
 
@@ -128,8 +129,12 @@ export default function StockPage() {
         />
 
         {/* Recent insights */}
-        <RecentInvestmentInsights data={investmentInsights.data!} />
-        <RecentMarketInsights data={marketInsights.data!} />
+        <RecentInvestmentInsights 
+          symbol={symbol}
+          data={investmentInsights.data!} />
+        <RecentMarketInsights 
+          symbol={symbol}
+          data={marketInsights.data!} />
       </div>
     </div>
   );

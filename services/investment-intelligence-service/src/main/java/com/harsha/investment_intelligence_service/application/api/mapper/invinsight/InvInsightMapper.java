@@ -1,7 +1,7 @@
 package com.harsha.investment_intelligence_service.application.api.mapper.invinsight;
 
-import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvInsightSummaryResponse;
-import com.harsha.investment_intelligence_service.application.api.dto.invinsight.InvestmentInsightDetailResponse;
+import com.harsha.contracts.dto.invinsight.InvInsightSummaryResponse;
+import com.harsha.contracts.dto.invinsight.InvestmentInsightDetailResponse;
 import com.harsha.investment_intelligence_service.domain.entity.AiReasoningJob;
 import com.harsha.investment_intelligence_service.domain.model.reasoning.response.dto.InvestmentReview;
 import org.springframework.stereotype.Component;

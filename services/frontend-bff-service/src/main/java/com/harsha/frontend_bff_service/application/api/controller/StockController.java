@@ -1,25 +1,20 @@
-package com.harsha.investment_intelligence_service.application.api.controller;
+package com.harsha.frontend_bff_service.application.api.controller;
 
-import com.harsha.contracts.dto.invinsight.InvInsightSummaryResponse;
-import com.harsha.contracts.dto.stock.MarketInsightHistoryResponse;
 import com.harsha.contracts.dto.stock.PriceHistoryResponse;
 import com.harsha.contracts.dto.stock.StockOverviewResponse;
-import com.harsha.investment_intelligence_service.application.api.service.StockQueryService;
-import org.springframework.data.domain.Page;
+import com.harsha.frontend_bff_service.application.api.service.StockClientService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/stocks")
-@CrossOrigin(origins = "http://localhost:9191")
+@CrossOrigin(origins = "http://localhost:3000")
 public class StockController {
-    private final StockQueryService service;
+    private final StockClientService service;
 
     public StockController(
-            StockQueryService service
+            StockClientService service
     ) {
         this.service = service;
     }
@@ -32,11 +27,14 @@ public class StockController {
     }
 
     @GetMapping("/{symbol}/investment-insights")
-    public Page<InvInsightSummaryResponse> getInvInsights(
+    public ResponseEntity<String> getInvInsights(
             @PathVariable("symbol") String symbol,
             Pageable pageable
     ) {
-        return service.getInvInsights(symbol, pageable);
+        return service.getInvInsights(
+                symbol,
+                pageable
+        );
     }
 
     @GetMapping("/{symbol}/price-history")
@@ -46,17 +44,16 @@ public class StockController {
     ) {
         return service.getPriceHistory(
                 symbol,
-                Instant.now().minus(days, ChronoUnit.DAYS),
-                Instant.now()
+                days
         );
     }
 
     @GetMapping("/{symbol}/market-insights")
-    public Page<MarketInsightHistoryResponse> getMarketInsights(
+    public ResponseEntity<String> getMarketInsights(
             @PathVariable("symbol") String symbol,
             Pageable pageable
     ) {
-        return service.getMarketInsightHistory(
+        return service.getMarketInsights(
                 symbol,
                 pageable
         );
