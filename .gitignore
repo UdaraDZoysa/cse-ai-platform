@@ -38,3 +38,6 @@ data/
 
 ### Locall roperties ###
 **/application-local.properties
+
+# JVM crash logs
+hs_err_pid*

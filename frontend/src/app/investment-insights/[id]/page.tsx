@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useInvestmentInsightDetails } from "@/features/investment-insights/hooks/useInvestmentInsightDetails";
 import {
-  ArrowLeft,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -15,6 +14,7 @@ import {
   BarChart3,
   Zap,
   Activity,
+  ChevronLeft,
 } from "lucide-react";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -129,6 +129,7 @@ function InfoCard({
 
 export default function InvestmentInsightDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const { data, isLoading, error } = useInvestmentInsightDetails(id);
 
@@ -185,29 +186,26 @@ export default function InvestmentInsightDetailPage() {
     <div className="min-h-screen" style={{ background: "#0A0E1A" }}>
       {/* Top bar */}
       <div
-        className="sticky top-0 z-10 px-8 py-4 flex items-center justify-between"
+        className="sticky top-0 z-10 "
         style={{
           background: "#0A0E1Aee",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid #1a2744",
         }}
       >
-        <Link
-          href="/investment-insights"
-          className="flex items-center gap-2 text-sm transition-colors"
-          style={{ color: "#6B7FA3" }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.color = "#E8EEF8")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.color = "#6B7FA3")
-          }
-        >
-          <ArrowLeft size={14} />
-          Back to Insights
-        </Link>
+        <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm transition-colors"
+            style={{ color: "#6B7FA3" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#E8EEF8")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#6B7FA3")}
+          >
+            <ChevronLeft size={14} />
+            Back
+          </button>
 
-        <div
+          <div
           className="flex items-center gap-2 text-xs"
           style={{
             fontFamily: "'JetBrains Mono', monospace",
@@ -216,6 +214,7 @@ export default function InvestmentInsightDetailPage() {
         >
           <Zap size={11} style={{ color: "#00D4FF" }} />
           Generated {new Date(data.createdAt).toLocaleString()}
+        </div>
         </div>
       </div>
 
@@ -233,6 +232,10 @@ export default function InvestmentInsightDetailPage() {
             <div>
               <div className="flex items-center gap-4 flex-wrap">
                 <div>   
+                  <Link
+                    href={`/stocks/${data.symbol}`}
+                    className="group inlne-block"
+                  > 
                     <h1
                     className="text-5xl font-bold leading-none"
                     style={{
@@ -250,6 +253,7 @@ export default function InvestmentInsightDetailPage() {
                         >
                         {data.companyName}
                     </p>
+                  </Link>
                 </div>
                 <span
                   className="px-4 py-1.5 rounded-lg text-sm font-bold tracking-wider"
