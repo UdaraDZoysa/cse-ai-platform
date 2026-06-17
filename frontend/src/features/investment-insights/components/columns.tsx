@@ -3,16 +3,16 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { InvestmentInsightSummary } from "../types/investment-insight.types";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { colors, fonts, statusColor, withAlpha, AlphaKey } from "@/theme/theme";
 
 // ── Risk badge ────────────────────────────────────────────────────────────────
 function RiskBadge({ risk }: { risk: string }) {
-  const styles: Record<string, { color: string; bg: string; border: string }> = {
-    HIGH:   { color: "#FF4560", bg: "#FF456018", border: "#FF456044" },
-    MEDIUM: { color: "#FFB800", bg: "#FFB80018", border: "#FFB80044" },
-    LOW:    { color: "#00FF94", bg: "#00FF9418", border: "#00FF9444" },
+  const keyByRisk: Record<string, AlphaKey> = {
+    HIGH: "negative",
+    MEDIUM: "warning",
+    LOW: "positive",
   };
-
-  const s = styles[risk?.toUpperCase()] ?? styles.MEDIUM;
+  const key = keyByRisk[risk?.toUpperCase()] ?? "warning";
 
   return (
     <span
@@ -24,10 +24,10 @@ function RiskBadge({ risk }: { risk: string }) {
         fontSize: "11px",
         fontWeight: 600,
         letterSpacing: "0.06em",
-        fontFamily: "'JetBrains Mono', monospace",
-        color: s.color,
-        background: s.bg,
-        border: `1px solid ${s.border}`,
+        fontFamily: fonts.mono,
+        color: statusColor[key as "negative" | "warning" | "positive"],
+        background: withAlpha(key, 0.1),
+        border: `1px solid ${withAlpha(key, 0.27)}`,
       }}
     >
       {risk}
@@ -41,9 +41,9 @@ function ActionBadge({ action }: { action: string }) {
   const isAccumulate = a === "ACCUMULATE" || a === "BUY";
   const isReduce = a === "REDUCE" || a === "SELL" || a === "AVOID";
 
-  const color = isAccumulate ? "#00FF94" : isReduce ? "#FF4560" : "#FFB800";
-  const bg    = isAccumulate ? "#00FF9415" : isReduce ? "#FF456015" : "#FFB80015";
-  const Icon  = isAccumulate ? TrendingUp : isReduce ? TrendingDown : Minus;
+  const key: AlphaKey = isAccumulate ? "positive" : isReduce ? "negative" : "warning";
+  const color = statusColor[key as "positive" | "negative" | "warning"];
+  const Icon = isAccumulate ? TrendingUp : isReduce ? TrendingDown : Minus;
 
   return (
     <span
@@ -56,10 +56,10 @@ function ActionBadge({ action }: { action: string }) {
         fontSize: "11px",
         fontWeight: 700,
         letterSpacing: "0.06em",
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: fonts.mono,
         color,
-        background: bg,
-        border: `1px solid ${color}44`,
+        background: withAlpha(key, 0.08),
+        border: `1px solid ${withAlpha(key, 0.27)}`,
       }}
     >
       <Icon size={11} />
@@ -70,8 +70,8 @@ function ActionBadge({ action }: { action: string }) {
 
 // ── Score cell ────────────────────────────────────────────────────────────────
 function ScoreCell({ score }: { score: number }) {
-  const color =
-    score >= 70 ? "#00FF94" : score >= 40 ? "#FFB800" : "#FF4560";
+  const key: AlphaKey = score >= 70 ? "positive" : score >= 40 ? "warning" : "negative";
+  const color = statusColor[key as "positive" | "warning" | "negative"];
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -81,7 +81,7 @@ function ScoreCell({ score }: { score: number }) {
           width: "64px",
           height: "4px",
           borderRadius: "2px",
-          background: "#1a2744",
+          background: colors.border,
           overflow: "hidden",
           flexShrink: 0,
         }}
@@ -92,13 +92,13 @@ function ScoreCell({ score }: { score: number }) {
             height: "100%",
             borderRadius: "2px",
             background: color,
-            boxShadow: `0 0 6px ${color}88`,
+            boxShadow: `0 0 6px ${withAlpha(key, 0.53)}`,
           }}
         />
       </div>
       <span
         style={{
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: fonts.mono,
           fontSize: "13px",
           fontWeight: 600,
           color,
@@ -111,38 +111,37 @@ function ScoreCell({ score }: { score: number }) {
 }
 
 // ── Symbol cell ───────────────────────────────────────────────────────────────
-function SymbolCell({ 
-    symbol,
-    companyName,
-
-}: { symbol: string; 
-    companyName: string 
-
+function SymbolCell({
+  symbol,
+  companyName,
+}: {
+  symbol: string;
+  companyName: string;
 }) {
   return (
     <div className="flex flex-col">
-    <span
+      <span
         style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: "13px",
-            fontWeight: 700,
-            color: "#00D4FF",
-            letterSpacing: "0.04em",
+          fontFamily: fonts.mono,
+          fontSize: "13px",
+          fontWeight: 700,
+          color: colors.accent,
+          letterSpacing: "0.04em",
         }}
-        >
+      >
         {symbol}
-        </span>
+      </span>
 
-        <span        
+      <span
         style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: "12px",
-            color: "#6B7FA3",
-            marginTop: "2px",
+          fontFamily: fonts.mono,
+          fontSize: "12px",
+          color: colors.textMuted,
+          marginTop: "2px",
         }}
-        >
+      >
         {companyName}
-        </span>
+      </span>
     </div>
   );
 }
@@ -152,9 +151,9 @@ function DateCell({ dateStr }: { dateStr: string }) {
   return (
     <span
       style={{
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: fonts.mono,
         fontSize: "12px",
-        color: "#6B7FA3",
+        color: colors.textMuted,
       }}
     >
       {new Date(dateStr).toLocaleString()}
@@ -167,10 +166,9 @@ export const columns: ColumnDef<InvestmentInsightSummary>[] = [
   {
     accessorKey: "symbol",
     header: "Symbol",
-    cell: ({ row }) => <SymbolCell 
-                            symbol={row.original.symbol} 
-                            companyName={row.original.companyName}
-                         />,
+    cell: ({ row }) => (
+      <SymbolCell symbol={row.original.symbol} companyName={row.original.companyName} />
+    ),
   },
   {
     accessorKey: "action",

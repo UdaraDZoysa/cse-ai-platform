@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, BarChart3, Layers, DollarSign } from "lucide-react";
 import { StockOverview } from "../types/stock-overview";
+import { colors, fonts, gradients, withAlpha } from "@/theme/theme";
 
 interface Props {
   overview: StockOverview;
@@ -15,7 +16,7 @@ function formatCompact(num: number) {
 export default function StockOverviewCard({ overview }: Props) {
   const change = Number(overview.percentageChange);
   const isPositive = change >= 0;
-  const changeColor = isPositive ? "#00FF94" : "#FF4560";
+  const changeColor = isPositive ? colors.positive : colors.negative;
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
 
   const stats = [
@@ -23,8 +24,8 @@ export default function StockOverviewCard({ overview }: Props) {
       label: "Current Price",
       value: `LKR ${Number(overview.currentPrice).toFixed(2)}`,
       icon: <DollarSign size={12} />,
-      color: "#00D4FF",
-      valueColor: "#E8EEF8",
+      color: colors.accent,
+      valueColor: colors.textPrimary,
     },
     {
       label: "Change",
@@ -37,36 +38,33 @@ export default function StockOverviewCard({ overview }: Props) {
       label: "Volume",
       value: formatCompact(Number(overview.shareVolume)),
       icon: <BarChart3 size={12} />,
-      color: "#4D9EFF",
-      valueColor: "#E8EEF8",
+      color: colors.info,
+      valueColor: colors.textPrimary,
     },
     {
       label: "Market Cap",
       value: `LKR ${formatCompact(Number(overview.marketCap))}`,
       icon: <Layers size={12} />,
-      color: "#FFB800",
-      valueColor: "#E8EEF8",
+      color: colors.warning,
+      valueColor: colors.textPrimary,
     },
   ];
 
   return (
     <div
       className="rounded-2xl p-7"
-      style={{
-        background: "linear-gradient(135deg, #0F1629, #141e35)",
-        border: "1px solid #1a2744",
-      }}
+      style={{ background: gradients.header, border: `1px solid ${colors.border}` }}
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-6 flex-wrap">
         <div>
           <h1
             className="text-5xl font-bold leading-none"
-            style={{ fontFamily: "'JetBrains Mono', monospace", color: "#00D4FF" }}
+            style={{ fontFamily: fonts.mono, color: colors.accent }}
           >
             {overview.symbol}
           </h1>
-          <p className="text-sm mt-3" style={{ color: "#6B7FA3" }}>
+          <p className="text-sm mt-3" style={{ color: colors.textMuted }}>
             {overview.companyName}
           </p>
         </div>
@@ -74,15 +72,18 @@ export default function StockOverviewCard({ overview }: Props) {
         {/* Live indicator */}
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-          style={{ background: "#00FF9412", border: "1px solid #00FF9433" }}
+          style={{
+            background: withAlpha("positive", 0.07),
+            border: `1px solid ${withAlpha("positive", 0.2)}`,
+          }}
         >
           <span
             className="w-1.5 h-1.5 rounded-full"
-            style={{ background: "#00FF94" }}
+            style={{ background: colors.positive }}
           />
           <span
             className="text-xs font-semibold"
-            style={{ fontFamily: "'JetBrains Mono', monospace", color: "#00FF94" }}
+            style={{ fontFamily: fonts.mono, color: colors.positive }}
           >
             LIVE
           </span>
@@ -95,20 +96,20 @@ export default function StockOverviewCard({ overview }: Props) {
           <div
             key={label}
             className="p-4 rounded-lg"
-            style={{ background: "#0A0E1A", border: "1px solid #1a2744" }}
+            style={{ background: colors.bgPage, border: `1px solid ${colors.border}` }}
           >
             <div className="flex items-center gap-2 mb-2">
               <span style={{ color }}>{icon}</span>
               <span
                 className="text-xs uppercase tracking-widest"
-                style={{ color: "#3D5080" }}
+                style={{ color: colors.textFaint }}
               >
                 {label}
               </span>
             </div>
             <div
               className="text-2xl font-bold"
-              style={{ fontFamily: "'JetBrains Mono', monospace", color: valueColor }}
+              style={{ fontFamily: fonts.mono, color: valueColor }}
             >
               {value}
             </div>

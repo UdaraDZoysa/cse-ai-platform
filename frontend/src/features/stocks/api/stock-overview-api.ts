@@ -4,15 +4,18 @@ import {
     PageResponse, 
     InvestmentInsightSummary, 
     MarketInsightHistoryResponse, 
-    PriceHistory
+    PriceHistory,
+    MarketNarratives
 } from '../types/stock-overview';
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_INV_INTELLIGENCE_API,
+    baseURL: process.env.NEXT_PUBLIC_INV_BFF_API,
 });
 
 export async function getStockOverview(symbol: string): Promise<StockOverview> {
-    const response = await api.get(`/api/stocks/${symbol}/overview`);
+    const response = await api.get(
+        `/api/stocks/${symbol}/overview`
+    );
     return response.data;
 }
 
@@ -44,6 +47,15 @@ export async function getPriceHistoryForStock(
 ): Promise<PriceHistory> {
     const response = await api.get(
         `/api/stocks/${symbol}/price-history?days=${days}`
+    );
+    return response.data;
+}
+
+export async function getMarketNarrativeForStock(
+    symbol: string
+): Promise<MarketNarratives> {
+    const response = await api.get(
+        `/api/stocks/${symbol}/market-narrative`
     );
     return response.data;
 }

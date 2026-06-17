@@ -3,7 +3,8 @@ import {
     getStockOverview, 
     getPriceHistoryForStock, 
     getMarketInsightHistoryForStock, 
-    getInvestmentInsightSummaryForStock 
+    getInvestmentInsightSummaryForStock,
+    getMarketNarrativeForStock
 } from '../api/stock-overview-api';
 
 export function useStockOverview(
@@ -47,6 +48,16 @@ export function useInvestmentInsightSummaryForStock(
     return useQuery({
         queryKey: ['investment-insight-summary', symbol, page, size],
         queryFn: () => getInvestmentInsightSummaryForStock(symbol, page, size),
+        enabled: !!symbol,
+    });
+}
+
+export function useMarketNarrativeForStock(
+    symbol: string
+) {
+    return useQuery({
+        queryKey: ['market-narrative', symbol],
+        queryFn: () => getMarketNarrativeForStock(symbol),
         enabled: !!symbol,
     });
 }

@@ -13,6 +13,10 @@ import {
 } from "recharts";
 import { Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { PriceHistory } from "../types/stock-overview";
+import { colors, fonts, statusColor } from "@/theme/theme";
+import { useThemeColors } from "@/theme/useThemeColors";
+
+type TrendKey = "positive" | "negative" | "accent";
 
 interface Props {
   history: PriceHistory;
@@ -33,17 +37,7 @@ interface CustomTooltipProps {
   days: number;
 }
 
-// ── Palette ──────────────────────────────────────────────────────────────
-const POSITIVE = "#16C784";
-const NEGATIVE = "#EA3943";
-const NEUTRAL = "#00D4FF";
-const GRID = "#1a2744";
-const AXIS_TEXT = "#3D5080";
-const MUTED = "#6B7FA3";
-const HEADING = "#E8EEF8";
-const CARD_BG = "#0F1629";
-const PAGE_BG = "#0A0E1A";
-const MONO = "'JetBrains Mono', monospace";
+const MONO = fonts.mono;
 
 // ── Formatting helpers ──────────────────────────────────────────────────────
 function formatAxisTick(timestamp: number, days: number): string {
@@ -83,25 +77,26 @@ function dayLabel(days: number) {
   return days === 365 ? "1 year" : `${days} days`;
 }
 
-// ── Tooltip ──────────────────────────────────────────────────────────────────
+// ── Tooltip (HTML — CSS var() resolves fine here) ────────────────────────────
 function CustomTooltip({ active, payload, label, days }: CustomTooltipProps) {
   if (!active || !payload?.length || label === undefined) return null;
 
   const point = payload[0].payload;
   const delta = point.price - point.prevPrice;
-  const deltaColor = delta > 0 ? POSITIVE : delta < 0 ? NEGATIVE : MUTED;
+  const deltaColor =
+    delta > 0 ? colors.positive : delta < 0 ? colors.negative : colors.textMuted;
 
   return (
     <div
       style={{
-        background: "#141e35",
-        border: `1px solid ${GRID}`,
+        background: colors.bgSurfaceAlt,
+        border: `1px solid ${colors.border}`,
         borderRadius: "8px",
         padding: "8px 12px",
         minWidth: "118px",
       }}
     >
-      <div style={{ fontSize: "11px", color: MUTED, fontFamily: MONO }}>
+      <div style={{ fontSize: "11px", color: colors.textMuted, fontFamily: MONO }}>
         {formatTooltipLabel(label, days)}
       </div>
       <div
@@ -113,7 +108,7 @@ function CustomTooltip({ active, payload, label, days }: CustomTooltipProps) {
           marginTop: "2px",
         }}
       >
-        <span style={{ fontSize: "14px", fontWeight: 700, color: HEADING, fontFamily: MONO }}>
+        <span style={{ fontSize: "14px", fontWeight: 700, color: colors.textPrimary, fontFamily: MONO }}>
           LKR {point.price.toFixed(2)}
         </span>
         {delta !== 0 && (
@@ -128,6 +123,9 @@ function CustomTooltip({ active, payload, label, days }: CustomTooltipProps) {
 }
 
 export default function PriceHistoryChart({ history, days }: Props) {
+  // Resolved (non-var) colors for the SVG/Recharts layer, which can't read var().
+  const c = useThemeColors();
+
   const chartData: ChartPoint[] = history.points.map((point, i) => ({
     timestamp: new Date(point.timestamp).getTime(),
     price: point.price,
@@ -136,20 +134,25 @@ export default function PriceHistoryChart({ history, days }: Props) {
 
   if (chartData.length === 0) {
     return (
-      <div className="rounded-xl p-5" style={{ background: CARD_BG, border: `1px solid ${GRID}` }}>
+      <div
+        className="rounded-xl p-5"
+        style={{ background: colors.bgSurface, border: `1px solid ${colors.border}` }}
+      >
         <div className="flex items-center gap-2 mb-1">
           <div
             className="w-6 h-6 rounded-md flex items-center justify-center"
-            style={{ background: "#00D4FF18", color: NEUTRAL }}
+            style={{ background: colors.bgSurfaceAlt, color: colors.accent }}
           >
             <Activity size={14} />
           </div>
-          <h2 className="text-sm font-semibold" style={{ color: HEADING }}>
+          <h2 className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
             Price History
           </h2>
         </div>
         <div className="h-[350px] flex items-center justify-center">
-          <p className="text-xs" style={{ color: MUTED }}>No price data available for this range</p>
+          <p className="text-xs" style={{ color: colors.textMuted }}>
+            No price data available for this range
+          </p>
         </div>
       </div>
     );
@@ -160,7 +163,9 @@ export default function PriceHistoryChart({ history, days }: Props) {
   const change = lastPrice - firstPrice;
   const changePercent = firstPrice !== 0 ? (change / firstPrice) * 100 : 0;
 
-  const trendColor = change > 0 ? POSITIVE : change < 0 ? NEGATIVE : NEUTRAL;
+  const trendKey: TrendKey = change > 0 ? "positive" : change < 0 ? "negative" : "accent";
+  const trendVar = statusColor[trendKey]; // CSS var — HTML text
+  const trendHex = c[trendKey]; // resolved — SVG
   const TrendIcon = change > 0 ? TrendingUp : change < 0 ? TrendingDown : Minus;
 
   const maxPoint = chartData.reduce((max, p) => (p.price > max.price ? p : max), chartData[0]);
@@ -171,38 +176,39 @@ export default function PriceHistoryChart({ history, days }: Props) {
   const targetTicks = 6;
   const tickInterval = chartData.length > targetTicks ? Math.floor(chartData.length / targetTicks) : 0;
 
-  //const lineType = days <= 1 ? "stepAfter" : "linear";
-
   const lineType = "monotone";
 
   return (
-    <div className="rounded-xl p-5" style={{ background: CARD_BG, border: `1px solid ${GRID}` }}>
+    <div
+      className="rounded-xl p-5"
+      style={{ background: colors.bgSurface, border: `1px solid ${colors.border}` }}
+    >
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-1">
         <div>
           <div className="flex items-center gap-2">
             <div
               className="w-6 h-6 rounded-md flex items-center justify-center"
-              style={{ background: "#00D4FF18", color: NEUTRAL }}
+              style={{ background: colors.bgSurfaceAlt, color: colors.accent }}
             >
               <Activity size={14} />
             </div>
-            <h2 className="text-sm font-semibold" style={{ color: HEADING }}>
+            <h2 className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
               Price History
             </h2>
           </div>
-          <p className="text-xs mt-1 ml-8" style={{ color: MUTED }}>
+          <p className="text-xs mt-1 ml-8" style={{ color: colors.textMuted }}>
             Last {dayLabel(days)}
           </p>
         </div>
 
         <div className="text-right">
-          <div className="text-lg font-bold" style={{ color: HEADING, fontFamily: MONO }}>
+          <div className="text-lg font-bold" style={{ color: colors.textPrimary, fontFamily: MONO }}>
             LKR {lastPrice.toFixed(2)}
           </div>
           <div
             className="flex items-center justify-end gap-1 text-xs font-semibold mt-0.5"
-            style={{ color: trendColor, fontFamily: MONO }}
+            style={{ color: trendVar, fontFamily: MONO }}
           >
             <TrendIcon size={12} />
             <span>
@@ -220,26 +226,26 @@ export default function PriceHistoryChart({ history, days }: Props) {
           <AreaChart data={chartData} margin={{ top: 18, right: 8, left: 0, bottom: 18 }}>
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={trendColor} stopOpacity={0.25} />
-                <stop offset="95%" stopColor={trendColor} stopOpacity={0} />
+                <stop offset="5%" stopColor={trendHex} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={trendHex} stopOpacity={0} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={c.border} vertical={false} />
 
             <XAxis
               dataKey="timestamp"
               type="category"
               interval={tickInterval}
-              stroke={GRID}
-              tick={{ fill: AXIS_TEXT, fontSize: 11, fontFamily: MONO }}
+              stroke={c.border}
+              tick={{ fill: c.textFaint, fontSize: 11, fontFamily: MONO }}
               tickLine={false}
               tickFormatter={(value: number) => formatAxisTick(value, days)}
             />
 
             <YAxis
-              stroke={GRID}
-              tick={{ fill: AXIS_TEXT, fontSize: 11, fontFamily: MONO }}
+              stroke={c.border}
+              tick={{ fill: c.textFaint, fontSize: 11, fontFamily: MONO }}
               tickLine={false}
               axisLine={false}
               domain={[minPoint.price - padding, maxPoint.price + padding]}
@@ -256,20 +262,18 @@ export default function PriceHistoryChart({ history, days }: Props) {
                   days={days}
                 />
               )}
-              cursor={{ stroke: `${trendColor}55` }}
+              cursor={{ stroke: trendHex, strokeOpacity: 0.33 }}
             />
 
-            {/* Anchors the move: everything above this line is "up" since
-               the start of the selected range, everything below is "down". */}
             <ReferenceLine
               y={firstPrice}
-              stroke={MUTED}
+              stroke={c.textMuted}
               strokeDasharray="4 4"
               strokeOpacity={0.5}
               label={{
                 value: `Start ${firstPrice.toFixed(2)}`,
                 position: "insideBottomLeft",
-                fill: MUTED,
+                fill: c.textMuted,
                 fontSize: 10,
                 fontFamily: MONO,
               }}
@@ -278,32 +282,30 @@ export default function PriceHistoryChart({ history, days }: Props) {
             <Area
               type={lineType}
               dataKey="price"
-              stroke={trendColor}
+              stroke={trendHex}
               strokeWidth={2}
               fill="url(#priceGradient)"
-              activeDot={{ r: 4, fill: trendColor, stroke: PAGE_BG, strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: trendHex, stroke: c.bgPage, strokeWidth: 2 }}
               isAnimationActive={false}
             />
 
-            {/* Period high / low markers give the same "Day High / Day Low"
-               context as the market-data section, directly on the chart. */}
             <ReferenceDot
               x={maxPoint.timestamp}
               y={maxPoint.price}
               r={3}
-              fill={POSITIVE}
-              stroke={PAGE_BG}
+              fill={c.positive}
+              stroke={c.bgPage}
               strokeWidth={2}
-              label={{ value: `H ${maxPoint.price.toFixed(2)}`, position: "top", fill: POSITIVE, fontSize: 10, fontFamily: MONO }}
+              label={{ value: `H ${maxPoint.price.toFixed(2)}`, position: "top", fill: c.positive, fontSize: 10, fontFamily: MONO }}
             />
             <ReferenceDot
               x={minPoint.timestamp}
               y={minPoint.price}
               r={3}
-              fill={NEGATIVE}
-              stroke={PAGE_BG}
+              fill={c.negative}
+              stroke={c.bgPage}
               strokeWidth={2}
-              label={{ value: `L ${minPoint.price.toFixed(2)}`, position: "bottom", fill: NEGATIVE, fontSize: 10, fontFamily: MONO }}
+              label={{ value: `L ${minPoint.price.toFixed(2)}`, position: "bottom", fill: c.negative, fontSize: 10, fontFamily: MONO }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -27,7 +27,7 @@ export default function MarketInsightTable({
       data={insights}
       onRowClick={(insight) =>
         router.push(
-          `/market-insights/${insight.id}`
+          `/market-insight/${insight.id}`
         )
       }
     />
