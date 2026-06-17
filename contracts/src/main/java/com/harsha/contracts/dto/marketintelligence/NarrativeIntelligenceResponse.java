@@ -1,14 +1,12 @@
-package com.harsha.contracts.dto.stock;
+package com.harsha.contracts.dto.marketintelligence;
 
 import java.time.Instant;
 
-public record MarketInsightHistoryResponse(
+public record NarrativeIntelligenceResponse(
         String id,
         String symbol,
         String companyName,
         String summary,
-        String sentiment,
-        double importanceScore,
         Instant generatedAt
 ) {
 }

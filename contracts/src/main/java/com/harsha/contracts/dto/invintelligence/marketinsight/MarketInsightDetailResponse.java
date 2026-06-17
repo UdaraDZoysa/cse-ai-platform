@@ -1,4 +1,4 @@
-package com.harsha.contracts.dto.marketinsight;
+package com.harsha.contracts.dto.invintelligence.marketinsight;
 
 import java.time.Instant;
 

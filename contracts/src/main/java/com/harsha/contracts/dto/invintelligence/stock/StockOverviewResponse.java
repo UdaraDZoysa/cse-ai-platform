@@ -1,4 +1,4 @@
-package com.harsha.contracts.dto.stock;
+package com.harsha.contracts.dto.invintelligence.stock;
 
 import java.time.Instant;
 
