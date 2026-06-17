@@ -1,9 +1,9 @@
 package com.harsha.investment_intelligence_service.application.api.adapter.stock;
 
-import com.harsha.contracts.dto.invinsight.InvInsightSummaryResponse;
-import com.harsha.contracts.dto.stock.MarketInsightHistoryResponse;
-import com.harsha.contracts.dto.stock.PriceHistoryResponse;
-import com.harsha.contracts.dto.stock.StockOverviewResponse;
+import com.harsha.contracts.dto.invintelligence.invinsight.InvInsightSummaryResponse;
+import com.harsha.contracts.dto.invintelligence.stock.MarketInsightHistoryResponse;
+import com.harsha.contracts.dto.invintelligence.stock.PriceHistoryResponse;
+import com.harsha.contracts.dto.invintelligence.stock.StockOverviewResponse;
 import com.harsha.investment_intelligence_service.application.api.mapper.invinsight.InvInsightMapper;
 import com.harsha.investment_intelligence_service.application.api.mapper.stock.StockMapper;
 import com.harsha.investment_intelligence_service.application.api.repository.stock.StockReadRepository;
