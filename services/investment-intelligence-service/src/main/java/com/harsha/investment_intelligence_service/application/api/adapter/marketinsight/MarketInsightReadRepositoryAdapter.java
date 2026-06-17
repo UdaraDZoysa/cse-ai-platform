@@ -1,6 +1,6 @@
 package com.harsha.investment_intelligence_service.application.api.adapter.marketinsight;
 
-import com.harsha.contracts.dto.marketinsight.MarketInsightDetailResponse;
+import com.harsha.contracts.dto.invintelligence.marketinsight.MarketInsightDetailResponse;
 import com.harsha.investment_intelligence_service.application.api.mapper.marketinsight.MarketInsightMapper;
 import com.harsha.investment_intelligence_service.application.api.repository.marketinsight.MarketInsightReadRepository;
 import com.harsha.investment_intelligence_service.infrastructure.storage.repository.JpaMarketInsightHistoryRepository;

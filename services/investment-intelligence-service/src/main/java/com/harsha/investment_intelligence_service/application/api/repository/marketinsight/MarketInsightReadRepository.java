@@ -1,6 +1,6 @@
 package com.harsha.investment_intelligence_service.application.api.repository.marketinsight;
 
-import com.harsha.contracts.dto.marketinsight.MarketInsightDetailResponse;
+import com.harsha.contracts.dto.invintelligence.marketinsight.MarketInsightDetailResponse;
 
 import java.util.UUID;
 

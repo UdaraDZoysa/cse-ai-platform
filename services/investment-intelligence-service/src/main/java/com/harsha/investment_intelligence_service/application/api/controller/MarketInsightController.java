@@ -1,6 +1,6 @@
 package com.harsha.investment_intelligence_service.application.api.controller;
 
-import com.harsha.contracts.dto.marketinsight.MarketInsightDetailResponse;
+import com.harsha.contracts.dto.invintelligence.marketinsight.MarketInsightDetailResponse;
 import com.harsha.investment_intelligence_service.application.api.service.MarketInsightQueryService;
 import org.springframework.web.bind.annotation.*;
 

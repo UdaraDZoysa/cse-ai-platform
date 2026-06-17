@@ -1,9 +1,9 @@
 package com.harsha.investment_intelligence_service.application.api.service;
 
-import com.harsha.contracts.dto.invinsight.InvInsightSummaryResponse;
-import com.harsha.contracts.dto.stock.MarketInsightHistoryResponse;
-import com.harsha.contracts.dto.stock.PriceHistoryResponse;
-import com.harsha.contracts.dto.stock.StockOverviewResponse;
+import com.harsha.contracts.dto.invintelligence.invinsight.InvInsightSummaryResponse;
+import com.harsha.contracts.dto.invintelligence.stock.MarketInsightHistoryResponse;
+import com.harsha.contracts.dto.invintelligence.stock.PriceHistoryResponse;
+import com.harsha.contracts.dto.invintelligence.stock.StockOverviewResponse;
 import com.harsha.investment_intelligence_service.application.api.repository.stock.StockReadRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

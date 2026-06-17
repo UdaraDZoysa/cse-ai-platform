@@ -1,6 +1,6 @@
 package com.harsha.investment_intelligence_service.application.api.mapper.marketinsight;
 
-import com.harsha.contracts.dto.marketinsight.MarketInsightDetailResponse;
+import com.harsha.contracts.dto.invintelligence.marketinsight.MarketInsightDetailResponse;
 import com.harsha.investment_intelligence_service.infrastructure.storage.entity.MarketInsightHistoryEntity;
 import org.springframework.stereotype.Component;
 
