@@ -5,7 +5,7 @@ import {
 } from "../types/investment-insight.types";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_INV_INTELLIGENCE_API,
+  baseURL: process.env.NEXT_PUBLIC_INV_BFF_API,
 });
 
 export async function getInvestmentInsights(

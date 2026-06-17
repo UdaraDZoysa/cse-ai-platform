@@ -2,10 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Sparkles, Activity, AlertCircle, Inbox } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  Activity,
+  AlertCircle,
+  Inbox,
+} from "lucide-react";
 
 import InvestmentInsightTable from "@/features/investment-insights/components/InvestmentInsightTable";
 import { useInvestmentInsights } from "@/features/investment-insights/hooks/useInvestmentInsights";
+import { colors, fonts, gradients, withAlpha } from "@/theme/theme";
 
 export default function InvestmentInsightsPage() {
   const [page, setPage] = useState(0);
@@ -14,31 +22,28 @@ export default function InvestmentInsightsPage() {
 
   const pageNumbers = data
     ? Array.from({ length: data.totalPages }, (_, index) => index).filter(
-        (p) =>
-          p === 0 ||
-          p === data.totalPages - 1 ||
-          Math.abs(p - page) <= 2
+        (p) => p === 0 || p === data.totalPages - 1 || Math.abs(p - page) <= 2
       )
     : [];
 
   return (
-    <div className="min-h-screen" style={{ background: "#0A0E1A" }}>
+    <div className="min-h-screen" style={{ background: colors.bgPage }}>
       {/* ── Top Bar ── */}
       <div
         className="sticky top-0 z-10 px-8 py-4"
         style={{
-          background: "#0A0E1Aee",
+          background: withAlpha("page", 0.93),
           backdropFilter: "blur(12px)",
-          borderBottom: "1px solid #1a2744",
+          borderBottom: `1px solid ${colors.border}`,
         }}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm transition-colors"
-            style={{ color: "#6B7FA3" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#E8EEF8")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#6B7FA3")}
+            style={{ color: colors.textMuted }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = colors.textPrimary)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = colors.textMuted)}
           >
             <ChevronLeft size={14} />
             Dashboard
@@ -48,13 +53,13 @@ export default function InvestmentInsightsPage() {
             <div
               className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg"
               style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#6B7FA3",
-                background: "#0F1629",
-                border: "1px solid #1a2744",
+                fontFamily: fonts.mono,
+                color: colors.textMuted,
+                background: colors.bgSurface,
+                border: `1px solid ${colors.border}`,
               }}
             >
-              <Sparkles size={11} style={{ color: "#00D4FF" }} />
+              <Sparkles size={11} style={{ color: colors.accent }} />
               {data.totalElements} total insights
             </div>
           )}
@@ -65,26 +70,23 @@ export default function InvestmentInsightsPage() {
         {/* ── Page Header ── */}
         <div
           className="rounded-2xl px-7 py-6"
-          style={{
-            background: "linear-gradient(135deg, #0F1629, #141e35)",
-            border: "1px solid #1a2744",
-          }}
+          style={{ background: gradients.header, border: `1px solid ${colors.border}` }}
         >
           <div className="flex items-center gap-3 mb-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: "#00D4FF18", border: "1px solid #00D4FF33" }}
+              style={{
+                background: withAlpha("accent", 0.1),
+                border: `1px solid ${withAlpha("accent", 0.2)}`,
+              }}
             >
-              <Sparkles size={16} style={{ color: "#00D4FF" }} />
+              <Sparkles size={16} style={{ color: colors.accent }} />
             </div>
-            <h1
-              className="text-2xl font-bold"
-              style={{ color: "#E8EEF8" }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>
               Investment Insights
             </h1>
           </div>
-          <p className="text-sm" style={{ color: "#6B7FA3" }}>
+          <p className="text-sm" style={{ color: colors.textMuted }}>
             AI-generated investment reviews and recommendations
           </p>
         </div>
@@ -93,19 +95,12 @@ export default function InvestmentInsightsPage() {
         {isLoading && (
           <div
             className="rounded-xl py-16 flex flex-col items-center gap-3"
-            style={{ background: "#0F1629", border: "1px solid #1a2744" }}
+            style={{ background: colors.bgSurface, border: `1px solid ${colors.border}` }}
           >
-            <Activity
-              size={24}
-              className="animate-pulse"
-              style={{ color: "#00D4FF" }}
-            />
+            <Activity size={24} className="animate-pulse" style={{ color: colors.accent }} />
             <span
               className="text-sm"
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#6B7FA3",
-              }}
+              style={{ fontFamily: fonts.mono, color: colors.textMuted }}
             >
               Loading investment insights…
             </span>
@@ -116,13 +111,10 @@ export default function InvestmentInsightsPage() {
         {error && (
           <div
             className="rounded-xl py-16 flex flex-col items-center gap-3"
-            style={{
-              background: "#0F1629",
-              border: "1px solid #FF456033",
-            }}
+            style={{ background: colors.bgSurface, border: `1px solid ${withAlpha("negative", 0.2)}` }}
           >
-            <AlertCircle size={24} style={{ color: "#FF4560" }} />
-            <span className="text-sm" style={{ color: "#6B7FA3" }}>
+            <AlertCircle size={24} style={{ color: colors.negative }} />
+            <span className="text-sm" style={{ color: colors.textMuted }}>
               Failed to load investment insights.
             </span>
           </div>
@@ -132,10 +124,10 @@ export default function InvestmentInsightsPage() {
         {!isLoading && !error && data && data.content.length === 0 && (
           <div
             className="rounded-xl py-16 flex flex-col items-center gap-3"
-            style={{ background: "#0F1629", border: "1px solid #1a2744" }}
+            style={{ background: colors.bgSurface, border: `1px solid ${colors.border}` }}
           >
-            <Inbox size={24} style={{ color: "#3D5080" }} />
-            <span className="text-sm" style={{ color: "#6B7FA3" }}>
+            <Inbox size={24} style={{ color: colors.textFaint }} />
+            <span className="text-sm" style={{ color: colors.textMuted }}>
               No investment insights found.
             </span>
           </div>
@@ -147,7 +139,7 @@ export default function InvestmentInsightsPage() {
             {/* Table container */}
             <div
               className="rounded-xl overflow-hidden"
-              style={{ border: "1px solid #1a2744" }}
+              style={{ border: `1px solid ${colors.border}` }}
             >
               <InvestmentInsightTable insights={data.content} />
             </div>
@@ -155,54 +147,45 @@ export default function InvestmentInsightsPage() {
             {/* ── Pagination footer ── */}
             <div
               className="rounded-xl px-5 py-4 flex items-center justify-between"
-              style={{ background: "#0F1629", border: "1px solid #1a2744" }}
+              style={{ background: colors.bgSurface, border: `1px solid ${colors.border}` }}
             >
               {/* Page info */}
               <span
                 className="text-xs"
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  color: "#3D5080",
-                }}
+                style={{ fontFamily: fonts.mono, color: colors.textFaint }}
               >
-                Page{" "}
-                <span style={{ color: "#6B7FA3" }}>{data.number + 1}</span>
-                {" "}of{" "}
-                <span style={{ color: "#6B7FA3" }}>{data.totalPages}</span>
+                Page <span style={{ color: colors.textMuted }}>{data.number + 1}</span> of{" "}
+                <span style={{ color: colors.textMuted }}>{data.totalPages}</span>
                 {"  ·  "}
-                <span style={{ color: "#6B7FA3" }}>{data.totalElements}</span>{" "}
-                insights
+                <span style={{ color: colors.textMuted }}>{data.totalElements}</span> insights
               </span>
 
               {/* Page controls */}
               <div className="flex items-center gap-1">
-                {/* Prev */}
                 <button
                   onClick={() => !data.first && setPage((p) => p - 1)}
                   disabled={data.first}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all"
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: data.first ? "#3D5080" : "#6B7FA3",
+                    fontFamily: fonts.mono,
+                    color: data.first ? colors.textFaint : colors.textMuted,
                     background: "transparent",
-                    border: "1px solid #1a2744",
+                    border: `1px solid ${colors.border}`,
                     cursor: data.first ? "not-allowed" : "pointer",
                   }}
                   onMouseEnter={(e) => {
-                    if (!data.first)
-                      e.currentTarget.style.color = "#E8EEF8";
+                    if (!data.first) e.currentTarget.style.color = colors.textPrimary;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.color = data.first
-                      ? "#3D5080"
-                      : "#6B7FA3";
+                      ? colors.textFaint
+                      : colors.textMuted;
                   }}
                 >
                   <ChevronLeft size={13} />
                   Prev
                 </button>
 
-                {/* Page numbers */}
                 <div className="flex items-center gap-1 mx-1">
                   {pageNumbers.map((pageNumber, i) => {
                     const isActive = pageNumber === page;
@@ -215,10 +198,7 @@ export default function InvestmentInsightsPage() {
                         {showEllipsis && (
                           <span
                             className="px-1 text-xs"
-                            style={{
-                              fontFamily: "'JetBrains Mono', monospace",
-                              color: "#3D5080",
-                            }}
+                            style={{ fontFamily: fonts.mono, color: colors.textFaint }}
                           >
                             …
                           </span>
@@ -227,20 +207,18 @@ export default function InvestmentInsightsPage() {
                           onClick={() => setPage(pageNumber)}
                           className="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
                           style={{
-                            fontFamily: "'JetBrains Mono', monospace",
-                            color: isActive ? "#00D4FF" : "#6B7FA3",
-                            background: isActive ? "#00D4FF15" : "transparent",
+                            fontFamily: fonts.mono,
+                            color: isActive ? colors.accent : colors.textMuted,
+                            background: isActive ? withAlpha("accent", 0.08) : "transparent",
                             border: isActive
-                              ? "1px solid #00D4FF33"
+                              ? `1px solid ${withAlpha("accent", 0.2)}`
                               : "1px solid transparent",
                           }}
                           onMouseEnter={(e) => {
-                            if (!isActive)
-                              e.currentTarget.style.color = "#E8EEF8";
+                            if (!isActive) e.currentTarget.style.color = colors.textPrimary;
                           }}
                           onMouseLeave={(e) => {
-                            if (!isActive)
-                              e.currentTarget.style.color = "#6B7FA3";
+                            if (!isActive) e.currentTarget.style.color = colors.textMuted;
                           }}
                         >
                           {pageNumber + 1}
@@ -250,25 +228,24 @@ export default function InvestmentInsightsPage() {
                   })}
                 </div>
 
-                {/* Next */}
                 <button
                   onClick={() => !data.last && setPage((p) => p + 1)}
                   disabled={data.last}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all"
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: data.last ? "#3D5080" : "#6B7FA3",
+                    fontFamily: fonts.mono,
+                    color: data.last ? colors.textFaint : colors.textMuted,
                     background: "transparent",
-                    border: "1px solid #1a2744",
+                    border: `1px solid ${colors.border}`,
                     cursor: data.last ? "not-allowed" : "pointer",
                   }}
                   onMouseEnter={(e) => {
-                    if (!data.last) e.currentTarget.style.color = "#E8EEF8";
+                    if (!data.last) e.currentTarget.style.color = colors.textPrimary;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.color = data.last
-                      ? "#3D5080"
-                      : "#6B7FA3";
+                      ? colors.textFaint
+                      : colors.textMuted;
                   }}
                 >
                   Next

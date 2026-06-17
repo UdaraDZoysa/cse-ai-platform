@@ -7,6 +7,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { colors } from "@/theme/theme";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -25,7 +27,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div style={{ background: "#0F1629", borderRadius: "12px", overflow: "hidden" }}>
+    <div style={{ background: colors.bgSurface, borderRadius: "12px", overflow: "hidden" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         {/* Header */}
         <thead>
@@ -33,8 +35,8 @@ export function DataTable<TData, TValue>({
             <tr
               key={headerGroup.id}
               style={{
-                background: "#141e35",
-                borderBottom: "1px solid #1a2744",
+                background: colors.bgSurfaceAlt,
+                borderBottom: `1px solid ${colors.border}`,
               }}
             >
               {headerGroup.headers.map((header) => (
@@ -47,7 +49,7 @@ export function DataTable<TData, TValue>({
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: "0.08em",
-                    color: "#3D5080",
+                    color: colors.textFaint,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -71,19 +73,19 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 onClick={() => onRowClick?.(row.original)}
                 style={{
-                  background: i % 2 === 0 ? "#0F1629" : "#0c1222",
-                  borderBottom: "1px solid #1a274455",
+                  background: i % 2 === 0 ? colors.bgSurface : colors.bgSurface2,
+                  borderBottom: `1px solid ${colors.border}`,
                   cursor: onRowClick ? "pointer" : "default",
                   transition: "background 0.15s ease",
                 }}
                 onMouseEnter={(e) => {
                   if (onRowClick)
                     (e.currentTarget as HTMLTableRowElement).style.background =
-                      "#1e2d4a";
+                      colors.bgHover;
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLTableRowElement).style.background =
-                    i % 2 === 0 ? "#0F1629" : "#0c1222";
+                    i % 2 === 0 ? colors.bgSurface : colors.bgSurface2;
                 }}
               >
                 {row.getVisibleCells().map((cell) => (
@@ -92,7 +94,7 @@ export function DataTable<TData, TValue>({
                     style={{
                       padding: "14px 20px",
                       fontSize: "13px",
-                      color: "#E8EEF8",
+                      color: colors.textPrimary,
                       verticalAlign: "middle",
                     }}
                   >
@@ -108,7 +110,7 @@ export function DataTable<TData, TValue>({
                 style={{
                   padding: "48px 20px",
                   textAlign: "center",
-                  color: "#3D5080",
+                  color: colors.textFaint,
                   fontSize: "13px",
                 }}
               >

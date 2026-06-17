@@ -53,3 +53,10 @@ export interface StockOverview {
     riskLevel: string;
     createdAt: string;
 }
+export interface MarketNarratives {
+   id: string;
+   symbol: string;
+   companyName: string;        
+   summary: string;
+   generatedAt: string;
+}

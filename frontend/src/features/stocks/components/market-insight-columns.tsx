@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { MarketInsightHistoryResponse } from "../types/stock-overview";
+import { colors, fonts, statusColor, withAlpha, AlphaKey } from "@/theme/theme";
 
 // ── Summary cell ──────────────────────────────────────────────────────────────
 function SummaryCell({ summary }: { summary: string }) {
@@ -9,7 +10,7 @@ function SummaryCell({ summary }: { summary: string }) {
     <span
       title={summary}
       style={{
-        color: "#A8BBDB",
+        color: colors.textBody,
         fontSize: "13px",
         display: "block",
         maxWidth: "420px",
@@ -25,13 +26,12 @@ function SummaryCell({ summary }: { summary: string }) {
 
 // ── Sentiment badge ───────────────────────────────────────────────────────────
 function SentimentBadge({ sentiment }: { sentiment: string }) {
-  const styles: Record<string, { color: string; bg: string; border: string }> = {
-    BULLISH: { color: "#00FF94", bg: "#00FF9418", border: "#00FF9444" },
-    BEARISH: { color: "#FF4560", bg: "#FF456018", border: "#FF456044" },
-    NEUTRAL: { color: "#FFB800", bg: "#FFB80018", border: "#FFB80044" },
+  const keyBySentiment: Record<string, AlphaKey> = {
+    BULLISH: "positive",
+    BEARISH: "negative",
+    NEUTRAL: "warning",
   };
-
-  const s = styles[sentiment?.toUpperCase()] ?? styles.NEUTRAL;
+  const key = keyBySentiment[sentiment?.toUpperCase()] ?? "warning";
 
   return (
     <span
@@ -43,10 +43,10 @@ function SentimentBadge({ sentiment }: { sentiment: string }) {
         fontSize: "11px",
         fontWeight: 600,
         letterSpacing: "0.06em",
-        fontFamily: "'JetBrains Mono', monospace",
-        color: s.color,
-        background: s.bg,
-        border: `1px solid ${s.border}`,
+        fontFamily: fonts.mono,
+        color: statusColor[key as "positive" | "negative" | "warning"],
+        background: withAlpha(key, 0.1),
+        border: `1px solid ${withAlpha(key, 0.27)}`,
       }}
     >
       {sentiment}
@@ -56,7 +56,8 @@ function SentimentBadge({ sentiment }: { sentiment: string }) {
 
 // ── Importance cell ───────────────────────────────────────────────────────────
 function ImportanceCell({ score }: { score: number }) {
-  const color = score >= 80 ? "#00FF94" : score >= 50 ? "#FFB800" : "#FF4560";
+  const key: AlphaKey = score >= 80 ? "positive" : score >= 50 ? "warning" : "negative";
+  const color = statusColor[key as "positive" | "warning" | "negative"];
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -65,7 +66,7 @@ function ImportanceCell({ score }: { score: number }) {
           width: "64px",
           height: "4px",
           borderRadius: "2px",
-          background: "#1a2744",
+          background: colors.border,
           overflow: "hidden",
           flexShrink: 0,
         }}
@@ -76,7 +77,7 @@ function ImportanceCell({ score }: { score: number }) {
             height: "100%",
             borderRadius: "2px",
             background: color,
-            boxShadow: `0 0 6px ${color}88`,
+            boxShadow: `0 0 6px ${withAlpha(key, 0.53)}`,
           }}
         />
       </div>
@@ -86,7 +87,7 @@ function ImportanceCell({ score }: { score: number }) {
           color,
           fontWeight: 600,
           fontSize: "13px",
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: fonts.mono,
         }}
       >
         {score}
@@ -100,9 +101,9 @@ function DateCell({ dateStr }: { dateStr: string }) {
   return (
     <span
       style={{
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: fonts.mono,
         fontSize: "12px",
-        color: "#6B7FA3",
+        color: colors.textMuted,
       }}
     >
       {new Date(dateStr).toLocaleString()}
@@ -125,7 +126,7 @@ export const marketInsightColumns: ColumnDef<MarketInsightHistoryResponse>[] = [
   {
     accessorKey: "importanceScore",
     header: "Importance",
-    cell: ({ row }) => <ImportanceCell score={row.original.importanceScore} />,
+    cell: ({ row }) => <ImportanceCell score={row.original.importanceScore * 100} />,
   },
   {
     accessorKey: "generatedAt",
