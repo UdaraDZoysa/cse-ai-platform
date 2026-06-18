@@ -4,6 +4,7 @@ import com.harsha.contracts.dto.invintelligence.invinsight.InvestmentInsightDeta
 import com.harsha.contracts.dto.invintelligence.marketinsight.MarketInsightDetailResponse;
 import com.harsha.contracts.dto.invintelligence.stock.PriceHistoryResponse;
 import com.harsha.contracts.dto.invintelligence.stock.StockOverviewResponse;
+import com.harsha.contracts.dto.invintelligence.watchlist.WatchlistResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -136,5 +137,16 @@ public class InvestmentIntelligenceClient {
                 .uri("/api/market-insight/{id}", id)
                 .retrieve()
                 .body(MarketInsightDetailResponse.class);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// WATCHLIST END POINTS
+    /////////////////////////////////////////////////////////////////////////
+
+    public WatchlistResponse getWatchlist() {
+        return restClient.get()
+                .uri("/api/watchlist")
+                .retrieve()
+                .body(WatchlistResponse.class);
     }
 }
