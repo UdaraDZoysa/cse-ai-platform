@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/watchlist")
+@RequestMapping("/api/watchlist")
 public class WatchlistController {
     private final StockFilter stockFilter;
 

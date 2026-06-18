@@ -86,14 +86,14 @@ export default function MarketInsightDetailPage() {
       >
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link
-            href={`/stocks/${data.symbol}`}
+            href={`/stocks/${data.symbol}/market-insights`}
             className="flex items-center gap-2 text-sm transition-colors"
             style={{ color: colors.textMuted }}
             onMouseEnter={(e) => (e.currentTarget.style.color = colors.textPrimary)}
             onMouseLeave={(e) => (e.currentTarget.style.color = colors.textMuted)}
           >
             <ChevronLeft size={14} />
-            Back to Stock
+            Back to Market Insights
           </Link>
 
           <div

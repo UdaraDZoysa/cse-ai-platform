@@ -4,6 +4,7 @@ import com.harsha.bff_service.application.api.service.StockClientService;
 import com.harsha.contracts.dto.invintelligence.stock.PriceHistoryResponse;
 import com.harsha.contracts.dto.invintelligence.stock.StockOverviewResponse;
 import com.harsha.contracts.dto.marketintelligence.NarrativeIntelligenceResponse;
+import com.harsha.contracts.dto.marketintelligence.StockLookupResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,5 +68,10 @@ public class StockController {
         return service.getNarrativeIntelligence(
                 symbol
         );
+    }
+
+    @GetMapping("/stock-lookup")
+    public StockLookupResponse getStockLookup() {
+        return service.getStockLookup();
     }
 }

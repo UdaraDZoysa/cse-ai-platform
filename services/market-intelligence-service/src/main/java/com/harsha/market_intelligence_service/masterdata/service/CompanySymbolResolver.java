@@ -1,5 +1,6 @@
 package com.harsha.market_intelligence_service.masterdata.service;
 
+import com.harsha.contracts.events.market_intelligence.StockLookup;
 import com.harsha.market_intelligence_service.masterdata.client.CseAllSecurityCodeClient;
 import com.harsha.market_intelligence_service.masterdata.dto.CseAllSecurityCodeDto;
 import com.harsha.market_intelligence_service.masterdata.util.CompanyNameNormalizer;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,5 +63,20 @@ public class CompanySymbolResolver {
 
     public String resolveCompanyName(String symbol) {
         return symbolToCompanyMappings.get(symbol);
+    }
+
+    public List<StockLookup> getAllStocks() {
+        return symbolToCompanyMappings.entrySet()
+                .stream()
+                .map(e -> new StockLookup(
+                        e.getKey(),
+                        e.getValue()
+                ))
+                .sorted(
+                        Comparator.comparing(
+                                StockLookup::companyName
+                        )
+                )
+                .toList();
     }
 }
