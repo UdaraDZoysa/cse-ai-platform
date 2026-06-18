@@ -5,6 +5,7 @@ import com.harsha.bff_service.application.api.client.MarketIntelligenceClient;
 import com.harsha.contracts.dto.invintelligence.stock.PriceHistoryResponse;
 import com.harsha.contracts.dto.invintelligence.stock.StockOverviewResponse;
 import com.harsha.contracts.dto.marketintelligence.NarrativeIntelligenceResponse;
+import com.harsha.contracts.dto.marketintelligence.StockLookupResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -61,5 +62,9 @@ public class StockClientService {
         return marketIntelligenceClient.getNarrativeIntelligence(
                 symbol
         );
+    }
+
+    public StockLookupResponse getStockLookup() {
+        return marketIntelligenceClient.getStockLookup();
     }
 }

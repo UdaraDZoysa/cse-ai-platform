@@ -3,13 +3,11 @@ package com.harsha.market_intelligence_service.application.api.controller;
 import com.harsha.contracts.dto.marketintelligence.MarketNarrativeDetailsResponse;
 import com.harsha.contracts.dto.marketintelligence.NarrativeIntelligenceResponse;
 import com.harsha.market_intelligence_service.application.api.service.NarrativeSourceQueryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/market-narrative")
+@CrossOrigin(origins = "http://localhost:9191")
 public class NarrativeSourceController {
     private final NarrativeSourceQueryService service;
 

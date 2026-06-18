@@ -203,7 +203,7 @@ export default function InvestmentInsightDetailPage() {
       >
         <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
           <Link
-            href="/investment-insights"
+            href={`/stocks/${data.symbol}/investment-insights`}
             className="flex items-center gap-2 text-sm transition-colors"
             style={{ color: colors.textMuted }}
             onMouseEnter={(e) => (e.currentTarget.style.color = colors.textPrimary)}
