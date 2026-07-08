@@ -17,7 +17,7 @@ CSE API → market-data → analysis → strategy  ─┐
 3. **strategy-service** normalizes features against per-symbol statistics (z-scores), detects the market regime, fuses four weighted detector signals into a confidence score, and tracks an opportunity lifecycle.
 4. **market-intelligence-service** ingests CSE announcements and web narratives (Exa search), then synthesizes scored market insights with an LLM (Groq).
 5. **investment-intelligence-service** materializes all events into local history, and every 15 minutes builds a prioritized, bounded context per symbol, runs it through a DB-backed AI reasoning job queue (Groq), and publishes validated investment insights.
-6. **notification-service** diffs each insight against the last known state and sends priority-scored Telegram alerts — only when something actually changed.
+6. **notification-service** diffs each insight against the last known state and sends priority-scored Telegram alerts, only when something actually changed.
 7. **bff-service** aggregates read APIs for the **Next.js frontend**.
 
 ## Tech stack
