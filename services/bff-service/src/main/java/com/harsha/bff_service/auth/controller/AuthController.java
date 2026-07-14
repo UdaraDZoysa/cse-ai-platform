@@ -2,8 +2,11 @@ package com.harsha.bff_service.auth.controller;
 
 import com.harsha.bff_service.auth.dto.LoginRequest;
 import com.harsha.bff_service.auth.dto.LoginResponse;
+import com.harsha.bff_service.auth.dto.LogoutRequest;
+import com.harsha.bff_service.auth.dto.RefreshTokenRequest;
 import com.harsha.bff_service.auth.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,8 +23,24 @@ public class AuthController {
     public LoginResponse login(
             @Valid @RequestBody LoginRequest request
     ) {
-        String token = authenticationService.login(request);
+        return authenticationService.login(request);
+    }
 
-        return new LoginResponse(token);
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        return ResponseEntity.ok(
+                authenticationService.refreshToken(request)
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @Valid @RequestBody LogoutRequest request
+    ) {
+        authenticationService.logout(request);
+
+        return ResponseEntity.noContent().build();
     }
 }
