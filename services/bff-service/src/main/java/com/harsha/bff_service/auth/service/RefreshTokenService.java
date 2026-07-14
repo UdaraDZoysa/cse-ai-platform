@@ -5,11 +5,12 @@ import com.harsha.bff_service.auth.exception.InvalidRefreshTokenException;
 import com.harsha.bff_service.auth.repository.JpaRefreshTokenRepository;
 import com.harsha.bff_service.security.entity.UserEntity;
 import com.harsha.bff_service.security.jwt.JwtProperties;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
@@ -24,10 +25,11 @@ public class RefreshTokenService {
         this.jwtProperties = jwtProperties;
     }
 
+    @Transactional
     public RefreshTokenEntity createRefreshToken(UserEntity user) {
         RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
                 .user(user)
-                .token(UUID.randomUUID().toString())
+                .token(KeyGenerators.string().generateKey())
                 .expiryDate(Instant.now().plusMillis(
                                 jwtProperties.getRefreshTokenExpiration()
                         )
@@ -54,13 +56,15 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-    public void deleteRefreshToken(
+    @Transactional
+    public void revokeRefreshToken(
             RefreshTokenEntity refreshToken
     ) {
         jpaRefreshTokenRepository.delete(refreshToken);
     }
 
-    public void deleteRefreshTokenByUser(
+    @Transactional
+    public void revokeRefreshTokensByUser(
             UserEntity user
     ) {
         jpaRefreshTokenRepository.deleteByUser(user);

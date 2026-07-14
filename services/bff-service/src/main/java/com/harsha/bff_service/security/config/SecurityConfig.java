@@ -45,10 +45,14 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/refresh",
+                                "/api/auth/logout"
+                        ).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "api/watchlist")
+                                "/api/watchlist")
                         .hasRole("ADMIN")
                         .anyRequest().authenticated())
 
