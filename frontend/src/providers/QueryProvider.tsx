@@ -13,7 +13,7 @@ export default function QueryProvider({ children }: Props) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60000,
+            staleTime: 500000,
             retry: 1,
           },
         },
