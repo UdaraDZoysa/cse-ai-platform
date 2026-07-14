@@ -1,15 +1,15 @@
-package com.harsha.bff_service.security.repository;
+package com.harsha.bff_service.auth.repository;
 
-import com.harsha.bff_service.security.entity.RefreshToken;
+import com.harsha.bff_service.auth.entity.RefreshTokenEntity;
 import com.harsha.bff_service.security.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
 public interface JpaRefreshTokenRepository 
-        extends JpaRepository<RefreshToken, Long> {
+        extends JpaRepository<RefreshTokenEntity, Long> {
     
-    Optional<RefreshToken> findByToken(String token);
+    Optional<RefreshTokenEntity> findByToken(String token);
 
     void deleteByUser(UserEntity user);
 }
