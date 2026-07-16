@@ -3,6 +3,7 @@ package com.harsha.bff_service.application.api.controller;
 import com.harsha.bff_service.application.api.service.WatchlistService;
 import com.harsha.contracts.dto.invintelligence.watchlist.WatchlistResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -20,6 +21,7 @@ public class WatchlistController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> update(
             @RequestBody Set<String> symbols
     ) {
