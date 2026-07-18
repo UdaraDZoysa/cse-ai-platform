@@ -23,39 +23,19 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String keycloakUserId;
+
     @Column(nullable = false, unique = true)
     private String username;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String phone;
 
     private String image;
 
     private String preferredName;
-
-    private boolean enabled;
-
-    private boolean accountNonExpired;
-
-    private boolean credentialsNonExpired;
-
-    private boolean accountNonLocked;
-
-    @PrePersist
-    protected void onCreate() {
-        accountNonExpired = true;
-        credentialsNonExpired = true;
-        accountNonLocked = true;
-        enabled = true;
-    }
 }
